@@ -247,11 +247,11 @@ public class Mino {
             }
 
             if (KeyHandler.zPressed) {
-                wallKick(1);
+                wallKick(2);
                 KeyHandler.zPressed = false;
             }
             if (KeyHandler.aPressed) {
-                wallKick(2);
+                wallKick(1);
                 KeyHandler.aPressed = false;
             }
             if (KeyHandler.spacePressed) { // hard drop

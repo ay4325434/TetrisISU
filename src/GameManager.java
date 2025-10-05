@@ -170,6 +170,8 @@ public class GameManager{
             currentSong = "menu";
         }
         if (gameState == PLAYING) {
+            mm.stop();
+            currentSong = "";
             if (!KeyHandler.pausePressed) {
                 if (!currentMino.active) {
                     alreadyHeld = false;
@@ -551,6 +553,12 @@ public class GameManager{
                 mm.stop();
                 mm.loop("instructions");
                 currentSong = "instructions";
+            }
+        }
+        else if(gameState == OTHER){
+            if(!currentSong.equals("other")) {
+                mm.stop();
+                currentSong = "";
             }
         }
     }

@@ -85,35 +85,24 @@ public class Board extends JPanel implements Runnable, MouseListener {
         Point p = e.getPoint();
         if(gm.musicSelectButton.contains(p) && gm.gameState == gm.MENU){
             gm.gameState = gm.MUSIC_SELECT;
-            mm.stop();
-            gm.currentSong = "";
         }
         else if(gm.credsButton.contains(p) && gm.gameState == gm.MENU){
-            gm.page = 0;
+            gm.page = 1;
             gm.gameState = gm.CREDITS;
-            mm.stop();
-            gm.currentSong = "";
         }
         else if(gm.insButton.contains(p) && gm.gameState == gm.MENU){
-            gm.page = 0;
+            gm.page = 1;
             gm.gameState = gm.INSTRUCTIONS;
-            mm.stop();
-            gm.currentSong = "";
         }
         else if(gm.otherButton.contains(p) && gm.gameState == gm.MENU){
             gm.page = 1;
             gm.gameState = gm.OTHER;
-            mm.stop();
-            gm.currentSong = "";
         }
         else if (gm.gameState == gm.MENU){
-            mm.stop();
             gm.gameState = gm.PLAYING;
         }
         if(gm.backButton.contains(p)){
-            if(gm.gameState == gm.MUSIC_SELECT || gm.gameState == gm.CREDITS || gm.gameState == gm.INSTRUCTIONS) {
-                mm.stop();
-                gm.currentSong = "";
+            if(gm.gameState == gm.MUSIC_SELECT || gm.gameState == gm.CREDITS || gm.gameState == gm.INSTRUCTIONS || gm.gameState == gm.OTHER) {
                 gm.gameState = gm.MENU;
                 try {
                     mm.loop(gm.currentSong);
