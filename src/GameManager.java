@@ -77,7 +77,7 @@ public class GameManager{
     public Rectangle placeholder = new Rectangle(80, 280, 380, 100);
     public Rectangle stuff = new Rectangle(360, 280, 100, 100);
 
-    public Image menu, musicSelect, credits, instructions;
+    public Image menu, musicSelect, credits;
 
     public int page = 1;
 

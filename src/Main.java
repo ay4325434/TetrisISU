@@ -1,9 +1,8 @@
-import javax.sound.sampled.UnsupportedAudioFileException;
+
 import javax.swing.*;
-import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) throws UnsupportedAudioFileException, IOException {
+    public static void main(String[] args){
         JFrame frame = new JFrame("Tetris");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Board board = new Board();
