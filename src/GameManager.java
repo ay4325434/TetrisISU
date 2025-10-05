@@ -1,7 +1,6 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -40,6 +39,7 @@ public class GameManager{
     public static boolean hold = false;
     private static boolean alreadyHeld = false;
     private Mino holdMino = null;
+    public static boolean selectionActivated = false;
 
     //Game states
     public static final int MENU = 0;
@@ -71,6 +71,7 @@ public class GameManager{
     public Rectangle mc4 = new Rectangle(0, 340, 500, 80);
     public Rectangle mc5 = new Rectangle(0, 440, 500, 80);
     public Rectangle mc6 = new Rectangle(0, 540, 500, 80);
+    public Rectangle select = new Rectangle(80, 0, 80, 30);
 
     public Rectangle leftButton = new Rectangle(20, 220, 50, 200);
     public Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
@@ -370,7 +371,7 @@ public class GameManager{
                 }
                 if (!"collectionC3".equals(currentSong) && song == 3){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionC3", 80, 110, 1500);
+                    mm.loopSnippet("collectionC3", 50, 80, 1500);
                     currentSong = "collectionC3";
                 }
                 if (!"collectionC4".equals(currentSong) && song == 4){
@@ -558,7 +559,8 @@ public class GameManager{
         else if(gameState == OTHER){
             if(!currentSong.equals("other")) {
                 mm.stop();
-                currentSong = "";
+                mm.loop("other");
+                currentSong = "other";
             }
         }
     }
@@ -699,6 +701,8 @@ public class GameManager{
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
+            g2.drawString("Select", select.x + 5, select.y + 20);
+            g2.drawRect(select.x, select.y, select.width, select.height);
             g2.setFont(new Font("Arial", Font.BOLD, 50));
             g2.drawString("Music Collection 1", 20, 100);
             g2.drawString("Music Collection 2", 20, 200);
@@ -842,17 +846,16 @@ public class GameManager{
                     g2.drawString("by Se-U-Ra", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 4){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 20));
-                    g2.drawString("Labyrinth in Kowloon:", placeholder.x + 15, placeholder.y + 30);
-                    g2.drawString("Walled World", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("GOODWORLD", placeholder.x + 15, placeholder.y + 30);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by Camellia", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by EBIMAYO", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 5){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
-                    g2.drawString("PANIC PARADISE", placeholder.x + 15, placeholder.y + 35);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("GOODRAGE", placeholder.x + 15, placeholder.y + 35);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by DJ.SHION.Y", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by EBIMAYO", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 6){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -1158,5 +1161,12 @@ public class GameManager{
         nextMino5 = startingMinos.get(5);
         nextMino5.setXY(nextX5, nextY5);
         nextMino6 = startingMinos.get(6);
+    }
+    public void saveSongCollection(int collection) {
+        try (PrintWriter out = new PrintWriter(new FileWriter("save.txt"))) {
+            out.println(collection);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -13,6 +13,7 @@ public class MusicManager {
         songPaths.put("menu", "Re End of a Dream.wav");
         songPaths.put("credits", "Aleph-0.wav");
         songPaths.put("instructions", "Nulctrl EX.wav");
+        songPaths.put("other", "Chronomia.wav");
 
         // Collection A (Music Collection 1)
         songPaths.put("collectionA1", "Music Collection 1/Crystallized.wav");
@@ -42,8 +43,8 @@ public class MusicManager {
         songPaths.put("collectionC1", "Music Collection 3/Destruction 3,2,1.wav");
         songPaths.put("collectionC2", "Music Collection 3/Distorted Fate.wav");
         songPaths.put("collectionC3", "Music Collection 3/Igallta.wav");
-        songPaths.put("collectionC4", "Music Collection 3/Labyrinth in Kowloon Walled World.wav");
-        songPaths.put("collectionC5", "Music Collection 3/Panic Paradise.wav");
+        songPaths.put("collectionC4", "Music Collection 3/GOODWORLD.wav");
+        songPaths.put("collectionC5", "Music Collection 3/GOODRAGE.wav");
         songPaths.put("collectionC6", "Music Collection 3/Rrhar'il.wav");
         songPaths.put("collectionC7", "Music Collection 3/Stardust Ray.wav");
         songPaths.put("collectionC8", "Music Collection 3/Water.wav");

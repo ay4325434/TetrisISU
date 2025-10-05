@@ -157,6 +157,9 @@ public class Board extends JPanel implements Runnable, MouseListener {
                 gm.song = 1;
                 gm.currentBackground = 1;
             }
+            if(gm.select.contains(p)){
+                gm.selectionActivated = true;
+            }
         }
         if(gm.leftButton.contains(p) && gm.gameState == gm.SONGS){
             gm.currentBackground--;
