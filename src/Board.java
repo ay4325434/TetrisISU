@@ -5,9 +5,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 
-public class Board extends JPanel implements Runnable, MouseListener {
+public class Board extends JPanel implements Runnable, MouseListener, MouseMotionListener {
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
 
@@ -27,6 +28,7 @@ public class Board extends JPanel implements Runnable, MouseListener {
         this.addKeyListener(new KeyHandler());
         this.setFocusable(true);
         addMouseListener(this);
+        addMouseMotionListener(this);
         gm = new GameManager();
     }
 
@@ -85,6 +87,7 @@ public class Board extends JPanel implements Runnable, MouseListener {
         Point p = e.getPoint();
         if(gm.musicSelectButton.contains(p) && gm.gameState == gm.MENU){
             gm.gameState = gm.MUSIC_SELECT;
+            return;
         }
         else if(gm.credsButton.contains(p) && gm.gameState == gm.MENU){
             gm.page = 1;
@@ -122,42 +125,80 @@ public class Board extends JPanel implements Runnable, MouseListener {
         }
         if(gm.gameState == gm.MUSIC_SELECT) {
             if (gm.mc1.contains(p)) {
-                gm.gameState = gm.SONGS;
-                gm.collection = 1;
-                gm.song = 1;
-                gm.currentBackground = 1;
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(1);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 1;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
             }
+
             if (gm.mc2.contains(p)) {
-                gm.gameState = gm.SONGS;
-                gm.collection = 2;
-                gm.song = 1;
-                gm.currentBackground = 1;
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(2);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 2;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
             }
+
             if (gm.mc3.contains(p)) {
-                gm.gameState = gm.SONGS;
-                gm.collection = 3;
-                gm.song = 1;
-                gm.currentBackground = 1;
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(3);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 3;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
             }
             if (gm.mc4.contains(p)) {
-                gm.gameState = gm.SONGS;
-                gm.collection = 4;
-                gm.song = 1;
-                gm.currentBackground = 1;
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(4);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 4;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
             }
             if (gm.mc5.contains(p)) {
-                gm.gameState = gm.SONGS;
-                gm.collection = 5;
-                gm.song = 1;
-                gm.currentBackground = 1;
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(5);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 5;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
             }
             if (gm.mc6.contains(p)) {
-                gm.gameState = gm.SONGS;
-                gm.collection = 6;
-                gm.song = 1;
-                gm.currentBackground = 1;
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(6);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 6;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
             }
-            if(gm.select.contains(p)){
+            if(gm.select.contains(p) && gm.gameState == gm.MUSIC_SELECT){
                 gm.selectionActivated = true;
             }
         }
@@ -248,5 +289,24 @@ public class Board extends JPanel implements Runnable, MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent e) {
+        Point p = e.getPoint();
+        if(gm.selectionActivated){
+            gm.hover = true;
+            if(gm.mc1.contains(p)) gm.hoveredCollection = 1;
+            else if(gm.mc2.contains(p)) gm.hoveredCollection = 2;
+            else if(gm.mc3.contains(p)) gm.hoveredCollection = 3;
+            else if(gm.mc4.contains(p)) gm.hoveredCollection = 4;
+            else if(gm.mc5.contains(p)) gm.hoveredCollection = 5;
+            else if(gm.mc6.contains(p)) gm.hoveredCollection = 6;
+        }
     }
 }

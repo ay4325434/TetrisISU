@@ -81,6 +81,10 @@ public class GameManager{
     public Image menu, musicSelect, credits;
 
     public int page = 1;
+    public static int playCollection = 1;
+
+    public boolean hover = false;
+    public static int hoveredCollection = 1;
 
     public GameManager(){
         leftX = (Board.WIDTH / 2) - (WIDTH / 2);
@@ -713,6 +717,33 @@ public class GameManager{
             g2.setFont(new Font("Tahoma", Font.BOLD, 100));
             g2.drawString("--- MUSIC", 640, 150);
             g2.drawString("SELECT---", 720, 270);
+            if(selectionActivated){
+                g2.setFont(new Font("Tahoma", Font.BOLD, 60));
+                g2.drawString("Click to select", 640, 500);
+                if(hover){
+                    g2.setColor(Color.BLUE);
+                    switch (hoveredCollection){
+                        case 1:
+                            g2.drawRect(mc1.x, mc1.y, mc1.width, mc1.height);
+                            break;
+                        case 2:
+                            g2.drawRect(mc2.x, mc2.y, mc2.width, mc2.height);
+                            break;
+                        case 3:
+                            g2.drawRect(mc3.x, mc3.y, mc3.width, mc3.height);
+                            break;
+                        case 4:
+                            g2.drawRect(mc4.x, mc4.y, mc4.width, mc4.height);
+                            break;
+                        case 5:
+                            g2.drawRect(mc5.x, mc5.y, mc5.width, mc5.height);
+                            break;
+                        case 6:
+                            g2.drawRect(mc6.x, mc6.y, mc6.width, mc6.height);
+                            break;
+                    }
+                }
+            }
         }
         if(gameState == SONGS){
             g2.setColor(Color.WHITE);
@@ -1165,6 +1196,7 @@ public class GameManager{
     public void saveSongCollection(int collection) {
         try (PrintWriter out = new PrintWriter(new FileWriter("save.txt"))) {
             out.println(collection);
+            out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
