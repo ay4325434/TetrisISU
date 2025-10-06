@@ -376,12 +376,12 @@ public class GameManager{
                 }
                 if (!"collectionC4".equals(currentSong) && song == 4){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionC4", 60, 90, 1500);
+                    mm.loopSnippet("collectionC4", 50, 80, 1500);
                     currentSong = "collectionC4";
                 }
                 if (!"collectionC5".equals(currentSong) && song == 5){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionC5", 60, 90, 1500);
+                    mm.loopSnippet("collectionC5", 85, 115, 1500);
                     currentSong = "collectionC5";
                 }
                 if (!"collectionC6".equals(currentSong) && song == 6){
