@@ -64,12 +64,6 @@ public class ImageManager extends JPanel {
         paths.put("E9", "Images/Collection 5/otonoke.png");
         paths.put("E10", "Images/Collection 5/roki.png");
 
-        paths.put("F1", "Images/Collection 6/holdontight.png");
-        paths.put("F2", "Images/Collection 6/korobeiniki.png");
-        paths.put("F3", "Images/Collection 6/tetoris.png");
-        paths.put("F4", "Images/Collection 6/tetris.png");
-        paths.put("F5", "Images/Collection 6/tetris99.png");
-
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
         paths.put("credits3", "Images/Credits/credits3.png");

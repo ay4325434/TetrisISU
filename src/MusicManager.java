@@ -74,14 +74,6 @@ public class MusicManager {
         songPaths.put("collectionE8", "Music Collection 5/Night Dancer.wav");
         songPaths.put("collectionE9", "Music Collection 5/Otonoke.wav");
         songPaths.put("collectionE10", "Music Collection 5/Roki.wav");
-
-        // Tetris Songs
-        songPaths.put("collectionF1", "Tetris Songs/Hold On Tight.wav");
-        songPaths.put("collectionF2", "Tetris Songs/Korobeiniki.wav");
-        songPaths.put("collectionF3", "Tetris Songs/Tetoris.wav");
-        songPaths.put("collectionF4", "Tetris Songs/Tetris Original Theme.wav");
-        songPaths.put("collectionF5", "Tetris Songs/Tetris 99 Theme.wav");
-
     }
 
     public void stop() {

@@ -116,6 +116,15 @@ public class GameManager{
         } catch (IOException e) {
             throw new RuntimeException("Failed to load image");
         }
+
+        try{
+            BufferedReader br = new BufferedReader(new FileReader("save.txt"));
+            playCollection = Integer.parseInt(br.readLine());
+        } catch (NumberFormatException e){
+            playCollection = 1;
+        } catch (IOException e){
+            playCollection = 1;
+        }
     }
     /**
      * Picks a random piece after the starting bag has been used up.
@@ -178,6 +187,31 @@ public class GameManager{
             mm.stop();
             currentSong = "";
             if (!KeyHandler.pausePressed) {
+                if(playCollection == 1){
+                    mm.loop("collectionA" + (level/2 + 1));
+                    currentSong = "collectionA" + (level/2 + 1);
+                }
+                if(playCollection == 2){
+                    mm.loop("collectionB" + (level/2 + 1));
+                    currentSong = "collectionB" + (level/2 + 1);
+                }
+                if(playCollection == 3){
+                    mm.loop("collectionC" + (level/2 + 1));
+                    currentSong = "collectionC" + (level/2 + 1);
+                }
+                if(playCollection == 4){
+                    mm.loop("collectionD" + (level/2 + 1));
+                    currentSong = "collectionD" + (level/2 + 1);
+                }
+                if(playCollection == 5){
+                    mm.loop("collectionE" + (level/2 + 1));
+                    currentSong = "collectionE" + (level/2 + 1);
+                }
+                if(playCollection == 6){
+                    mm.loop("collectionF" + (level/2 + 1));
+                    currentSong = "collectionF" + (level/2 + 1);
+                }
+
                 if (!currentMino.active) {
                     alreadyHeld = false;
                     for (int i = 0; i < 4; i++) {
@@ -240,6 +274,7 @@ public class GameManager{
                     currentMino.update();
                 }
             }
+            else{}
             // Update message timer
             if (messageTimer > 0) {
                 messageTimer--;
@@ -621,6 +656,8 @@ public class GameManager{
             g2.drawString("Credits", 200, 20);
             g2.drawString("Instructions", 350, 20);
             g2.drawString("Other", 500, 20);
+            g2.setFont(new Font("Arial", Font.BOLD, 60));
+            g2.drawString("Music Collection 6 currently unavailable", 100, 500);
             g2.setFont(new Font("Sans Serif Collection", Font.PLAIN, 16));
             g2.drawString("Now Playing:", 880, 580);
             g2.drawString("by uma vs. Morimori Atsushi", 880, 680);
