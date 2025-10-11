@@ -83,7 +83,7 @@ public class ImageManager extends JPanel {
         if (!cache.containsKey(imageId)) {
             String path = paths.get(imageId);
             if (path == null) {
-                System.err.println("Image ID not found: " + imageId);
+//                System.err.println("Image ID not found: " + imageId);
                 return null;
             }
             try {

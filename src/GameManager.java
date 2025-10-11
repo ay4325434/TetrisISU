@@ -71,6 +71,7 @@ public class GameManager{
     public Rectangle mc4 = new Rectangle(0, 340, 500, 80);
     public Rectangle mc5 = new Rectangle(0, 440, 500, 80);
     public Rectangle mc6 = new Rectangle(0, 540, 500, 80);
+    public Rectangle mc7 = new Rectangle(0, 640, 500, 80);
     public Rectangle select = new Rectangle(80, 0, 80, 30);
 
     public Rectangle leftButton = new Rectangle(20, 220, 50, 200);
@@ -556,7 +557,7 @@ public class GameManager{
             else if(collection == 6){
                 if (!"collectionF1".equals(currentSong) && song == 1){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF1", 90, 120, 1500);
+                    mm.loopSnippet("collectionF1", 100, 130, 1500);
                     currentSong = "collectionF1";
                 }
                 if (!"collectionF2".equals(currentSong) && song == 2){
@@ -564,9 +565,9 @@ public class GameManager{
                     mm.loopSnippet("collectionF2", 20, 50, 1500);
                     currentSong = "collectionF2";
                 }
-                if (!"collectionF1".equals(currentSong) && song == 3){
+                if (!"collectionF3".equals(currentSong) && song == 3){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF3", 90, 120, 1500);
+                    mm.loopSnippet("collectionF3", 100, 130, 1500);
                     currentSong = "collectionF3";
                 }
                 if (!"collectionF4".equals(currentSong) && song == 4){
@@ -574,10 +575,87 @@ public class GameManager{
                     mm.loopSnippet("collectionF4", 90, 120, 1500);
                     currentSong = "collectionF4";
                 }
-                if (!"collectionF5".equals(currentSong) && song == 1){
+                if (!"collectionF5".equals(currentSong) && song == 5){
                     mm.stopLoop();
                     mm.loopSnippet("collectionF5", 90, 120, 1500);
                     currentSong = "collectionF5";
+                }
+                if (!"collectionF6".equals(currentSong) && song == 6){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionF6", 90, 120, 1500);
+                    currentSong = "collectionF6";
+                }
+                if (!"collectionF7".equals(currentSong) && song == 7){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionF7", 90, 120, 1500);
+                    currentSong = "collectionF7";
+                }
+                if (!"collectionF8".equals(currentSong) && song == 8){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionF8", 90, 120, 1500);
+                    currentSong = "collectionF8";
+                }
+                if (!"collectionF9".equals(currentSong) && song == 9){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionF9", 90, 120, 1500);
+                    currentSong = "collectionF9";
+                }
+                if (!"collectionF10".equals(currentSong) && song == 10){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionF10", 70, 100, 1500);
+                    currentSong = "collectionF10";
+                }
+            }
+            else if (collection == 7){
+                if (!"collectionG1".equals(currentSong) && song == 1){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG1", 90, 120, 1500);
+                    currentSong = "collectionG1";
+                }
+                if (!"collectionG2".equals(currentSong) && song == 2){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG2", 90, 120, 1500);
+                    currentSong = "collectionG2";
+                }
+                if (!"collectionG3".equals(currentSong) && song == 3){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG3", 90, 120, 1500);
+                    currentSong = "collectionG3";
+                }
+                if (!"collectionG4".equals(currentSong) && song == 4){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG4", 90, 120, 1500);
+                    currentSong = "collectionG4";
+                }
+                if (!"collectionG5".equals(currentSong) && song == 5){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG5", 90, 120, 1500);
+                    currentSong = "collectionG5";
+                }
+                if (!"collectionG6".equals(currentSong) && song == 6){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG6", 90, 120, 1500);
+                    currentSong = "collectionG6";
+                }
+                if (!"collectionG7".equals(currentSong) && song == 7){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG7", 90, 120, 1500);
+                    currentSong = "collectionG7";
+                }
+                if (!"collectionG8".equals(currentSong) && song == 8){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG8", 90, 120, 1500);
+                    currentSong = "collectionG8";
+                }
+                if (!"collectionG9".equals(currentSong) && song == 9){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG9", 90, 120, 1500);
+                    currentSong = "collectionG9";
+                }
+                if (!"collectionG10".equals(currentSong) && song == 10){
+                    mm.stopLoop();
+                    mm.loopSnippet("collectionG10", 90, 120, 1500);
+                    currentSong = "collectionG10";
                 }
             }
         }
@@ -656,8 +734,6 @@ public class GameManager{
             g2.drawString("Credits", 200, 20);
             g2.drawString("Instructions", 350, 20);
             g2.drawString("Other", 500, 20);
-            g2.setFont(new Font("Arial", Font.BOLD, 60));
-            g2.drawString("Music Collection 6 currently unavailable", 100, 500);
             g2.setFont(new Font("Sans Serif Collection", Font.PLAIN, 16));
             g2.drawString("Now Playing:", 880, 580);
             g2.drawString("by uma vs. Morimori Atsushi", 880, 680);
@@ -751,6 +827,7 @@ public class GameManager{
             g2.drawString("Music Collection 4", 20, 400);
             g2.drawString("Music Collection 5", 20, 500);
             g2.drawString("Music Collection 6", 20, 600);
+            g2.drawString("Music Collection 7", 20, 700);
             g2.setFont(new Font("Tahoma", Font.BOLD, 100));
             g2.drawString("--- MUSIC", 640, 150);
             g2.drawString("SELECT---", 720, 270);
@@ -777,6 +854,9 @@ public class GameManager{
                             break;
                         case 6:
                             g2.drawRect(mc6.x, mc6.y, mc6.width, mc6.height);
+                            break;
+                        case 7:
+                            g2.drawRect(mc7.x, mc7.y, mc7.width, mc7.height);
                             break;
                     }
                 }

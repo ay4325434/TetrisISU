@@ -74,6 +74,29 @@ public class MusicManager {
         songPaths.put("collectionE8", "Music Collection 5/Night Dancer.wav");
         songPaths.put("collectionE9", "Music Collection 5/Otonoke.wav");
         songPaths.put("collectionE10", "Music Collection 5/Roki.wav");
+
+        songPaths.put("collectionF1", "Music Collection 6/Aegleseeker.wav");
+        songPaths.put("collectionF2", "Music Collection 6/BBKKBKK.wav");
+        songPaths.put("collectionF3", "Music Collection 6/Brain Power.wav");
+        songPaths.put("collectionF4", "Music Collection 6/Chou Night of Knights.wav");
+        songPaths.put("collectionF5", "Music Collection 6/Grievous Lady.wav");
+        songPaths.put("collectionF6", "Music Collection 6/Mesmerizer.wav");
+        songPaths.put("collectionF7", "Music Collection 6/PANDORA PARADOXXX.wav");
+        songPaths.put("collectionF8", "Music Collection 6/PUPA.wav");
+        songPaths.put("collectionF9", "Music Collection 6/Sage.wav");
+        songPaths.put("collectionF10", "Music Collection 6/the EmpErroR.wav");
+
+        songPaths.put("collectionG1", "Music Collection 7/Angelic Jelly.wav");
+        songPaths.put("collectionG2", "Music Collection 7/Chaos Time.wav");
+        songPaths.put("collectionG3", "Music Collection 7/Cheatreal.wav");
+        songPaths.put("collectionG4", "Music Collection 7/Chrome VOX.wav");
+        songPaths.put("collectionG5", "Music Collection 7/Garakuta Doll Play.wav");
+        songPaths.put("collectionG6", "Music Collection 7/KABOOOOOM!!!!.wav");
+        songPaths.put("collectionG7", "Music Collection 7/Oshama Scramble.wav");
+        songPaths.put("collectionG8", "Music Collection 7/QZKago Requiem.wav");
+        songPaths.put("collectionG9", "Music Collection 7/Tempestissimo.wav");
+        songPaths.put("collectionG10", "Music Collection 7/TO THE COSMIC!!.wav");
+
     }
 
     public void stop() {
