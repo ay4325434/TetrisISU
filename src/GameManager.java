@@ -50,7 +50,8 @@ public class GameManager{
     public static final int CREDITS = 5;
     public static final int SONGS = 6;
     public static final int OTHER = 7;
-    public static int gameState = MENU;
+    public static final int INITIALIZE = 8;
+    public static int gameState = INITIALIZE;
 
     public static int currentBackground = 1; // Iterates through the music collections
     public static int song = 1;
@@ -572,32 +573,32 @@ public class GameManager{
                 }
                 if (!"collectionF4".equals(currentSong) && song == 4){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF4", 90, 120, 1500);
+                    mm.loopSnippet("collectionF4", 60, 90, 1500);
                     currentSong = "collectionF4";
                 }
                 if (!"collectionF5".equals(currentSong) && song == 5){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF5", 90, 120, 1500);
+                    mm.loopSnippet("collectionF5", 60, 90, 1500);
                     currentSong = "collectionF5";
                 }
                 if (!"collectionF6".equals(currentSong) && song == 6){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF6", 90, 120, 1500);
+                    mm.loopSnippet("collectionF6", 60, 90, 1500);
                     currentSong = "collectionF6";
                 }
                 if (!"collectionF7".equals(currentSong) && song == 7){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF7", 90, 120, 1500);
+                    mm.loopSnippet("collectionF7", 60, 90, 1500);
                     currentSong = "collectionF7";
                 }
                 if (!"collectionF8".equals(currentSong) && song == 8){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF8", 90, 120, 1500);
+                    mm.loopSnippet("collectionF8", 60, 90, 1500);
                     currentSong = "collectionF8";
                 }
                 if (!"collectionF9".equals(currentSong) && song == 9){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF9", 90, 120, 1500);
+                    mm.loopSnippet("collectionF9", 75, 105, 1500);
                     currentSong = "collectionF9";
                 }
                 if (!"collectionF10".equals(currentSong) && song == 10){
@@ -609,7 +610,7 @@ public class GameManager{
             else if (collection == 7){
                 if (!"collectionG1".equals(currentSong) && song == 1){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionG1", 90, 120, 1500);
+                    mm.loopSnippet("collectionG1", 60, 90, 1500);
                     currentSong = "collectionG1";
                 }
                 if (!"collectionG2".equals(currentSong) && song == 2){
@@ -624,7 +625,7 @@ public class GameManager{
                 }
                 if (!"collectionG4".equals(currentSong) && song == 4){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionG4", 90, 120, 1500);
+                    mm.loopSnippet("collectionG4", 110, 140, 1500);
                     currentSong = "collectionG4";
                 }
                 if (!"collectionG5".equals(currentSong) && song == 5){
@@ -639,12 +640,12 @@ public class GameManager{
                 }
                 if (!"collectionG7".equals(currentSong) && song == 7){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionG7", 90, 120, 1500);
+                    mm.loopSnippet("collectionG7", 45, 75, 1500);
                     currentSong = "collectionG7";
                 }
                 if (!"collectionG8".equals(currentSong) && song == 8){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionG8", 90, 120, 1500);
+                    mm.loopSnippet("collectionG8", 30, 60, 1500);
                     currentSong = "collectionG8";
                 }
                 if (!"collectionG9".equals(currentSong) && song == 9){
@@ -1176,6 +1177,11 @@ public class GameManager{
                 g2.drawImage(img, 470, 150, 720, 405, null);
                 g2.drawString("Music Collection 6", 560, 30);
             }
+            if(collection == 7){
+                img = im.getImage("G" + currentBackground);
+                g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.drawString("Music Collection 7", 560, 30);
+            }
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.drawString("<", 20, 350);
             g2.drawString(">", 1200, 350);
@@ -1276,6 +1282,10 @@ public class GameManager{
             g2.drawString(">", 1200, 350);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
+        }
+        else if (gameState == INITIALIZE){
+            img = im.getImage("initialize1");
+            g2.drawImage(img, 0, 0, 1280, 720, null);
         }
     }
     public void reset(){

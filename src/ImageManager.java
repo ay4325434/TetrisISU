@@ -64,6 +64,28 @@ public class ImageManager extends JPanel {
         paths.put("E9", "Images/Collection 5/otonoke.png");
         paths.put("E10", "Images/Collection 5/roki.png");
 
+        paths.put("F1", "Images/Collection 6/aegleseeker.png");
+        paths.put("F2", "Images/Collection 6/bbkkbkk.png");
+        paths.put("F3", "Images/Collection 6/brain power.png");
+        paths.put("F4", "Images/Collection 6/cnok.png");
+        paths.put("F5", "Images/Collection 6/grievous lady.png");
+        paths.put("F6", "Images/Collection 6/mesmerizer.png");
+        paths.put("F7", "Images/Collection 6/pp.png");
+        paths.put("F8", "Images/Collection 6/pupa.png");
+        paths.put("F9", "Images/Collection 6/sage.png");
+        paths.put("F10", "Images/Collection 6/the emperror.png");
+
+        paths.put("G1", "Images/Collection 7/angelic jelly.png");
+        paths.put("G2", "Images/Collection 7/chaos time.png");
+        paths.put("G3", "Images/Collection 7/cheatreal.png");
+        paths.put("G4", "Images/Collection 7/chrome vox.png");
+        paths.put("G5", "Images/Collection 7/gdp.png");
+        paths.put("G6", "Images/Collection 7/kabooooom.png");
+        paths.put("G7", "Images/Collection 7/oshama scramble.png");
+        paths.put("G8", "Images/Collection 7/qzkr.png");
+        paths.put("G9", "Images/Collection 7/tempestissimo.png");
+        paths.put("G10", "Images/Collection 7/to the cosmic.png");
+
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
         paths.put("credits3", "Images/Credits/credits3.png");
@@ -78,6 +100,8 @@ public class ImageManager extends JPanel {
         paths.put("other1", "Images/Other/other1.png");
         paths.put("other2", "Images/Other/other2.png");
         paths.put("other3", "Images/Other/other3.png");
+
+        paths.put("initialize1", "Images/Initialize/initialize1.png");
     }
     public Image getImage(String imageId) {
         if (!cache.containsKey(imageId)) {

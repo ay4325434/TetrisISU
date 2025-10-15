@@ -6,15 +6,12 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.IOException;
 
 public class Board extends JPanel implements Runnable, MouseListener, MouseMotionListener {
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
 
     final int FPS = 60;
-
-    public Image menu;
 
     public Rectangle screen = new Rectangle(0, 0, WIDTH, HEIGHT);
 
@@ -85,6 +82,10 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     @Override
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
+        if(gm.gameState == gm.INITIALIZE && screen.contains(p)){
+            gm.gameState = gm.MENU;
+            return;
+        }
         if(gm.musicSelectButton.contains(p) && gm.gameState == gm.MENU){
             gm.gameState = gm.MUSIC_SELECT;
             return;
@@ -107,17 +108,6 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         if(gm.backButton.contains(p)){
             if(gm.gameState == gm.MUSIC_SELECT || gm.gameState == gm.CREDITS || gm.gameState == gm.INSTRUCTIONS || gm.gameState == gm.OTHER) {
                 gm.gameState = gm.MENU;
-                try {
-                    mm.loop(gm.currentSong);
-                } catch (UnsupportedAudioFileException ex) {
-                    throw new RuntimeException(ex);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
-                } catch (LineUnavailableException ex) {
-                    throw new RuntimeException(ex);
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
             }
             else if (gm.gameState == gm.SONGS){
                 gm.gameState = gm.MUSIC_SELECT;
@@ -236,11 +226,11 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         }
         if(gm.rightButton.contains(p) && gm.gameState == gm.CREDITS){
             gm.page++;
-            if(gm.page > 6) gm.page = 1;
+            if(gm.page > 7) gm.page = 1;
         }
         if(gm.leftButton.contains(p) && gm.gameState == gm.CREDITS){
             gm.page--;
-            if(gm.page < 1) gm.page = 6;
+            if(gm.page < 1) gm.page = 7;
         }
         if(gm.rightButton.contains(p) && gm.gameState == gm.INSTRUCTIONS){
             gm.page++;
