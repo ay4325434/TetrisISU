@@ -17,6 +17,7 @@ public class GameManager{
     public int lines = 0;
     public int linesCleared = 0;
     public int level = 1;
+    public int score = 0;
 
     //Piece properties
     private Mino currentMino;
@@ -35,6 +36,7 @@ public class GameManager{
 
     public static ArrayList<Block> placedBlocks = new ArrayList<>();
     public static ArrayList<Mino> startingMinos = new ArrayList<>();
+    private ArrayList<Mino> minos = new ArrayList<>(startingMinos);
 
     public static boolean hold = false;
     private static boolean alreadyHeld = false;
@@ -51,7 +53,7 @@ public class GameManager{
     public static final int SONGS = 6;
     public static final int OTHER = 7;
     public static final int INITIALIZE = 8;
-    public static int gameState = INITIALIZE;
+    public static int gameState = MENU;
 
     public static int currentBackground = 1; // Iterates through the music collections
     public static int song = 1;
@@ -87,6 +89,9 @@ public class GameManager{
 
     public boolean hover = false;
     public static int hoveredCollection = 1;
+
+    private int b2b = -1;
+    private boolean surgeSent = false;
 
     public GameManager(){
         leftX = (Board.WIDTH / 2) - (WIDTH / 2);
@@ -133,50 +138,94 @@ public class GameManager{
      * @return The next piece in queue that is not displayed yet
      */
     private Mino pickMino(){
-        Mino m = null;
-        int rand = (int)(Math.random()*7);
-        switch (rand) { // Determining the next piece
-            case 0:
-                m = new IPiece();
-                break;
-            case 1:
-                m = new JPiece();
-                break;
-            case 2:
-                m = new LPiece();
-                break;
-            case 3:
-                m = new OPiece();
-                break;
-            case 4:
-                m = new SPiece();
-                break;
-            case 5:
-                m = new TPiece();
-                break;
-            case 6:
-                m = new ZPiece();
-                break;
+        Mino m;
+        if(!minos.isEmpty()){
+            m = minos.getFirst();
+            minos.removeFirst();
+        }
+        else{
+            minos.add(new LPiece());
+            minos.add(new JPiece());
+            minos.add(new IPiece());
+            minos.add(new SPiece());
+            minos.add(new ZPiece());
+            minos.add(new TPiece());
+            minos.add(new OPiece());
+            m = minos.getFirst();
+            minos.removeFirst();
         }
         return m;
     }
 
     private String lineClearMessage = ""; // message to display
+    private String spinMessage = "";
+    private String pcMessage = "";
     private int messageTimer = 0;         // counts frames or updates
     private final int MESSAGE_DURATION = 120; // frames to display (2 seconds at 60 FPS)
 
     // --- Call this when clearing lines ---
     public void handleLineClear(int linesCleared) {
+        if(checkForTSpin()){
+            if(currentMino.direction == 1){
+                spinMessage = "Mini T-Spin";
+            }
+            else{
+                spinMessage = "T-Spin";
+            }
+        }
+        if(checkForAllClear()){
+            pcMessage = "ALL CLEAR";
+        }
         switch(linesCleared) {
-            case 1: lineClearMessage = "SINGLE"; break;
-            case 2: lineClearMessage = "DOUBLE"; break;
-            case 3: lineClearMessage = "TRIPLE"; break;
-            case 4: lineClearMessage = "QUAD"; break;
-            default: lineClearMessage = "";
+            case 1:
+                lineClearMessage = "SINGLE";
+                if(checkForTSpin() && checkForAllClear()) b2b++;
+                else {
+                    if(b2b > 4){
+                        surgeSent = true;
+                        b2b = -1;
+                    }
+                }
+                break;
+            case 2:
+                lineClearMessage = "DOUBLE";
+                if(checkForTSpin() && checkForAllClear()) b2b++;
+                else {
+                    if(b2b > 4){
+                        surgeSent = true;
+                        b2b = -1;
+                    }
+                }
+                break;
+            case 3:
+                lineClearMessage = "TRIPLE";
+                if(checkForTSpin() && checkForAllClear()) b2b++;
+                else {
+                    if(b2b > 4){
+                        surgeSent = true;
+                        b2b = -1;
+                    }
+                }
+                break;
+            case 4:
+                lineClearMessage = "QUAD";
+                b2b++;
+                break;
+            default:
+                lineClearMessage = "";
+                spinMessage = "";
+                pcMessage = "";
             break;
         }
         messageTimer = MESSAGE_DURATION; // reset timer
+    }
 
+    private boolean checkForTSpin(){
+        return currentMino.justRotated;
+    }
+
+    private boolean checkForAllClear(){
+        return placedBlocks.isEmpty();
     }
 
     public void update() throws Exception {
@@ -273,10 +322,13 @@ public class GameManager{
                             holdMino.setXY(leftX - 150, topY + 80);
                         }
                     }
+                    if (gameState == PLAYING && KeyHandler.spacePressed) {
+                        currentMino.hardDrop();
+                        KeyHandler.spacePressed = false;  // reset so it only triggers once
+                    }
                     currentMino.update();
                 }
             }
-            else{}
             // Update message timer
             if (messageTimer > 0) {
                 messageTimer--;
@@ -765,14 +817,53 @@ public class GameManager{
 
             //Draw level and lines cleared
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
-            g2.drawString("LINES: " + lines, leftX - 150, topY + 600);
-            g2.drawString("LEVEL: " + level, leftX - 150, topY + 650);
+            g2.drawString("LINES: " + lines, leftX - 250, topY + 550);
+            g2.drawString("LEVEL: " + level, leftX - 250, topY + 600);
+            g2.drawString("SCORE: " + score, leftX - 250, topY + 650);
 
             // Draw line clear message if active
             if (!lineClearMessage.isEmpty()) {
                 g2.setFont(new Font("Arial", Font.BOLD, 40));
                 g2.setColor(Color.WHITE);
                 g2.drawString(lineClearMessage, leftX - 200, topY + 300);
+            }
+
+            if(!spinMessage.isEmpty()){
+                g2.setColor(Color.MAGENTA);
+                g2.setFont(new Font("Arial", Font.BOLD, 25));
+                g2.drawString(spinMessage, leftX - 200, topY + 250);
+            }
+
+            if(!pcMessage.isEmpty()){
+                g2.setColor(Color.WHITE);
+                g2.setFont(new Font("Arial", Font.BOLD, 50));
+                g2.drawString(pcMessage, leftX + 20, topY + 400);
+            }
+
+            if(b2b > 0){
+                if(b2b < 5) {
+                    g2.setColor(Color.WHITE);
+                }
+                else if (b2b < 10){
+                    g2.setColor(Color.CYAN);
+                }
+                else if (b2b < 15){
+                    g2.setColor(Color.GREEN);
+                }
+                else if (b2b < 25){
+                    g2.setColor(Color.ORANGE);
+                }
+                else if (b2b < 30){
+                    g2.setColor(Color.RED);
+                }
+                else if (b2b < 40){
+                    g2.setColor(Color.PINK);
+                }
+                else{
+                    g2.setColor(Color.MAGENTA);
+                }
+                g2.setFont(new Font("Arial", Font.BOLD, 25));
+                g2.drawString("B2B x" + b2b, leftX - 200, topY + 350);
             }
 
             if (currentMino != null) {

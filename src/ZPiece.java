@@ -29,7 +29,6 @@ public class ZPiece extends Mino{
         temp[2].y = b[0].y - Block.SIZE;
         temp[3].x = b[0].x - Block.SIZE;
         temp[3].y = b[0].y - Block.SIZE;
-        updateXY(1);
     }
     public void rightDirection(){
         //    o
@@ -43,7 +42,6 @@ public class ZPiece extends Mino{
         temp[2].y = b[0].y;
         temp[3].x = b[0].x + Block.SIZE;
         temp[3].y = b[0].y - Block.SIZE;
-        updateXY(2);
     }
     public void downDirection(){
         //
@@ -57,7 +55,6 @@ public class ZPiece extends Mino{
         temp[2].y = b[0].y + Block.SIZE;
         temp[3].x = b[0].x + Block.SIZE;
         temp[3].y = b[0].y + Block.SIZE;
-        updateXY(3);
     }
     public void leftDirection(){
         //  o
@@ -71,6 +68,5 @@ public class ZPiece extends Mino{
         temp[2].y = b[0].y;
         temp[3].x = b[0].x - Block.SIZE;
         temp[3].y = b[0].y + Block.SIZE;
-        updateXY(4);
     }
 }

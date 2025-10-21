@@ -27,8 +27,6 @@ public class JPiece extends Mino{
         temp[2].y = b[0].y;
         temp[3].x = b[0].x - Block.SIZE;
         temp[3].y = b[0].y - Block.SIZE;
-
-        updateXY(1);
     }
     public void rightDirection(){
         //  o o
@@ -42,8 +40,6 @@ public class JPiece extends Mino{
         temp[2].y = b[0].y - Block.SIZE;
         temp[3].x = b[0].x + Block.SIZE;
         temp[3].y = b[0].y - Block.SIZE;
-
-        updateXY(2);
     }
     public void downDirection(){
         //o o o
@@ -56,8 +52,6 @@ public class JPiece extends Mino{
         temp[2].y = b[0].y;
         temp[3].x = b[0].x + Block.SIZE;
         temp[3].y = b[0].y + Block.SIZE;
-
-        updateXY(3);
     }
     public void leftDirection(){
         //  o
@@ -71,7 +65,5 @@ public class JPiece extends Mino{
         temp[2].y = b[0].y + Block.SIZE;
         temp[3].x = b[0].x - Block.SIZE;
         temp[3].y = b[0].y + Block.SIZE;
-
-        updateXY(4);
     }
 }

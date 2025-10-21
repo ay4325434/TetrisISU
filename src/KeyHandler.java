@@ -33,7 +33,9 @@ public class KeyHandler implements KeyListener{
             shiftPressed = true;
         }
         if(code == KeyEvent.VK_SPACE){
-            spacePressed = true;
+            if(GameManager.gameState == GameManager.PLAYING) {
+                spacePressed = true;
+            }
         }
 
         if (code == KeyEvent.VK_P && !pausePressed) {
