@@ -200,6 +200,18 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.currentBackground = 1;
                 }
             }
+            if (gm.mc8.contains(p)) {
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(8);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 8;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
+            }
             if(gm.select.contains(p) && gm.gameState == gm.MUSIC_SELECT){
                 gm.selectionActivated = true;
             }
@@ -226,11 +238,11 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         }
         if(gm.rightButton.contains(p) && gm.gameState == gm.CREDITS){
             gm.page++;
-            if(gm.page > 7) gm.page = 1;
+            if(gm.page > 6) gm.page = 1;
         }
         if(gm.leftButton.contains(p) && gm.gameState == gm.CREDITS){
             gm.page--;
-            if(gm.page < 1) gm.page = 7;
+            if(gm.page < 1) gm.page = 6;
         }
         if(gm.rightButton.contains(p) && gm.gameState == gm.INSTRUCTIONS){
             gm.page++;

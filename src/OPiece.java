@@ -3,6 +3,7 @@ import java.awt.*;
 public class OPiece extends Mino{
     public OPiece(){
         create(Color.YELLOW);
+        type = "O";
     }
     public void setXY(int x, int y) {
         //o o

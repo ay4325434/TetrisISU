@@ -14,10 +14,10 @@ public class GameManager{
     public static int rightX;
     public static int bottomY;
 
-    public int lines = 0;
-    public int linesCleared = 0;
-    public int level = 1;
-    public int score = 0;
+    public static int lines = 0;
+    public static int linesCleared = 0;
+    public static int level = 1;
+    public static int score = 0;
 
     //Piece properties
     private Mino currentMino;
@@ -75,6 +75,7 @@ public class GameManager{
     public Rectangle mc5 = new Rectangle(0, 440, 500, 80);
     public Rectangle mc6 = new Rectangle(0, 540, 500, 80);
     public Rectangle mc7 = new Rectangle(0, 640, 500, 80);
+    public Rectangle mc8 = new Rectangle(550, 40, 500, 80);
     public Rectangle select = new Rectangle(80, 0, 80, 30);
 
     public Rectangle leftButton = new Rectangle(20, 220, 50, 200);
@@ -91,7 +92,7 @@ public class GameManager{
     public static int hoveredCollection = 1;
 
     private int b2b = -1;
-    private boolean surgeSent = false;
+    private int combo = -1;
 
     public GameManager(){
         leftX = (Board.WIDTH / 2) - (WIDTH / 2);
@@ -158,13 +159,18 @@ public class GameManager{
     }
 
     private String lineClearMessage = ""; // message to display
-    private String spinMessage = "";
+    public static String spinMessage = "";
     private String pcMessage = "";
     private int messageTimer = 0;         // counts frames or updates
+    public static int spinMessageTimer = 0;
     private final int MESSAGE_DURATION = 120; // frames to display (2 seconds at 60 FPS)
 
-    // --- Call this when clearing lines ---
+    /**
+     * Handles line clearing and perfect clears.
+     * @param linesCleared
+     */
     public void handleLineClear(int linesCleared) {
+        boolean surgeSent = false;
         if(checkForTSpin()){
             if(currentMino.direction == 1){
                 spinMessage = "Mini T-Spin";
@@ -179,49 +185,126 @@ public class GameManager{
         switch(linesCleared) {
             case 1:
                 lineClearMessage = "SINGLE";
-                if(checkForTSpin() && checkForAllClear()) b2b++;
+                if(checkForTSpin() || checkForAllClear()){
+                    b2b++;
+                    if(spinMessage.equals("T-Spin")){
+                        if(b2b > 1) {
+                            score += (100 * b2b * level * 5);
+                        }
+                        else{
+                            score += 100 * level * 5;
+                        }
+                    }
+                    if(checkForAllClear()){
+                        if(b2b > 1) {
+                            score += (100 * b2b * level * 20);
+                        }
+                        else {
+                            score += (100 * level * 20);
+                        }
+                    }
+                }
                 else {
+                    score += 100 * level;
                     if(b2b > 4){
                         surgeSent = true;
+                        score *= b2b;
                         b2b = -1;
                     }
+                }
+                combo++;
+                if(combo > 1){
+                    score += combo * level;
                 }
                 break;
             case 2:
                 lineClearMessage = "DOUBLE";
-                if(checkForTSpin() && checkForAllClear()) b2b++;
+                if(checkForTSpin() || checkForAllClear()){
+                    b2b++;
+                    if(spinMessage.equals("T-Spin")){
+                        if(b2b > 1) {
+                            score += (200 * b2b * level * 5);
+                        }
+                        else{
+                            score += 200 * level * 5;
+                        }
+                    }
+                    if(checkForAllClear()){
+                        if(b2b > 1) {
+                            score += (200 * b2b * level * 20);
+                        }
+                        else {
+                            score += (200 * level * 20);
+                        }
+                    }
+                }
                 else {
                     if(b2b > 4){
                         surgeSent = true;
+                        score *= b2b;
                         b2b = -1;
                     }
                 }
+                combo++;
+                if(combo > 1){
+                    score += combo * level;
+                }
                 break;
             case 3:
-                lineClearMessage = "TRIPLE";
-                if(checkForTSpin() && checkForAllClear()) b2b++;
+                if(checkForTSpin() || checkForAllClear()){
+                    b2b++;
+                    if(spinMessage.equals("T-Spin")){
+                        if(b2b > 1) {
+                            score += (400 * b2b * level * 5);
+                        }
+                        else{
+                            score += 400 * level * 5;
+                        }
+                    }
+                    if(checkForAllClear()){
+                        if(b2b > 1) {
+                            score += (400 * b2b * level * 20);
+                        }
+                        else {
+                            score += (400 * level * 20);
+                        }
+                    }
+                }
                 else {
                     if(b2b > 4){
                         surgeSent = true;
+                        score *= b2b;
                         b2b = -1;
                     }
+                }
+                combo++;
+                if(combo > 1){
+                    score += combo * level;
                 }
                 break;
             case 4:
                 lineClearMessage = "QUAD";
                 b2b++;
+                if(checkForAllClear()){
+                    score += (1000 * level * 20);
+                }
+                combo++;
+                if(combo > 1){
+                    score += combo * level;
+                }
                 break;
             default:
                 lineClearMessage = "";
                 spinMessage = "";
                 pcMessage = "";
-            break;
+                combo = -1;
+                break;
         }
         messageTimer = MESSAGE_DURATION; // reset timer
     }
 
     private boolean checkForTSpin(){
-        return currentMino.justRotated;
+        return currentMino.rotatedDuringLockDelay && currentMino.type.equals("T");
     }
 
     private boolean checkForAllClear(){
@@ -277,6 +360,8 @@ public class GameManager{
                         currentMino.deactivating = false;
                         //Shift all pieces in the "Next" column up one unit
                         currentMino = nextMino1;
+                        currentMino.spin = false;
+                        currentMino.justRotated = false;
                         currentMino.setXY(startX, startY);
                         nextMino1 = nextMino2;
                         nextMino1.setXY(nextX1, nextY1);
@@ -334,6 +419,7 @@ public class GameManager{
                 messageTimer--;
                 if (messageTimer == 0) {
                     lineClearMessage = ""; // Clear message after duration
+                    pcMessage = "";
                 }
             }
         }
@@ -558,7 +644,7 @@ public class GameManager{
             else if (collection == 5){
                 if (!"collectionE1".equals(currentSong) && song == 1){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionE1", 90, 120, 1500);
+                    mm.loopSnippet("collectionE1", 40, 70, 1500);
                     currentSong = "collectionE1";
                 }
                 if (!"collectionE2".equals(currentSong) && song == 2){
@@ -625,7 +711,7 @@ public class GameManager{
                 }
                 if (!"collectionF4".equals(currentSong) && song == 4){
                     mm.stopLoop();
-                    mm.loopSnippet("collectionF4", 60, 90, 1500);
+                    mm.loopSnippet("collectionF4", 30, 60, 1500);
                     currentSong = "collectionF4";
                 }
                 if (!"collectionF5".equals(currentSong) && song == 5){
@@ -828,16 +914,20 @@ public class GameManager{
                 g2.drawString(lineClearMessage, leftX - 200, topY + 300);
             }
 
-            if(!spinMessage.isEmpty()){
+            if(!spinMessage.isEmpty() && spinMessageTimer > 0){
                 g2.setColor(Color.MAGENTA);
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.drawString(spinMessage, leftX - 200, topY + 250);
+                spinMessageTimer--;
+            }
+            if (spinMessageTimer <= 0) {
+                spinMessage = "";
             }
 
             if(!pcMessage.isEmpty()){
                 g2.setColor(Color.WHITE);
                 g2.setFont(new Font("Arial", Font.BOLD, 50));
-                g2.drawString(pcMessage, leftX + 20, topY + 400);
+                g2.drawString(pcMessage, leftX + 15, topY + 400);
             }
 
             if(b2b > 0){
@@ -864,6 +954,10 @@ public class GameManager{
                 }
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.drawString("B2B x" + b2b, leftX - 200, topY + 350);
+            }
+            if(combo > 1){
+                g2.setFont(new Font("Arial", Font.BOLD, 30));
+                g2.drawString(combo + " COMBO", leftX - 200, topY + 400);
             }
 
             if (currentMino != null) {
@@ -897,12 +991,6 @@ public class GameManager{
             if (holdMino != null) {
                 holdMino.draw(g2);
             }
-            if(collection == 1){}
-            if(collection == 2){}
-            if(collection == 3){}
-            if(collection == 4){}
-            if(collection == 5){}
-            if(collection == 6){}
 
         }
         if (gameState == MUSIC_SELECT) {
@@ -920,12 +1008,13 @@ public class GameManager{
             g2.drawString("Music Collection 5", 20, 500);
             g2.drawString("Music Collection 6", 20, 600);
             g2.drawString("Music Collection 7", 20, 700);
+            g2.drawString("Music Collection 8", 570, 100);
             g2.setFont(new Font("Tahoma", Font.BOLD, 100));
-            g2.drawString("--- MUSIC", 640, 150);
-            g2.drawString("SELECT---", 720, 270);
+            g2.drawString("--- MUSIC", 640, 250);
+            g2.drawString("SELECT---", 720, 370);
             if(selectionActivated){
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
-                g2.drawString("Click to select", 640, 500);
+                g2.drawString("Click to select", 670, 550);
                 if(hover){
                     g2.setColor(Color.BLUE);
                     switch (hoveredCollection){
@@ -949,6 +1038,9 @@ public class GameManager{
                             break;
                         case 7:
                             g2.drawRect(mc7.x, mc7.y, mc7.width, mc7.height);
+                            break;
+                        case 8:
+                            g2.drawRect(mc8.x, mc8.y, mc8.width, mc8.height);
                             break;
                     }
                 }
@@ -1086,14 +1178,14 @@ public class GameManager{
                     g2.drawString("by Se-U-Ra", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 4){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
-                    g2.drawString("GOODWORLD", placeholder.x + 15, placeholder.y + 30);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("GOODWORLD", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by EBIMAYO", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 5){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("GOODRAGE", placeholder.x + 15, placeholder.y + 35);
+                    g2.drawString("GOODRAGE", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by EBIMAYO", placeholder.x + 15, placeholder.y + 85);
                 }
@@ -1204,7 +1296,7 @@ public class GameManager{
                     g2.drawString("Brain Fluid", placeholder.x + 15, placeholder.y + 30);
                     g2.drawString("Explosion Girl", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by rerulili ft. GUMI", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by rerulili ft. GUMI & Miku", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 2){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -1267,11 +1359,113 @@ public class GameManager{
                 img = im.getImage("F" + currentBackground);
                 g2.drawImage(img, 470, 150, 720, 405, null);
                 g2.drawString("Music Collection 6", 560, 30);
+                if(song == 1){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Aegleseeker", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Silentroom vs. Frums", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 2){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("B.B.K.K.B.K.K", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by nora2r", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 3){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Brain Power", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by NOMA", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 4){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 20));
+                    g2.drawString("Chou Night of Knights", placeholder.x + 15, placeholder.y + 30);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by beatMARIO x MARON", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 5){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Grievous Lady", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Team Grimoire vs. Laur", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 6){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Mesmerizer", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 17));
+                    g2.drawString("by 32ki ft. Hatsune Miku & Kasane Teto", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 7){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
+                    g2.drawString("PANDORA PARADOXXX", placeholder.x + 15, placeholder.y + 35);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Sakuzyo", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 8){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("PUPA", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Morimori Atsushi", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 9){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Sage", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Camellia", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 10){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("the EmpErroR", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by sasakure.UK", placeholder.x + 15, placeholder.y + 85);
+                }
             }
             if(collection == 7){
                 img = im.getImage("G" + currentBackground);
                 g2.drawImage(img, 470, 150, 720, 405, null);
                 g2.drawString("Music Collection 7", 560, 30);
+                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+                g2.drawString("by t+pazolite", placeholder.x+15, placeholder.y + 85);
+                if(song == 1){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Angelic Jelly", placeholder.x + 15, placeholder.y + 50);
+                }
+                if(song == 2){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Chaos Time", placeholder.x + 15, placeholder.y + 50);
+                }
+                if(song == 3){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Cheatreal", placeholder.x + 15, placeholder.y + 50);
+                }
+                if(song == 4){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Chrome VOX", placeholder.x + 15, placeholder.y + 50);
+                }
+                if(song == 5){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Garakuta Doll Play", placeholder.x + 15, placeholder.y + 40);
+                }
+                if(song == 6){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("KABOOOOOM!!!!", placeholder.x + 15, placeholder.y + 50);
+                }
+                if(song == 7){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Oshama Scramble", placeholder.x + 15, placeholder.y + 40);
+                }
+                if(song == 8){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("QZKago Requiem", placeholder.x + 15, placeholder.y + 40);
+                }
+                if(song == 9){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Tempestissimo", placeholder.x + 15, placeholder.y + 50);
+                }
+                if(song == 10){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
+                    g2.drawString("FLY AWAY! TO THE COSMIC!!", placeholder.x + 15, placeholder.y + 50);
+                }
             }
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.drawString("<", 20, 350);
@@ -1382,8 +1576,9 @@ public class GameManager{
     public void reset(){
         placedBlocks.clear();
         startingMinos.clear();
-        currentMino = null;
+        holdMino = null;
         lines = 0;
+        score = 0;
         level = 1;
         // Adding the starting bag of pieces (each piece must appear )
         startingMinos.add(new LPiece());

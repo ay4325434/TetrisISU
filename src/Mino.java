@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.awt.*;
 
 public class Mino {
@@ -14,6 +15,9 @@ public class Mino {
     public boolean deactivating;
     int deactivateCounter = 0;
     public boolean justRotated = false;
+    public String type;
+    public boolean spin = false;
+    public boolean rotatedDuringLockDelay = false;
 
     public void create(Color c){
         for(int i=0; i<4; i++){
@@ -21,303 +25,382 @@ public class Mino {
             temp[i] = new Block(c);
         }
     }
-    public void setXY(int x, int y){}
-    public void updateXY(int direction){
-        checkRotationCollision();
-        if(!leftCollision && !rightCollision && !bottomCollision){
-            this.direction = direction;
-            b[0].x = temp[0].x;
-            b[0].y = temp[0].y;
-            b[1].x = temp[1].x;
-            b[1].y = temp[1].y;
-            b[2].x = temp[2].x;
-            b[2].y = temp[2].y;
-            b[3].x = temp[3].x;
-            b[3].y = temp[3].y;
-        }
-    }
-    public void upDirection(){}
-    public void rightDirection(){}
-    public void downDirection(){}
-    public void leftDirection(){}
 
+    public void setXY(int x, int y){ }
+    // Direction methods removed — pivot-based rotation will handle everything
+
+    // --- COLLISIONS ---
     public void checkMovementCollision() {
-        leftCollision = false;
-        rightCollision = false;
-        bottomCollision = false;
+        leftCollision = rightCollision = bottomCollision = false;
         for (int i = 0; i < b.length; i++) {
             if (b[i].x <= GameManager.leftX) leftCollision = true;
-        }
-        for (int i = 0; i < b.length; i++) {
             if (b[i].x + Block.SIZE >= GameManager.rightX) rightCollision = true;
-        }
-        for (int i = 0; i < b.length; i++) {
             if (b[i].y + Block.SIZE >= GameManager.bottomY) bottomCollision = true;
         }
     }
-    public void checkRotationCollision(){
-        leftCollision = false;
-        rightCollision = false;
-        bottomCollision = false;
-        for (int i = 0; i < b.length; i++) {
-            if(temp[i].x < GameManager.leftX) leftCollision = true;
-        }
-        for (int i = 0; i < b.length; i++) {
-            if(temp[i].x + Block.SIZE > GameManager.rightX) rightCollision = true;
-        }
-        for (int i = 0; i < b.length; i++) {
-            if (temp[i].y + Block.SIZE > GameManager.bottomY) bottomCollision = true;
-        }
-    }
+
     public void checkBlockCollision() {
-        // Reset all movement collisions
-        leftCollision = false;
-        rightCollision = false;
-        bottomCollision = false;
+        leftCollision = rightCollision = bottomCollision = false;
 
-        for (int i = 0; i < GameManager.placedBlocks.size(); i++) {
-            int targetX = GameManager.placedBlocks.get(i).x;
-            int targetY = GameManager.placedBlocks.get(i).y;
+        int[] pieceGridX = new int[4];
+        int[] pieceGridY = new int[4];
+        for (int i = 0; i < 4; i++) {
+            pieceGridX[i] = b[i].x / Block.SIZE;
+            pieceGridY[i] = b[i].y / Block.SIZE;
+        }
 
-            for (int j = 0; j < 4; j++) {
-                // Check left side
-                if (b[j].x - Block.SIZE == targetX && b[j].y == targetY)
-                    leftCollision = true;
+        for (Block placed : GameManager.placedBlocks) {
+            int targetGridX = placed.x / Block.SIZE;
+            int targetGridY = placed.y / Block.SIZE;
 
-                // Check right side
-                if (b[j].x + Block.SIZE == targetX && b[j].y == targetY)
-                    rightCollision = true;
-
-                // Check bottom
-                if (b[j].x == targetX && b[j].y + Block.SIZE == targetY)
-                    bottomCollision = true;
+            for (int i = 0; i < 4; i++) {
+                if (pieceGridX[i] - 1 == targetGridX && pieceGridY[i] == targetGridY) leftCollision = true;
+                if (pieceGridX[i] + 1 == targetGridX && pieceGridY[i] == targetGridY) rightCollision = true;
+                if (pieceGridX[i] == targetGridX && pieceGridY[i] + 1 == targetGridY) bottomCollision = true;
             }
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (pieceGridY[i] >= (GameManager.bottomY / Block.SIZE) - 1) bottomCollision = true;
         }
     }
 
     boolean rotationBlockCollision;
     public void checkRotationBlockCollision() {
-        rotationBlockCollision = false; // reset
-
-        for (int i = 0; i < GameManager.placedBlocks.size(); i++) {
-            int targetX = GameManager.placedBlocks.get(i).x;
-            int targetY = GameManager.placedBlocks.get(i).y;
-
+        rotationBlockCollision = false;
+        for (Block placed : GameManager.placedBlocks) {
             for (int j = 0; j < 4; j++) {
-                if (temp[j].x == targetX && temp[j].y == targetY) {
+                if (temp[j].x == placed.x && temp[j].y == placed.y) {
                     rotationBlockCollision = true;
-                    return; // no need to check further
+                    return;
                 }
             }
         }
     }
 
+    // --- PIVOT ROTATIONS ---
+    private void rotateTempCW() {
+        int px = b[0].x, py = b[0].y;
+        temp[0].x = px; temp[0].y = py;
+        for (int i = 1; i < 4; i++) {
+            int relX = b[i].x - px;
+            int relY = b[i].y - py;
+            temp[i].x = px - relY;
+            temp[i].y = py + relX;
+        }
+    }
+
+    private void rotateTempCCW() {
+        int px = b[0].x, py = b[0].y;
+        temp[0].x = px; temp[0].y = py;
+        for (int i = 1; i < 4; i++) {
+            int relX = b[i].x - px;
+            int relY = b[i].y - py;
+            temp[i].x = px + relY;
+            temp[i].y = py - relX;
+        }
+    }
+
+    private int newDirection(int rotationType) {
+        int result = direction;
+        switch(rotationType) {
+            case 0: result = (direction % 4) + 1; break; // CW
+            case 1: result = ((direction + 2) % 4) + 1; break; // CCW
+            case 2: result = ((direction + 1) % 4) + 1; break; // 180°
+        }
+        return result;
+    }
+
     public void rotate(int rotationType) {
-        // Copy current positions into temp
+        justRotated = true;
+        if (active) rotatedDuringLockDelay = true;
+
+        // Save current direction (optional, useful for wall kick tables)
+        int fromDir = direction;
+
+        // Copy current positions to temp as baseline
         for (int i = 0; i < 4; i++) {
             temp[i].x = b[i].x;
             temp[i].y = b[i].y;
         }
 
-        int newDirection = direction;
-
-        // Apply rotation preview
+        // Rotate temp[] according to rotation type
         switch(rotationType) {
-            case 0: // clockwise
-                if(direction == 1) { rightDirection(); newDirection = 2; }
-                else if(direction == 2) { downDirection(); newDirection = 3; }
-                else if(direction == 3) { leftDirection(); newDirection = 4; }
-                else if(direction == 4) { upDirection(); newDirection = 1; }
+            case 0: // CW 90°
+                rotateTempCW();
+                direction = (direction % 4) + 1; // cycle 1→2→3→4→1
                 break;
-            case 1: // counterclockwise
-                if(direction == 1) { downDirection(); newDirection = 4; }
-                else if(direction == 2) { leftDirection(); newDirection = 1; }
-                else if(direction == 3) { upDirection(); newDirection = 2; }
-                else if(direction == 4) { rightDirection(); newDirection = 3; }
+            case 1: // CCW 90°
+                rotateTempCCW();
+                direction = (direction == 1) ? 4 : direction - 1;
                 break;
-            case 2: // 180 degrees
-                if(direction == 1) { leftDirection(); newDirection = 3; }
-                else if(direction == 2) { upDirection(); newDirection = 4; }
-                else if(direction == 3) { rightDirection(); newDirection = 1; }
-                else if(direction == 4) { downDirection(); newDirection = 2; }
+            case 2: // 180°
+                rotateTempCW();
+                rotateTempCW();
+                direction = (direction + 1) % 4 + 1; // simple way to update, optional
                 break;
         }
 
-        // Check all collision types
-        checkRotationCollision();       // walls/floor
-        checkRotationBlockCollision();  // placed blocks
-
-        if (!leftCollision && !rightCollision && !bottomCollision && !rotationBlockCollision) {
-            // Safe to apply rotation
+        // Attempt rotation + wall kicks
+        if (!attemptRotationWithKicks(fromDir, direction, rotationType)) {
+            // rotation failed → restore b[] from temp baseline
             for (int i = 0; i < 4; i++) {
-                b[i].x = temp[i].x;
-                b[i].y = temp[i].y;
+                temp[i].x = b[i].x;
+                temp[i].y = b[i].y;
             }
-            direction = newDirection;
+        }
+    }
+    private boolean attemptRotationWithKicks(int fromDir, int toDir, int rotationType) {
+        int[][] kicks = getWallKicks(fromDir, toDir, rotationType);
+
+        for (int[] offset : kicks) {
+            // Apply kick to temp[] (already rotated)
+            for (int i = 0; i < 4; i++) {
+                temp[i].x += offset[0] * Block.SIZE;
+                temp[i].y += offset[1] * Block.SIZE;
+            }
+
+            // Check for collisions using temp[]
+            leftCollision = rightCollision = bottomCollision = false;
+            checkRotationCollision();      // wall boundaries
+            checkRotationBlockCollision(); // collision with placed blocks
+
+            if (!leftCollision && !rightCollision && !bottomCollision && !rotationBlockCollision) {
+                // Kick successful → commit temp[] to b[]
+                for (int i = 0; i < 4; i++) {
+                    b[i].x = temp[i].x;
+                    b[i].y = temp[i].y;
+                }
+                return true;
+            }
+
+            // Undo this kick if invalid (restore rotated shape without offset)
+            for (int i = 0; i < 4; i++) {
+                temp[i].x -= offset[0] * Block.SIZE;
+                temp[i].y -= offset[1] * Block.SIZE;
+            }
         }
 
-        justRotated = true;
+        return false; // no kick worked
     }
 
+    private int[][] getWallKicks(int from, int to, int rotationType) {
+        boolean isI = type.equals("I");
 
+        // JLSTZ
+        int[][] JLSTZ_0R = {{0,0}, {-1,0}, {-1,1}, {0,-2}, {-1,-2}};
+        int[][] JLSTZ_R0 = {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}};
+        int[][] JLSTZ_R2 = {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}};
+        int[][] JLSTZ_2R = {{0,0}, {-1,0}, {-1,1}, {0,-2}, {-1,-2}};
+        int[][] JLSTZ_2L = {{0,0}, {1,0}, {1,1}, {0,-2}, {1,-2}};
+        int[][] JLSTZ_L2 = {{0,0}, {-1,0}, {-1,-1}, {0,2}, {-1,2}};
+        int[][] JLSTZ_L0 = {{0,0}, {-1,0}, {-1,-1}, {0,2}, {-1,2}};
+        int[][] JLSTZ_0L = {{0,0}, {1,0}, {1,1}, {0,-2}, {1,-2}};
+
+        // I piece
+        int[][] I_0R = {{0,0}, {-2,0}, {1,0}, {-2,-1}, {1,2}};
+        int[][] I_R0 = {{0,0}, {2,0}, {-1,0}, {2,1}, {-1,-2}};
+        int[][] I_R2 = {{0,0}, {-1,0}, {2,0}, {-1,2}, {2,-1}};
+        int[][] I_2R = {{0,0}, {1,0}, {-2,0}, {1,-2}, {-2,1}};
+        int[][] I_2L = {{0,0}, {2,0}, {-1,0}, {2,1}, {-1,-2}};
+        int[][] I_L2 = {{0,0}, {-2,0}, {1,0}, {-2,-1}, {1,2}};
+        int[][] I_L0 = {{0,0}, {1,0}, {-2,0}, {1,-2}, {-2,1}};
+        int[][] I_0L = {{0,0}, {-1,0}, {2,0}, {-1,2}, {2,-1}};
+
+        if (isI) {
+            switch(from) {
+                case 1: if (to == 2) return I_0R; if (to == 4) return I_0L; break;
+                case 2: if (to == 3) return I_R2; if (to == 1) return I_R0; break;
+                case 3: if (to == 4) return I_2R; if (to == 2) return I_2L; break;
+                case 4: if (to == 1) return I_L0; if (to == 3) return I_L2; break;
+            }
+            if (rotationType == 2) return new int[][]{{0,0}};
+        } else {
+            switch(from) {
+                case 1: if (to == 2) return JLSTZ_0R; if (to == 4) return JLSTZ_0L; break;
+                case 2: if (to == 3) return JLSTZ_R2; if (to == 1) return JLSTZ_R0; break;
+                case 3: if (to == 4) return JLSTZ_2R; if (to == 2) return JLSTZ_2L; break;
+                case 4: if (to == 1) return JLSTZ_L0; if (to == 3) return JLSTZ_L2; break;
+            }
+            if (rotationType == 2) return new int[][]{{0,0}};
+        }
+
+        return new int[][]{{0,0}};
+    }
+
+    // --- DEACTIVATION / T-SPIN LOGIC ---
     private void deactivate() {
-        // Count frames of being stationary
-        deactivateCounter++;
+        if(KeyHandler.spacePressed) active = false;
+        updateCurrentCollisions();
+        int delay = 90;
+        if(isOnFloor()) delay = 45;
+        if (!canMoveDown()) {
+            deactivateCounter++;
+            if (deactivateCounter >= delay) {
+                active = false;
+                if (rotatedDuringLockDelay) {
+                    spin = true;
+                    System.out.println("T-spin detected");
+                    if (direction == 1) {
+                        GameManager.spinMessage = "Mini T-Spin";
+                    } else {
+                        GameManager.spinMessage = "T-Spin";
+                    }
+                    GameManager.spinMessageTimer = 120;
+                }
+                deactivateCounter = 0;
+                deactivating = false;
+                rotatedDuringLockDelay = false;
+            }
+        } else {
+            deactivateCounter = 0;
+            deactivating = false;
+            spin = false;
+            rotatedDuringLockDelay = false;
+        }
+    }
 
-        // Run both checks before using the result
+    public void update() {
+        if (GameManager.gameState != GameManager.PLAYING) return;
+
         leftCollision = rightCollision = bottomCollision = false;
+        rotationBlockCollision = false;
         checkMovementCollision();
         checkBlockCollision();
 
-        if (bottomCollision) {
-            // If touching something, start grace countdown
-            if (deactivateCounter >= 45) {
-                active = false;
-                deactivateCounter = 0;
+        if (deactivating) deactivate();
+
+        if (KeyHandler.upPressed) { rotate(0); KeyHandler.upPressed = false; }
+        if (KeyHandler.zPressed) { rotate(1); KeyHandler.zPressed = false; }
+        if (KeyHandler.aPressed) { rotate(2); KeyHandler.aPressed = false; }
+
+        if (KeyHandler.leftPressed) {
+            if (canMove(-Block.SIZE, 0)) {
+                for (Block blk : b) blk.x -= Block.SIZE;
+                justRotated = false;
             }
-        } else {
-            // Reset if no longer touching ground
-            deactivateCounter = 0;
-            deactivating = false;
+            KeyHandler.leftPressed = false;
         }
+
+// RIGHT
+        if (KeyHandler.rightPressed) {
+            if (canMove(Block.SIZE, 0)) {
+                for (Block blk : b) blk.x += Block.SIZE;
+                justRotated = false;
+            }
+            KeyHandler.rightPressed = false;
+        }
+
+        if (KeyHandler.downPressed && !deactivating) {
+            if (movePieceDown()) { GameManager.score++; deactivateCounter = 0; deactivating = false; }
+            else { checkMovementCollision(); checkBlockCollision(); deactivating = true; }
+            KeyHandler.downPressed = false;
+        }
+
+        checkMovementCollision();
+        checkBlockCollision();
+        if (bottomCollision || rotationBlockCollision) deactivating = true;
+
+        if (KeyHandler.shiftPressed) { GameManager.hold = true; KeyHandler.shiftPressed = false; }
+
+        autoDropCounter++;
+        if (autoDropCounter >= GameManager.dropInterval) {
+            if (!movePieceDown()) { checkMovementCollision(); checkBlockCollision(); deactivating = true; }
+            else { deactivateCounter = 0; deactivating = false; }
+            autoDropCounter = 0;
+        }
+
+        if (deactivating) deactivate();
     }
-    public void update(){
-        if(GameManager.gameState == GameManager.PLAYING) {
-            leftCollision = rightCollision = bottomCollision = false;
-            rotationBlockCollision = false; // if you use it
-            checkMovementCollision();
-            checkBlockCollision();
-            if (deactivating) deactivate();
-            if (KeyHandler.upPressed) {
-                rotate(0); // clockwise rotation
-                KeyHandler.upPressed = false;
-            }
-            checkMovementCollision();
-            checkBlockCollision();
-            if (KeyHandler.leftPressed) {
-                justRotated = false;
-                boolean canMoveLeft = true;
 
-                for (Block blk : b) {
-                    // Wall collision
-                    if (blk.x - Block.SIZE < GameManager.leftX) {
-                        canMoveLeft = false;
-                        break;
-                    }
-                    // Collision with placed blocks
-                    for (Block placed : GameManager.placedBlocks) {
-                        if (blk.x - Block.SIZE == placed.x && blk.y == placed.y) {
-                            canMoveLeft = false;
-                            break;
-                        }
-                    }
-                    if (!canMoveLeft) break;
-                }
+    private boolean isOnFloor() {
+        for (int i = 0; i < 4; i++) if (b[i].y + Block.SIZE >= GameManager.bottomY) return true;
+        return false;
+    }
 
-// Apply move only if valid
-                if (canMoveLeft) {
-                    for (Block blk : b) {
-                        blk.x -= Block.SIZE;
-                    }
-                }
-                KeyHandler.leftPressed = false;
-            }
-            if (KeyHandler.rightPressed) {
-                justRotated = false;
-                // compute proposed position
-                boolean canMoveRight = true;
-                for (Block blk : b) {
-                    if (blk.x + Block.SIZE >= GameManager.rightX) canMoveRight = false;
-                    for (Block placed : GameManager.placedBlocks) {
-                        if (blk.x + Block.SIZE == placed.x && blk.y == placed.y) canMoveRight = false;
-                    }
-                }
+    private boolean canMove(int dx, int dy) {
+        for (Block blk : b) {
+            int newX = blk.x + dx;
+            int newY = blk.y + dy;
 
-                // apply move only if valid
-                if (canMoveRight) {
-                    for (Block blk : b) {
-                        blk.x += Block.SIZE;
-                    }
-                }
+            // Walls
+            if (newX < GameManager.leftX || newX >= GameManager.rightX) return false;
 
-                KeyHandler.rightPressed = false;
-            }
+            // Floor / ceiling
+            if (newY >= GameManager.bottomY) return false;
 
-            if (KeyHandler.downPressed && !bottomCollision && !deactivating) {
-                for (int i = 0; i < 4; i++) {
-                    b[i].y += Block.SIZE;
-                }
-                KeyHandler.downPressed = false;
-                autoDropCounter = 0;
-            }
-
-            if (KeyHandler.zPressed) {
-                rotate(2);
-                KeyHandler.zPressed = false;
-            }
-            if (KeyHandler.aPressed) {
-                rotate(1);
-                KeyHandler.aPressed = false;
-            }
-            if (bottomCollision) {
-                deactivating = true;
-            }
-            if (KeyHandler.shiftPressed) {
-                GameManager.hold = true;
-                KeyHandler.shiftPressed = false;
-            } else {
-                autoDropCounter++;
-                if (autoDropCounter == GameManager.dropInterval) {
-                    for (int i = 0; i < 4; i++) {
-                        b[i].y += Block.SIZE;
-                    }
-                    autoDropCounter = 0;
-                }
+            // Placed blocks
+            for (Block placed : GameManager.placedBlocks) {
+                if (placed.x == newX && placed.y == newY) return false;
             }
         }
+        return true;
     }
+
+
+    private boolean movePieceDown() {
+        for (int i = 0; i < 4; i++) { temp[i].x = b[i].x; temp[i].y = b[i].y + Block.SIZE; }
+        bottomCollision = leftCollision = rightCollision = false;
+        checkRotationCollision();
+        checkRotationBlockCollision();
+        if (!bottomCollision && !rotationBlockCollision) {
+            for (int i = 0; i < 4; i++) b[i].y = temp[i].y;
+            return true;
+        }
+        return false;
+    }
+
+    private boolean canMoveDown() {
+        for (int i = 0; i < 4; i++) {
+            int newY = b[i].y + Block.SIZE;
+            if (newY >= GameManager.bottomY) return false;
+            for (Block placed : GameManager.placedBlocks) if (placed.x == b[i].x && placed.y == newY) return false;
+        }
+        return true;
+    }
+
+    private void updateCurrentCollisions() {
+        leftCollision = rightCollision = bottomCollision = false;
+        for (int i = 0; i < 4; i++) {
+            if (b[i].x < GameManager.leftX) leftCollision = true;
+            if (b[i].x + Block.SIZE > GameManager.rightX) rightCollision = true;
+            if (b[i].y + Block.SIZE >= GameManager.bottomY) bottomCollision = true;
+        }
+        checkRotationBlockCollision();
+    }
+
     public void hardDrop() {
         int safety = 0;
-
         while (true) {
             boolean willCollide = false;
-
-            // Predict collision before moving
             for (Block blk : b) {
                 int nextY = blk.y + Block.SIZE;
-
-                // Bottom of board
-                if (nextY >= GameManager.bottomY) {
-                    willCollide = true;
-                    break;
-                }
-
-                // Collision with placed blocks
-                for (Block placed : GameManager.placedBlocks) {
-                    if (blk.x == placed.x && nextY == placed.y) {
-                        willCollide = true;
-                        break;
-                    }
-                }
+                if (nextY >= GameManager.bottomY) { willCollide = true; break; }
+                for (Block placed : GameManager.placedBlocks) if (blk.x == placed.x && nextY == placed.y) { willCollide = true; break; }
                 if (willCollide) break;
             }
-
             if (willCollide || safety > 100) break;
-
-            // Safe to move
-            for (int i = 0; i < 4; i++) {
-                b[i].y += Block.SIZE;
-            }
-
-            safety++;
+            for (Block blk : b) blk.y += Block.SIZE;
+            safety++; GameManager.score++;
         }
-
-        active = false;
-        deactivating = false;
-        bottomCollision = true;
-        System.out.println("Hard drop finished after " + safety + " steps");
+        deactivateCounter = 45; bottomCollision = true; deactivating = true; deactivate();
     }
 
+    private void checkRotationCollision() {
+        leftCollision = rightCollision = bottomCollision = false;
+        int playfieldWidth = GameManager.rightX - GameManager.leftX;
+        int playfieldHeight = GameManager.bottomY - GameManager.topY;
+        int cols = playfieldWidth / Block.SIZE;
+        int rows = playfieldHeight / Block.SIZE;
+
+        for (Block block : temp) {
+            int gridX = (block.x - GameManager.leftX) / Block.SIZE;
+            int gridY = (block.y - GameManager.topY) / Block.SIZE;
+            if (gridX < 0) leftCollision = true;
+            if (gridX >= cols) rightCollision = true;
+            if (gridY >= rows) bottomCollision = true;
+        }
+    }
 
     public void draw(Graphics2D g2){
         int margin = 2;

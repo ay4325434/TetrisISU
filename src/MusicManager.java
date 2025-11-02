@@ -97,6 +97,16 @@ public class MusicManager {
         songPaths.put("collectionG9", "Music Collection 7/Tempestissimo.wav");
         songPaths.put("collectionG10", "Music Collection 7/TO THE COSMIC!!.wav");
 
+        songPaths.put("collectionH1", "Music Collection 8/");
+        songPaths.put("collectionH2", "Music Collection 8/");
+        songPaths.put("collectionH3", "Music Collection 8/");
+        songPaths.put("collectionH4", "Music Collection 8/");
+        songPaths.put("collectionH5", "Music Collection 8/");
+        songPaths.put("collectionH6", "Music Collection 8/");
+        songPaths.put("collectionH7", "Music Collection 8/");
+        songPaths.put("collectionH8", "Music Collection 8/");
+        songPaths.put("collectionH9", "Music Collection 8/");
+        songPaths.put("collectionH10", "Music Collection 8/");
     }
 
     public void stop() {

@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ImageManager extends JPanel {
+public class ImageManager {
     private Map<String, String> paths = new HashMap<>();
     private Map<String, Image> cache = new HashMap<>();
     public ImageManager(){
@@ -86,6 +86,17 @@ public class ImageManager extends JPanel {
         paths.put("G9", "Images/Collection 7/tempestissimo.png");
         paths.put("G10", "Images/Collection 7/to the cosmic.png");
 
+        paths.put("H1", "Images/Collection 8/");
+        paths.put("H2", "Images/Collection 8/");
+        paths.put("H3", "Images/Collection 8/");
+        paths.put("H4", "Images/Collection 8/");
+        paths.put("H5", "Images/Collection 8/");
+        paths.put("H6", "Images/Collection 8/");
+        paths.put("H7", "Images/Collection 8/");
+        paths.put("H8", "Images/Collection 8/");
+        paths.put("H9", "Images/Collection 8/");
+        paths.put("H10", "Images/Collection 8/");
+
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
         paths.put("credits3", "Images/Credits/credits3.png");
@@ -103,11 +114,11 @@ public class ImageManager extends JPanel {
 
         paths.put("initialize1", "Images/Initialize/initialize1.png");
     }
+
     public Image getImage(String imageId) {
         if (!cache.containsKey(imageId)) {
             String path = paths.get(imageId);
             if (path == null) {
-//                System.err.println("Image ID not found: " + imageId);
                 return null;
             }
             try {
