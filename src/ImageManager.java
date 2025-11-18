@@ -86,16 +86,16 @@ public class ImageManager {
         paths.put("G9", "Images/Collection 7/tempestissimo.png");
         paths.put("G10", "Images/Collection 7/to the cosmic.png");
 
-        paths.put("H1", "Images/Collection 8/");
-        paths.put("H2", "Images/Collection 8/");
-        paths.put("H3", "Images/Collection 8/");
-        paths.put("H4", "Images/Collection 8/");
-        paths.put("H5", "Images/Collection 8/");
-        paths.put("H6", "Images/Collection 8/");
-        paths.put("H7", "Images/Collection 8/");
-        paths.put("H8", "Images/Collection 8/");
-        paths.put("H9", "Images/Collection 8/");
-        paths.put("H10", "Images/Collection 8/");
+        paths.put("H1", "Images/Collection 8/bring it on.png");
+        paths.put("H2", "Images/Collection 8/gimme x gimme.png");
+        paths.put("H3", "Images/Collection 8/hibana.png");
+        paths.put("H4", "Images/Collection 8/llnf.png");
+        paths.put("H5", "Images/Collection 8/monitoring.png");
+        paths.put("H6", "Images/Collection 8/override.png");
+        paths.put("H7", "Images/Collection 8/sbz.png");
+        paths.put("H8", "Images/Collection 8/styaos.png");
+        paths.put("H9", "Images/Collection 8/tivohm.png");
+        paths.put("H10", "Images/Collection 8/ttb.png");
 
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");

@@ -17,7 +17,6 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
 
     Thread gameThread;
     GameManager gm;
-    MusicManager mm = new MusicManager();
     public Board(){
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         this.setBackground(Color.BLACK);
@@ -58,6 +57,11 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 repaint();
                 delta--;
                 drawCount++;
+            }
+            if (timer >= 1_000_000_000) {   // 1 second
+                System.out.println("FPS: " + drawCount);
+                drawCount = 0;
+                timer = 0;
             }
         }
     }

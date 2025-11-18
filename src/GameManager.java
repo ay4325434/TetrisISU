@@ -3,19 +3,20 @@ import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.StringTokenizer;
 
 public class GameManager{
 
     //Game window properties
-    final int WIDTH = 300;
-    final int HEIGHT = 660;
+    public static final int WIDTH = 300;
+    public static final int HEIGHT = 660;
     public static int leftX;
     public static int topY;
     public static int rightX;
     public static int bottomY;
 
-    public static int lines = 0;
-    public static int linesCleared = 0;
+    private int lines = 0;
+    private int linesCleared = 0;
     public static int level = 1;
     public static int score = 0;
 
@@ -127,7 +128,8 @@ public class GameManager{
 
         try{
             BufferedReader br = new BufferedReader(new FileReader("save.txt"));
-            playCollection = Integer.parseInt(br.readLine());
+            playCollection = Integer.parseInt(br.readLine().trim());
+            br.close();
         } catch (NumberFormatException e){
             playCollection = 1;
         } catch (IOException e){
@@ -173,21 +175,22 @@ public class GameManager{
         boolean surgeSent = false;
         if(checkForTSpin()){
             if(currentMino.direction == 1){
-                spinMessage = "Mini T-Spin";
+                spinMessage = "Mini " + currentMino.type + "-Spin";
             }
             else{
-                spinMessage = "T-Spin";
+                spinMessage = currentMino.type + "-Spin";
             }
         }
         if(checkForAllClear()){
             pcMessage = "ALL CLEAR";
         }
+        StringTokenizer st = new StringTokenizer(spinMessage, " ");
         switch(linesCleared) {
             case 1:
                 lineClearMessage = "SINGLE";
                 if(checkForTSpin() || checkForAllClear()){
                     b2b++;
-                    if(spinMessage.equals("T-Spin")){
+                    if(!st.nextToken().equalsIgnoreCase("Mini")){
                         if(b2b > 1) {
                             score += (100 * b2b * level * 5);
                         }
@@ -221,7 +224,7 @@ public class GameManager{
                 lineClearMessage = "DOUBLE";
                 if(checkForTSpin() || checkForAllClear()){
                     b2b++;
-                    if(spinMessage.equals("T-Spin")){
+                    if(!st.nextToken().equalsIgnoreCase("Mini")){
                         if(b2b > 1) {
                             score += (200 * b2b * level * 5);
                         }
@@ -251,7 +254,7 @@ public class GameManager{
                 }
                 break;
             case 3:
-                if(checkForTSpin() || checkForAllClear()){
+                if(!st.nextToken().equalsIgnoreCase("Mini")){
                     b2b++;
                     if(spinMessage.equals("T-Spin")){
                         if(b2b > 1) {
@@ -308,61 +311,48 @@ public class GameManager{
     }
 
     private boolean checkForAllClear(){
-        return placedBlocks.isEmpty();
+        return placedBlocks.isEmpty(); // only works mid-game
     }
 
     public void update() throws Exception {
-        if (gameState == MENU && !currentSong.equals("menu")){
+        // --- MUSIC HANDLING FOR MENU ---
+        if (gameState == MENU && !"menu".equals(currentSong)) {
             mm.stop();
             mm.loop("menu");
             currentSong = "menu";
         }
+
+        // --- TETRIS GAMEPLAY ---
         if (gameState == PLAYING) {
-            mm.stop();
-            currentSong = "";
             if (!KeyHandler.pausePressed) {
-                if(playCollection == 1){
-                    mm.loop("collectionA" + (level/2 + 1));
-                    currentSong = "collectionA" + (level/2 + 1);
-                }
-                if(playCollection == 2){
-                    mm.loop("collectionB" + (level/2 + 1));
-                    currentSong = "collectionB" + (level/2 + 1);
-                }
-                if(playCollection == 3){
-                    mm.loop("collectionC" + (level/2 + 1));
-                    currentSong = "collectionC" + (level/2 + 1);
-                }
-                if(playCollection == 4){
-                    mm.loop("collectionD" + (level/2 + 1));
-                    currentSong = "collectionD" + (level/2 + 1);
-                }
-                if(playCollection == 5){
-                    mm.loop("collectionE" + (level/2 + 1));
-                    currentSong = "collectionE" + (level/2 + 1);
-                }
-                if(playCollection == 6){
-                    mm.loop("collectionF" + (level/2 + 1));
-                    currentSong = "collectionF" + (level/2 + 1);
+                // --- Background music per collection/level ---
+                String levelKey = "collection" + (char)('A' + playCollection - 1) + (level / 2 + 1);
+                if (!levelKey.equals(currentSong)) {
+                    mm.loop(levelKey);
+                    currentSong = levelKey;
                 }
 
+                // --- Piece has landed ---
                 if (!currentMino.active) {
                     alreadyHeld = false;
+
+                    // Add blocks to placed
                     for (int i = 0; i < 4; i++) {
                         placedBlocks.add(currentMino.b[i]);
                     }
 
-                    // Check for game over
+                    // Check game over
                     if (currentMino.b[0].x == startX && currentMino.b[0].y == startY) {
                         gameState = GAME_OVER;
-                    }
-                    else {
+                    } else {
                         currentMino.deactivating = false;
-                        //Shift all pieces in the "Next" column up one unit
+
+                        // Shift next pieces
                         currentMino = nextMino1;
                         currentMino.spin = false;
                         currentMino.justRotated = false;
                         currentMino.setXY(startX, startY);
+
                         nextMino1 = nextMino2;
                         nextMino1.setXY(nextX1, nextY1);
                         nextMino2 = nextMino3;
@@ -374,18 +364,20 @@ public class GameManager{
                         nextMino5 = nextMino6;
                         nextMino5.setXY(nextX5, nextY5);
                         nextMino6 = pickMino();
-                        nextMino6.setXY(0, 0); // Position off-screen until it becomes the 5th next piece
+                        nextMino6.setXY(0, 0);
 
                         clearLines();
                     }
                 } else {
-                    if (KeyHandler.shiftPressed && !alreadyHeld) { // Hold piece
-                        alreadyHeld = true; // Player can only hold once until the current piece is dropped
+                    // --- Holding logic ---
+                    if (KeyHandler.shiftPressed && !alreadyHeld) {
+                        alreadyHeld = true;
                         if (!hold) {
                             holdMino = currentMino;
                             holdMino.setXY(leftX - 150, topY + 80);
                             currentMino = nextMino1;
                             currentMino.setXY(startX, startY);
+
                             nextMino1 = nextMino2;
                             nextMino1.setXY(nextX1, nextY1);
                             nextMino2 = nextMino3;
@@ -397,9 +389,10 @@ public class GameManager{
                             nextMino5 = nextMino6;
                             nextMino5.setXY(nextX5, nextY5);
                             nextMino6 = pickMino();
-                            nextMino6.setXY(0, 0); // Position off-screen until it becomes the 5th next piece
+                            nextMino6.setXY(0, 0);
+
                             hold = true;
-                        } else { // Switch the current piece with the piece in the hold slot
+                        } else {
                             Mino temp = currentMino;
                             currentMino = holdMino;
                             currentMino.setXY(startX, startY);
@@ -407,419 +400,66 @@ public class GameManager{
                             holdMino.setXY(leftX - 150, topY + 80);
                         }
                     }
-                    if (gameState == PLAYING && KeyHandler.spacePressed) {
+
+                    // --- Hard drop ---
+                    if (KeyHandler.spacePressed) {
                         currentMino.hardDrop();
-                        KeyHandler.spacePressed = false;  // reset so it only triggers once
+                        KeyHandler.spacePressed = false;
                     }
+
+                    // Update current piece
                     currentMino.update();
                 }
             }
-            // Update message timer
+
+            // --- Message timer ---
             if (messageTimer > 0) {
                 messageTimer--;
                 if (messageTimer == 0) {
-                    lineClearMessage = ""; // Clear message after duration
+                    lineClearMessage = "";
                     pcMessage = "";
                 }
             }
         }
-        else if (gameState == MUSIC_SELECT){
+
+        // --- SONG SELECTION SNIPPETS ---
+        if (gameState == SONGS) {
+            String key = (char)('A' + collection - 1) + String.valueOf(song); // e.g., "A1", "B3"
+            Snippet snippet = mm.getSnippet(key);
+            if (snippet != null && !key.equals(currentSong)) {
+                mm.stopLoop();
+                mm.loopSnippet("collection" + key, snippet.start, snippet.end, snippet.loopDelay);
+                currentSong = key;
+            }
+        }
+
+        // --- OTHER GAME STATES ---
+        else if (gameState == MUSIC_SELECT) {
             mm.stop();
             currentSong = "";
         }
-        else if (gameState == GAME_OVER){
+        else if (gameState == GAME_OVER) {
             mm.stop();
             currentSong = "";
             reset();
         }
-        else if (gameState == SONGS){
-            if(collection == 1){
-                if (!"collectionA5".equals(currentSong) && song == 1) {
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA5", 40, 65, 1500);
-                    currentSong = "collectionA5";
-                }
-                if (!"collectionA1".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA1", 80, 110, 1500);
-                    currentSong = "collectionA1";
-                }
-                if (!"collectionA2".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA2", 40, 70, 1500);
-                    currentSong = "collectionA2";
-                }
-                if (!"collectionA3".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA3", 238, 268, 1500);
-                    currentSong = "collectionA3";
-                }
-                if (!"collectionA4".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA4", 191, 220, 1500);
-                    currentSong = "collectionA4";
-                }
-                if (!"collectionA6".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA6", 60, 90, 1500);
-                    currentSong = "collectionA6";
-                }
-                if (!"collectionA7".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA7", 150, 180, 1500);
-                    currentSong = "collectionA7";
-                }
-                if (!"collectionA8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA8", 195, 225, 1500);
-                    currentSong = "collectionA8";
-                }
-                if (!"collectionA9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA9", 245, 275, 1500);
-                    currentSong = "collectionA9";
-                }
-                if (!"collectionA10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionA10", 90, 120, 1500);
-                    currentSong = "collectionA10";
-                }
-            }
-            else if (collection == 2){
-                if (!"collectionB1".equals(currentSong) && song == 1){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB1", 30, 60, 1500);
-                    currentSong = "collectionB1";
-                }
-                if (!"collectionB2".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB2", 110, 140, 1500);
-                    currentSong = "collectionB2";
-                }
-                if (!"collectionB3".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB3", 105, 135, 1500);
-                    currentSong = "collectionB3";
-                }
-                if (!"collectionB4".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB4", 30, 60, 1500);
-                    currentSong = "collectionB4";
-                }
-                if (!"collectionB5".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB5", 90, 120, 1500);
-                    currentSong = "collectionB5";
-                }
-                if (!"collectionB6".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB6", 90, 120, 1500);
-                    currentSong = "collectionB6";
-                }
-                if (!"collectionB7".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB7", 165, 195, 1500);
-                    currentSong = "collectionB7";
-                }
-                if (!"collectionB8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB8", 90, 120, 1500);
-                    currentSong = "collectionB8";
-                }
-                if (!"collectionB9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB9", 90, 120, 1500);
-                    currentSong = "collectionB9";
-                }
-                if (!"collectionB10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionB10", 90, 120, 1500);
-                    currentSong = "collectionB10";
-                }
-            }
-            else if (collection == 3){
-                if (!"collectionC1".equals(currentSong) && song == 1){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC1", 90, 120, 1500);
-                    currentSong = "collectionC1";
-                }
-                if (!"collectionC2".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC2", 20, 50, 1500);
-                    currentSong = "collectionC2";
-                }
-                if (!"collectionC3".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC3", 50, 80, 1500);
-                    currentSong = "collectionC3";
-                }
-                if (!"collectionC4".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC4", 50, 80, 1500);
-                    currentSong = "collectionC4";
-                }
-                if (!"collectionC5".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC5", 85, 115, 1500);
-                    currentSong = "collectionC5";
-                }
-                if (!"collectionC6".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC6", 105, 135, 1500);
-                    currentSong = "collectionC6";
-                }
-                if (!"collectionC7".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC7", 105, 135, 1500);
-                    currentSong = "collectionC7";
-                }
-                if (!"collectionC8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC8", 130, 160, 1500);
-                    currentSong = "collectionC8";
-                }
-                if (!"collectionC9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC9", 110, 140, 1500);
-                    currentSong = "collectionC9";
-                }
-                if (!"collectionC10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionC10", 200, 230, 1500);
-                    currentSong = "collectionC10";
-                }
-            }
-            else if (collection == 4){
-                if (!"collectionD2".equals(currentSong) && song == 1){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD2", 90, 120, 1500);
-                    currentSong = "collectionD2";
-                }
-                if (!"collectionD3".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD3", 90, 120, 1500);
-                    currentSong = "collectionD3";
-                }
-                if (!"collectionD4".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD4", 75, 105, 1500);
-                    currentSong = "collectionD4";
-                }
-                if (!"collectionD5".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD5", 90, 120, 1500);
-                    currentSong = "collectionD5";
-                }
-                if (!"collectionD6".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD6", 90, 120, 1500);
-                    currentSong = "collectionD6";
-                }
-                if (!"collectionD7".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD7", 110, 140, 1500);
-                    currentSong = "collectionD7";
-                }
-                if (!"collectionD1".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD1", 90, 120, 1500);
-                    currentSong = "collectionD1";
-                }
-                if (!"collectionD8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD8", 90, 120, 1500);
-                    currentSong = "collectionD8";
-                }
-                if (!"collectionD9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD9", 80, 110, 1500);
-                    currentSong = "collectionD9";
-                }
-                if (!"collectionD10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionD10", 30, 60, 1500);
-                    currentSong = "collectionD10";
-                }
-            }
-            else if (collection == 5){
-                if (!"collectionE1".equals(currentSong) && song == 1){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE1", 40, 70, 1500);
-                    currentSong = "collectionE1";
-                }
-                if (!"collectionE2".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE2", 60, 90, 1500);
-                    currentSong = "collectionE2";
-                }
-                if (!"collectionE3".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE3", 55, 85, 1500);
-                    currentSong = "collectionE3";
-                }
-                if (!"collectionE4".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE4", 200, 230, 1500);
-                    currentSong = "collectionE4";
-                }
-                if (!"collectionE5".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE5", 45, 75, 1500);
-                    currentSong = "collectionE5";
-                }
-                if (!"collectionE6".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE6", 60, 90, 1500);
-                    currentSong = "collectionE6";
-                }
-                if (!"collectionE7".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE7", 90, 120, 1500);
-                    currentSong = "collectionE7";
-                }
-                if (!"collectionE8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE8", 90, 120, 1500);
-                    currentSong = "collectionE8";
-                }
-                if (!"collectionE9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE9", 90, 120, 1500);
-                    currentSong = "collectionE9";
-                }
-                if (!"collectionE10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionE10", 60, 90, 1500);
-                    currentSong = "collectionE10";
-                }
-            }
-            else if(collection == 6){
-                if (!"collectionF1".equals(currentSong) && song == 1){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF1", 100, 130, 1500);
-                    currentSong = "collectionF1";
-                }
-                if (!"collectionF2".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF2", 20, 50, 1500);
-                    currentSong = "collectionF2";
-                }
-                if (!"collectionF3".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF3", 100, 130, 1500);
-                    currentSong = "collectionF3";
-                }
-                if (!"collectionF4".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF4", 30, 60, 1500);
-                    currentSong = "collectionF4";
-                }
-                if (!"collectionF5".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF5", 60, 90, 1500);
-                    currentSong = "collectionF5";
-                }
-                if (!"collectionF6".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF6", 60, 90, 1500);
-                    currentSong = "collectionF6";
-                }
-                if (!"collectionF7".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF7", 60, 90, 1500);
-                    currentSong = "collectionF7";
-                }
-                if (!"collectionF8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF8", 60, 90, 1500);
-                    currentSong = "collectionF8";
-                }
-                if (!"collectionF9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF9", 75, 105, 1500);
-                    currentSong = "collectionF9";
-                }
-                if (!"collectionF10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionF10", 70, 100, 1500);
-                    currentSong = "collectionF10";
-                }
-            }
-            else if (collection == 7){
-                if (!"collectionG1".equals(currentSong) && song == 1){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG1", 60, 90, 1500);
-                    currentSong = "collectionG1";
-                }
-                if (!"collectionG2".equals(currentSong) && song == 2){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG2", 90, 120, 1500);
-                    currentSong = "collectionG2";
-                }
-                if (!"collectionG3".equals(currentSong) && song == 3){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG3", 90, 120, 1500);
-                    currentSong = "collectionG3";
-                }
-                if (!"collectionG4".equals(currentSong) && song == 4){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG4", 110, 140, 1500);
-                    currentSong = "collectionG4";
-                }
-                if (!"collectionG5".equals(currentSong) && song == 5){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG5", 90, 120, 1500);
-                    currentSong = "collectionG5";
-                }
-                if (!"collectionG6".equals(currentSong) && song == 6){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG6", 90, 120, 1500);
-                    currentSong = "collectionG6";
-                }
-                if (!"collectionG7".equals(currentSong) && song == 7){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG7", 45, 75, 1500);
-                    currentSong = "collectionG7";
-                }
-                if (!"collectionG8".equals(currentSong) && song == 8){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG8", 30, 60, 1500);
-                    currentSong = "collectionG8";
-                }
-                if (!"collectionG9".equals(currentSong) && song == 9){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG9", 90, 120, 1500);
-                    currentSong = "collectionG9";
-                }
-                if (!"collectionG10".equals(currentSong) && song == 10){
-                    mm.stopLoop();
-                    mm.loopSnippet("collectionG10", 90, 120, 1500);
-                    currentSong = "collectionG10";
-                }
-            }
+        else if (gameState == CREDITS && !"credits".equals(currentSong)) {
+            mm.stop();
+            mm.loop("credits");
+            currentSong = "credits";
         }
-        else if (gameState == CREDITS){
-            if(!currentSong.equals("credits")) {
-                mm.stop();
-                mm.loop("credits");
-                currentSong = "credits";
-            }
+        else if (gameState == INSTRUCTIONS && !"instructions".equals(currentSong)) {
+            mm.stop();
+            mm.loop("instructions");
+            currentSong = "instructions";
         }
-        else if (gameState == INSTRUCTIONS){
-            if(!currentSong.equals("instructions")) {
-                mm.stop();
-                mm.loop("instructions");
-                currentSong = "instructions";
-            }
-        }
-        else if(gameState == OTHER){
-            if(!currentSong.equals("other")) {
-                mm.stop();
-                mm.loop("other");
-                currentSong = "other";
-            }
+        else if (gameState == OTHER && !"other".equals(currentSong)) {
+            mm.stop();
+            mm.loop("other");
+            currentSong = "other";
         }
     }
+
     public void clearLines() {
         int y = bottomY - Block.SIZE;
         while (y > topY) {
@@ -991,7 +631,6 @@ public class GameManager{
             if (holdMino != null) {
                 holdMino.draw(g2);
             }
-
         }
         if (gameState == MUSIC_SELECT) {
             g2.drawImage(musicSelect, 0, 0, 1280, 720, null);
@@ -1609,7 +1248,6 @@ public class GameManager{
     public void saveSongCollection(int collection) {
         try (PrintWriter out = new PrintWriter(new FileWriter("save.txt"))) {
             out.println(collection);
-            out.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

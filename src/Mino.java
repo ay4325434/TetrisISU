@@ -1,7 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 
-public class Mino {
+public abstract class Mino {
 
     public Block b[] = new Block[4];
     public Block temp[] = new Block[4];
@@ -26,7 +26,7 @@ public class Mino {
         }
     }
 
-    public void setXY(int x, int y){ }
+    public abstract void setXY(int x, int y);
     // Direction methods removed — pivot-based rotation will handle everything
 
     // --- COLLISIONS ---
@@ -80,7 +80,8 @@ public class Mino {
 
     // --- PIVOT ROTATIONS ---
     private void rotateTempCW() {
-        int px = b[0].x, py = b[0].y;
+        int px = b[0].x;
+        int py = b[0].y;
         temp[0].x = px; temp[0].y = py;
         for (int i = 1; i < 4; i++) {
             int relX = b[i].x - px;
@@ -91,7 +92,8 @@ public class Mino {
     }
 
     private void rotateTempCCW() {
-        int px = b[0].x, py = b[0].y;
+        int px = b[0].x;
+        int py = b[0].y;
         temp[0].x = px; temp[0].y = py;
         for (int i = 1; i < 4; i++) {
             int relX = b[i].x - px;
@@ -101,18 +103,10 @@ public class Mino {
         }
     }
 
-    private int newDirection(int rotationType) {
-        int result = direction;
-        switch(rotationType) {
-            case 0: result = (direction % 4) + 1; break; // CW
-            case 1: result = ((direction + 2) % 4) + 1; break; // CCW
-            case 2: result = ((direction + 1) % 4) + 1; break; // 180°
-        }
-        return result;
-    }
-
     public void rotate(int rotationType) {
+        if(type.equals("O")) return;
         justRotated = true;
+
         if (active) rotatedDuringLockDelay = true;
 
         // Save current direction (optional, useful for wall kick tables)
