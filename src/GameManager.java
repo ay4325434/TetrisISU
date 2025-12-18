@@ -64,6 +64,7 @@ public class GameManager{
     public String currentSong = "";
     private ImageManager im = new ImageManager();
 
+    // Buttons for user selection
     public Rectangle musicSelectButton = new Rectangle(0, 0, 170, 30);
     public Rectangle backButton = new Rectangle(0, 0, 50, 30);
     public Rectangle credsButton = new Rectangle(180, 0, 100, 30);
@@ -86,12 +87,15 @@ public class GameManager{
 
     public Image menu, musicSelect, credits;
 
+    // When in the playing state, keeps track of the current song.
     public int page = 1;
     public static int playCollection = 1;
 
+    // Music selection properties
     public boolean hover = false;
     public static int hoveredCollection = 1;
 
+    // In Tetris, the B2B combo and normal combos actually start at -1, not 0.
     private int b2b = -1;
     private int combo = -1;
 
@@ -126,15 +130,6 @@ public class GameManager{
             throw new RuntimeException("Failed to load image");
         }
 
-        try{
-            BufferedReader br = new BufferedReader(new FileReader("save.txt"));
-            playCollection = Integer.parseInt(br.readLine().trim());
-            br.close();
-        } catch (NumberFormatException e){
-            playCollection = 1;
-        } catch (IOException e){
-            playCollection = 1;
-        }
     }
     /**
      * Picks a random piece after the starting bag has been used up.
@@ -144,9 +139,10 @@ public class GameManager{
         Mino m;
         if(!minos.isEmpty()){
             m = minos.getFirst();
-            minos.removeFirst();
+            minos.removeFirst(); // Use the starting bag of pieces first
         }
         else{
+            // Restablishing the bag of 7 different pieces
             minos.add(new LPiece());
             minos.add(new JPiece());
             minos.add(new IPiece());
@@ -172,8 +168,7 @@ public class GameManager{
      * @param linesCleared
      */
     public void handleLineClear(int linesCleared) {
-        boolean surgeSent = false;
-        if(checkForTSpin()){
+        if(checkForTSpin()){ // Piece spin detected
             if(currentMino.direction == 1){
                 spinMessage = "Mini " + currentMino.type + "-Spin";
             }
@@ -184,10 +179,11 @@ public class GameManager{
         if(checkForAllClear()){
             pcMessage = "ALL CLEAR";
         }
-        StringTokenizer st = new StringTokenizer(spinMessage, " ");
+        StringTokenizer st = new StringTokenizer(spinMessage, " "); // check to see if a mini or a regular spin occurred
         switch(linesCleared) {
             case 1:
                 lineClearMessage = "SINGLE";
+                // Score calculation
                 if(checkForTSpin() || checkForAllClear()){
                     b2b++;
                     if(!st.nextToken().equalsIgnoreCase("Mini")){
@@ -210,7 +206,6 @@ public class GameManager{
                 else {
                     score += 100 * level;
                     if(b2b > 4){
-                        surgeSent = true;
                         score *= b2b;
                         b2b = -1;
                     }
@@ -243,7 +238,6 @@ public class GameManager{
                 }
                 else {
                     if(b2b > 4){
-                        surgeSent = true;
                         score *= b2b;
                         b2b = -1;
                     }
@@ -275,7 +269,6 @@ public class GameManager{
                 }
                 else {
                     if(b2b > 4){
-                        surgeSent = true;
                         score *= b2b;
                         b2b = -1;
                     }
@@ -310,19 +303,23 @@ public class GameManager{
         return currentMino.rotatedDuringLockDelay && currentMino.type.equals("T");
     }
 
+    /**
+     * Check to see if a perfect clear has occurred (line clear results in an empty board).
+     * @return true if board is empty
+     */
     private boolean checkForAllClear(){
         return placedBlocks.isEmpty(); // only works mid-game
     }
 
     public void update() throws Exception {
-        // --- MUSIC HANDLING FOR MENU ---
+        // Menu music
         if (gameState == MENU && !"menu".equals(currentSong)) {
             mm.stop();
             mm.loop("menu");
             currentSong = "menu";
         }
 
-        // --- TETRIS GAMEPLAY ---
+        // Gameplay
         if (gameState == PLAYING) {
             if (!KeyHandler.pausePressed) {
                 // --- Background music per collection/level ---
@@ -332,7 +329,7 @@ public class GameManager{
                     currentSong = levelKey;
                 }
 
-                // --- Piece has landed ---
+                // Piece has landed
                 if (!currentMino.active) {
                     alreadyHeld = false;
 
@@ -341,7 +338,7 @@ public class GameManager{
                         placedBlocks.add(currentMino.b[i]);
                     }
 
-                    // Check game over
+                    // Check for game over
                     if (currentMino.b[0].x == startX && currentMino.b[0].y == startY) {
                         gameState = GAME_OVER;
                     } else {
@@ -369,10 +366,10 @@ public class GameManager{
                         clearLines();
                     }
                 } else {
-                    // --- Holding logic ---
+                    // Holding logic
                     if (KeyHandler.shiftPressed && !alreadyHeld) {
-                        alreadyHeld = true;
-                        if (!hold) {
+                        alreadyHeld = true; // user can only hold once per piece
+                        if (!hold) { // no piece in hold slot
                             holdMino = currentMino;
                             holdMino.setXY(leftX - 150, topY + 80);
                             currentMino = nextMino1;
@@ -392,7 +389,7 @@ public class GameManager{
                             nextMino6.setXY(0, 0);
 
                             hold = true;
-                        } else {
+                        } else { // swap the previously held piece with the current piece
                             Mino temp = currentMino;
                             currentMino = holdMino;
                             currentMino.setXY(startX, startY);
@@ -401,7 +398,7 @@ public class GameManager{
                         }
                     }
 
-                    // --- Hard drop ---
+                    // Hard drop
                     if (KeyHandler.spacePressed) {
                         currentMino.hardDrop();
                         KeyHandler.spacePressed = false;
@@ -412,7 +409,7 @@ public class GameManager{
                 }
             }
 
-            // --- Message timer ---
+            // Message timer
             if (messageTimer > 0) {
                 messageTimer--;
                 if (messageTimer == 0) {
@@ -422,18 +419,25 @@ public class GameManager{
             }
         }
 
-        // --- SONG SELECTION SNIPPETS ---
+        // Play the audio snippet to preview song
         if (gameState == SONGS) {
-            String key = (char)('A' + collection - 1) + String.valueOf(song); // e.g., "A1", "B3"
-            Snippet snippet = mm.getSnippet(key);
-            if (snippet != null && !key.equals(currentSong)) {
-                mm.stopLoop();
-                mm.loopSnippet("collection" + key, snippet.start, snippet.end, snippet.loopDelay);
-                currentSong = key;
+            String collectionKey = String.valueOf((char)('A' + collection - 1)); // "A", "B", etc.
+            Snippet snippet = mm.getSnippet(collectionKey, song); // lookup in nested map
+
+            if (snippet != null) {
+                String key = "collection" + collectionKey + song; // for tracking/looping
+                if (!key.equals(currentSong)) {
+                    mm.stopLoop();
+                    mm.loopSnippet(key, snippet.start, snippet.end, snippet.loopDelay);
+                    currentSong = key;
+                    System.out.println("Playing: " + key);
+                }
+            } else {
+                System.out.println("Snippet not found: " + collectionKey + song);
             }
         }
 
-        // --- OTHER GAME STATES ---
+        // OTHER GAME STATES
         else if (gameState == MUSIC_SELECT) {
             mm.stop();
             currentSong = "";
@@ -441,7 +445,7 @@ public class GameManager{
         else if (gameState == GAME_OVER) {
             mm.stop();
             currentSong = "";
-            reset();
+            reset(); // reset the progress once game ends
         }
         else if (gameState == CREDITS && !"credits".equals(currentSong)) {
             mm.stop();
@@ -460,6 +464,9 @@ public class GameManager{
         }
     }
 
+    /**
+     * Clears lines when a row is fully filled.
+     */
     public void clearLines() {
         int y = bottomY - Block.SIZE;
         while (y > topY) {
@@ -480,12 +487,11 @@ public class GameManager{
                     }
                 }
                 lines++;
-                linesCleared++;
-                handleLineClear(linesCleared);
+                linesCleared++; // use this to determine how many lines were cleared at once
                 if(lines % 10 == 0 && dropInterval > 1){
                     level++;
-                    if(dropInterval > 10) dropInterval -= 10;
-                    else if (dropInterval > 5) dropInterval -= 5;
+                    if(dropInterval > 10) dropInterval -= 5;
+                    else if (dropInterval > 5) dropInterval -= 3;
                     else dropInterval--;
                 }
                 // Drop blocks above
@@ -497,6 +503,7 @@ public class GameManager{
             } else {
                 y -= Block.SIZE; // move up
             }
+            handleLineClear(linesCleared);
         }
         linesCleared = 0; // Reset for next potential clear
     }
@@ -648,9 +655,7 @@ public class GameManager{
             g2.drawString("Music Collection 6", 20, 600);
             g2.drawString("Music Collection 7", 20, 700);
             g2.drawString("Music Collection 8", 570, 100);
-            g2.setFont(new Font("Tahoma", Font.BOLD, 100));
-            g2.drawString("--- MUSIC", 640, 250);
-            g2.drawString("SELECT---", 720, 370);
+            g2.drawString("Music Collection 9", 570, 200);
             if(selectionActivated){
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
                 g2.drawString("Click to select", 670, 550);
@@ -1216,6 +1221,7 @@ public class GameManager{
         placedBlocks.clear();
         startingMinos.clear();
         holdMino = null;
+        hold = false;
         lines = 0;
         score = 0;
         level = 1;
@@ -1244,6 +1250,16 @@ public class GameManager{
         nextMino5 = startingMinos.get(5);
         nextMino5.setXY(nextX5, nextY5);
         nextMino6 = startingMinos.get(6);
+
+        try{
+            BufferedReader br = new BufferedReader(new FileReader("save.txt"));
+            playCollection = Integer.parseInt(br.readLine().trim());
+            br.close();
+        } catch (NumberFormatException e){
+            playCollection = 1;
+        } catch (IOException e){
+            playCollection = 1;
+        }
     }
     public void saveSongCollection(int collection) {
         try (PrintWriter out = new PrintWriter(new FileWriter("save.txt"))) {

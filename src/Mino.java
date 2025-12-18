@@ -1,16 +1,21 @@
+/*
+ * Manages all pieces. Rotation, wall kicks, and piece type are all kept track in this class.
+ */
+
 import javax.swing.*;
 import java.awt.*;
 
 public abstract class Mino {
 
-    public Block b[] = new Block[4];
-    public Block temp[] = new Block[4];
+    public Block[] b = new Block[4]; // One piece, which is composed of four blocks
+    public Block[] temp = new Block[4]; // Use to determine if a move is valid
 
     int autoDropCounter = 0;
     public int direction = 1; // 1: up, 2: right, 3: down, 4: left
 
-    boolean leftCollision, rightCollision, bottomCollision;
+    boolean leftCollision, rightCollision, bottomCollision; // collision flags
 
+    // Piece properties
     public boolean active = true;
     public boolean deactivating;
     int deactivateCounter = 0;
@@ -19,18 +24,22 @@ public abstract class Mino {
     public boolean spin = false;
     public boolean rotatedDuringLockDelay = false;
 
-    public void create(Color c){
+    public void create(Color c){ // Set distinct colors for each piece
         for(int i=0; i<4; i++){
             b[i] = new Block(c);
             temp[i] = new Block(c);
         }
     }
 
+    /**
+     * Sets the piece on a certain spot on the graphics window.
+     * @param x the x-coordinate of the piece
+     * @param y the y-coordinate of the piece
+     */
     public abstract void setXY(int x, int y);
-    // Direction methods removed — pivot-based rotation will handle everything
 
     // --- COLLISIONS ---
-    public void checkMovementCollision() {
+    public void checkMovementCollision() { // Check for collision with the walls
         leftCollision = rightCollision = bottomCollision = false;
         for (int i = 0; i < b.length; i++) {
             if (b[i].x <= GameManager.leftX) leftCollision = true;
@@ -39,7 +48,7 @@ public abstract class Mino {
         }
     }
 
-    public void checkBlockCollision() {
+    public void checkBlockCollision() { // Check for collision with blocks
         leftCollision = rightCollision = bottomCollision = false;
 
         int[] pieceGridX = new int[4];
@@ -48,7 +57,7 @@ public abstract class Mino {
             pieceGridX[i] = b[i].x / Block.SIZE;
             pieceGridY[i] = b[i].y / Block.SIZE;
         }
-
+        // Scale block positions to match indices, then check for collision
         for (Block placed : GameManager.placedBlocks) {
             int targetGridX = placed.x / Block.SIZE;
             int targetGridY = placed.y / Block.SIZE;
@@ -65,8 +74,8 @@ public abstract class Mino {
         }
     }
 
-    boolean rotationBlockCollision;
-    public void checkRotationBlockCollision() {
+    private boolean rotationBlockCollision;
+    public void checkRotationBlockCollision() { // check rotation collision with blocks
         rotationBlockCollision = false;
         for (Block placed : GameManager.placedBlocks) {
             for (int j = 0; j < 4; j++) {
@@ -78,8 +87,8 @@ public abstract class Mino {
         }
     }
 
-    // --- PIVOT ROTATIONS ---
-    private void rotateTempCW() {
+    // PIVOT ROTATIONS
+    private void rotateTempCW() { // Temporarily rotates CW, but doesn't register yet
         int px = b[0].x;
         int py = b[0].y;
         temp[0].x = px; temp[0].y = py;
@@ -91,7 +100,7 @@ public abstract class Mino {
         }
     }
 
-    private void rotateTempCCW() {
+    private void rotateTempCCW() { // Temporarily rotates CCW, but doesn't register yet
         int px = b[0].x;
         int py = b[0].y;
         temp[0].x = px; temp[0].y = py;
@@ -103,11 +112,14 @@ public abstract class Mino {
         }
     }
 
+    /**
+     * Rotates a piece in a certain direction.
+     * @param rotationType the direction of the rotation
+     */
     public void rotate(int rotationType) {
-        if(type.equals("O")) return;
+        if(type.equals("O")) return; // the O piece doesn't rotate
         justRotated = true;
-
-        if (active) rotatedDuringLockDelay = true;
+        if (active) rotatedDuringLockDelay = true; // this is useful for piece spins
 
         // Save current direction (optional, useful for wall kick tables)
         int fromDir = direction;
@@ -137,15 +149,23 @@ public abstract class Mino {
 
         // Attempt rotation + wall kicks
         if (!attemptRotationWithKicks(fromDir, direction, rotationType)) {
-            // rotation failed → restore b[] from temp baseline
+            // rotation failed - restore b[] from temp baseline
             for (int i = 0; i < 4; i++) {
                 temp[i].x = b[i].x;
                 temp[i].y = b[i].y;
             }
         }
     }
+
+    /**
+     * Attempts to rotate a piece using wall kicks. Fails if all resulting cases still result in collisions.
+     * @param fromDir The original direction of the piece
+     * @param toDir The direction of intended rotation
+     * @param rotationType The type of rotation
+     * @return whether the rotation can be executed
+     */
     private boolean attemptRotationWithKicks(int fromDir, int toDir, int rotationType) {
-        int[][] kicks = getWallKicks(fromDir, toDir, rotationType);
+        int[][] kicks = getWallKicks(fromDir, toDir, rotationType); // obtain wall kick table
 
         for (int[] offset : kicks) {
             // Apply kick to temp[] (already rotated)
@@ -160,7 +180,7 @@ public abstract class Mino {
             checkRotationBlockCollision(); // collision with placed blocks
 
             if (!leftCollision && !rightCollision && !bottomCollision && !rotationBlockCollision) {
-                // Kick successful → commit temp[] to b[]
+                // Kick successful - pass from temp[] to b[]
                 for (int i = 0; i < 4; i++) {
                     b[i].x = temp[i].x;
                     b[i].y = temp[i].y;
@@ -178,10 +198,20 @@ public abstract class Mino {
         return false; // no kick worked
     }
 
+    /**
+     * Provides a wall kick table for a certain piece.
+     * @param from the initial position
+     * @param to the rotated position
+     * @param rotationType the type of rotation
+     * @return the wall kick table, in a 2D array
+     */
     private int[][] getWallKicks(int from, int to, int rotationType) {
-        boolean isI = type.equals("I");
+        boolean isI = type.equals("I"); // the I-piece has different offsets.
 
-        // JLSTZ
+        // IMPORTANT: These are not the official SRS wall kick tables for Tetris.
+        // As a result, triples cannot be obtained from a spin.
+
+        // JLSTZ pieces - follow these offsets
         int[][] JLSTZ_0R = {{0,0}, {-1,0}, {-1,1}, {0,-2}, {-1,-2}};
         int[][] JLSTZ_R0 = {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}};
         int[][] JLSTZ_R2 = {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}};
@@ -201,6 +231,7 @@ public abstract class Mino {
         int[][] I_L0 = {{0,0}, {1,0}, {-2,0}, {1,-2}, {-2,1}};
         int[][] I_0L = {{0,0}, {-1,0}, {2,0}, {-1,2}, {2,-1}};
 
+        // Match the rotation with its corresponding offsets
         if (isI) {
             switch(from) {
                 case 1: if (to == 2) return I_0R; if (to == 4) return I_0L; break;
@@ -226,27 +257,27 @@ public abstract class Mino {
     private void deactivate() {
         if(KeyHandler.spacePressed) active = false;
         updateCurrentCollisions();
-        int delay = 90;
-        if(isOnFloor()) delay = 45;
+        int delay = 90; // piece lock timer
+        if(isOnFloor()) delay = 45; // balancing the lock delay because there is more delay on the floor
         if (!canMoveDown()) {
-            deactivateCounter++;
+            deactivateCounter++; // start counting frames
             if (deactivateCounter >= delay) {
-                active = false;
-                if (rotatedDuringLockDelay) {
+                active = false; // pieces has locked
+                if (rotatedDuringLockDelay) { // piece rotated during deactivation
                     spin = true;
                     System.out.println("T-spin detected");
                     if (direction == 1) {
-                        GameManager.spinMessage = "Mini T-Spin";
+                        GameManager.spinMessage = "Mini" + type + "-Spin";
                     } else {
-                        GameManager.spinMessage = "T-Spin";
+                        GameManager.spinMessage = type + "-Spin";
                     }
                     GameManager.spinMessageTimer = 120;
                 }
-                deactivateCounter = 0;
+                deactivateCounter = 0; // reset all values
                 deactivating = false;
                 rotatedDuringLockDelay = false;
             }
-        } else {
+        } else { // piece can still move down
             deactivateCounter = 0;
             deactivating = false;
             spin = false;
@@ -255,6 +286,7 @@ public abstract class Mino {
     }
 
     public void update() {
+        // ignore when user is not playing
         if (GameManager.gameState != GameManager.PLAYING) return;
 
         leftCollision = rightCollision = bottomCollision = false;
@@ -262,21 +294,23 @@ public abstract class Mino {
         checkMovementCollision();
         checkBlockCollision();
 
-        if (deactivating) deactivate();
+        if (deactivating) deactivate(); // piece cannot move down any further
 
+        // check for rotation
         if (KeyHandler.upPressed) { rotate(0); KeyHandler.upPressed = false; }
         if (KeyHandler.zPressed) { rotate(1); KeyHandler.zPressed = false; }
         if (KeyHandler.aPressed) { rotate(2); KeyHandler.aPressed = false; }
 
+        // move left
         if (KeyHandler.leftPressed) {
             if (canMove(-Block.SIZE, 0)) {
                 for (Block blk : b) blk.x -= Block.SIZE;
                 justRotated = false;
             }
-            KeyHandler.leftPressed = false;
+            KeyHandler.leftPressed = false; // only allow one input at a time
         }
 
-// RIGHT
+        // right
         if (KeyHandler.rightPressed) {
             if (canMove(Block.SIZE, 0)) {
                 for (Block blk : b) blk.x += Block.SIZE;
@@ -284,9 +318,12 @@ public abstract class Mino {
             }
             KeyHandler.rightPressed = false;
         }
-
+        // Soft drop
         if (KeyHandler.downPressed && !deactivating) {
-            if (movePieceDown()) { GameManager.score++; deactivateCounter = 0; deactivating = false; }
+            if (movePieceDown()) {
+                GameManager.score++;
+                deactivateCounter = 0;
+                deactivating = false; }
             else { checkMovementCollision(); checkBlockCollision(); deactivating = true; }
             KeyHandler.downPressed = false;
         }

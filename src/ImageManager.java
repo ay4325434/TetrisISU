@@ -97,6 +97,18 @@ public class ImageManager {
         paths.put("H9", "Images/Collection 8/tivohm.png");
         paths.put("H10", "Images/Collection 8/ttb.png");
 
+        // New music collection - add images here
+        paths.put("I1", "Images/Collection 9/");
+        paths.put("I2", "Images/Collection 9/");
+        paths.put("I3", "Images/Collection 9/");
+        paths.put("I4", "Images/Collection 9/");
+        paths.put("I5", "Images/Collection 9/");
+        paths.put("I6", "Images/Collection 9/");
+        paths.put("I7", "Images/Collection 9/");
+        paths.put("I8", "Images/Collection 9/");
+        paths.put("I9", "Images/Collection 9/");
+        paths.put("I10", "Images/Collection 9/");
+
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
         paths.put("credits3", "Images/Credits/credits3.png");
@@ -115,6 +127,11 @@ public class ImageManager {
         paths.put("initialize1", "Images/Initialize/initialize1.png");
     }
 
+    /**
+     * Loads an image for the GUI.
+     * @param imageId The name of the image. Stores it in a cache to prevent repeated I/O reading.
+     * @return The image
+     */
     public Image getImage(String imageId) {
         if (!cache.containsKey(imageId)) {
             String path = paths.get(imageId);

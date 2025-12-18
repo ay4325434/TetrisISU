@@ -59,7 +59,6 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 drawCount++;
             }
             if (timer >= 1_000_000_000) {   // 1 second
-                System.out.println("FPS: " + drawCount);
                 drawCount = 0;
                 timer = 0;
             }

@@ -35,13 +35,11 @@ A: Rotate 180 degrees
 
 Tips and tricks:
 - Clean stacking: Try to make your stack flat. It opens up more potential to clear lines.
-- T-spins: They give a score bonus - A T-spin double gives you the same score as a Quad.
+- T-spins: They give a score bonus. A T-spin double gives you the same score as a Quad.
 
 Bugs:
 - Rotation: Piece may rotate in the wrong direction or 180 degrees for no reason.
 - Blocks may phase into other blocks.
-- Line clearing: Especially with the I piece, some lines may be cleared by accident
-  (the row hasn't been filled).
 
 Features being implemented:
 - Wall kicks: This feature looks for alternative spaces for a piece to fit in if the original
@@ -78,7 +76,7 @@ Is a T-spin triple possible?
 
   If you place the T-piece flat and insert to cover slots 1, 2, 3, and 4, you can rotate it left
   to cover slots 5, 6, 7, and 8. This is only possible because any other case in the wall kick table
-  will result in a collision.
+  will result in a collision. This feature may or may not be implemented.
 
 
 Credits
@@ -91,6 +89,8 @@ Music Collection 4
 Music Collection 5
 Music Collection 6
 Music Collection 7
+Music Collection 8
+Music Collection 9
 
 
 

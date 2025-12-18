@@ -1,3 +1,7 @@
+/*
+ * Represents a single block in the grid.
+ */
+
 import java.awt.*;
 public class Block extends Rectangle{
     public int x, y;

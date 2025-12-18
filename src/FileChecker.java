@@ -1,3 +1,6 @@
+/*
+Checks to see if an image can load properly.
+ */
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
