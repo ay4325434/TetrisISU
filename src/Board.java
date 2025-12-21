@@ -215,6 +215,18 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.currentBackground = 1;
                 }
             }
+            if (gm.mc9.contains(p)) {
+                if(gm.selectionActivated){
+                    gm.saveSongCollection(9);
+                    gm.selectionActivated = false;
+                }
+                else {
+                    gm.gameState = gm.SONGS;
+                    gm.collection = 9;
+                    gm.song = 1;
+                    gm.currentBackground = 1;
+                }
+            }
             if(gm.select.contains(p) && gm.gameState == gm.MUSIC_SELECT){
                 gm.selectionActivated = true;
             }

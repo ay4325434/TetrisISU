@@ -78,6 +78,7 @@ public class GameManager{
     public Rectangle mc6 = new Rectangle(0, 540, 500, 80);
     public Rectangle mc7 = new Rectangle(0, 640, 500, 80);
     public Rectangle mc8 = new Rectangle(550, 40, 500, 80);
+    public Rectangle mc9 = new Rectangle(550, 140, 500, 80);
     public Rectangle select = new Rectangle(80, 0, 80, 30);
 
     public Rectangle leftButton = new Rectangle(20, 220, 50, 200);
@@ -689,6 +690,11 @@ public class GameManager{
                     }
                 }
             }
+            else{
+                g2.setFont(new Font("Tahoma", Font.BOLD, 60));
+                g2.drawString("TURN DOWN", 700, 550);
+                g2.drawString("YOUR VOLUME!", 700, 620);
+            }
         }
         if(gameState == SONGS){
             g2.setColor(Color.WHITE);
@@ -703,6 +709,7 @@ public class GameManager{
             if(collection == 1){
                 img = im.getImage("A" + currentBackground);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+
                 g2.drawString("Music Collection 1", 560, 25);
                 g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
                 g2.drawString("by Camellia", placeholder.x+15, placeholder.y + 85);
@@ -739,7 +746,7 @@ public class GameManager{
                 g2.drawString("Music Collection 2", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("Ai no Sukima", placeholder.x + 15, placeholder.y + 50);
+                    g2.drawString("Marshmary", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by MIMI ft. Hatsune Miku", placeholder.x + 15, placeholder.y + 85);
                 }
@@ -787,10 +794,10 @@ public class GameManager{
                     g2.drawString("by Ichimichi Mao", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 9){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("Lagtrain", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
+                    g2.drawString("Don't Fight the Music", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by inabakumori & Kaai Yuki", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by Chroma", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 10){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -1111,6 +1118,18 @@ public class GameManager{
                     g2.drawString("FLY AWAY! TO THE COSMIC!!", placeholder.x + 15, placeholder.y + 50);
                 }
             }
+            if(collection == 8){
+                img = im.getImage("H" + currentBackground);
+                g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.drawString("Music Collection 8", 560, 30);
+                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+            }
+            if(collection == 9){
+                img = im.getImage("I" + currentBackground);
+                g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.drawString("Music Collection 9", 560, 30);
+                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+            }
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.drawString("<", 20, 350);
             g2.drawString(">", 1200, 350);
@@ -1264,6 +1283,7 @@ public class GameManager{
     public void saveSongCollection(int collection) {
         try (PrintWriter out = new PrintWriter(new FileWriter("save.txt"))) {
             out.println(collection);
+            reset();
         } catch (IOException e) {
             e.printStackTrace();
         }

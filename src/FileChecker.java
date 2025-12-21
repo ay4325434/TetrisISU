@@ -10,7 +10,7 @@ public class FileChecker {
     public static void main(String[] args) {
         BufferedImage img;
         try {
-            File f = new File("Images/Other/other3.png");
+            File f = new File("Images/Collection 9/cthugha.png");
             System.out.println("Looking for: " + f.getAbsolutePath());
             img = ImageIO.read(f);
             System.out.println(f.exists());

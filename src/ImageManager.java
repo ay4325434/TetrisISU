@@ -20,7 +20,7 @@ public class ImageManager {
         paths.put("A9", "Images/Collection 1/tera.png");
         paths.put("A10", "Images/Collection 1/wmsa.png");
 
-        paths.put("B1", "Images/Collection 2/ans.png");
+        paths.put("B1", "Images/Collection 2/marshmary.png");
         paths.put("B2", "Images/Collection 2/ath.png");
         paths.put("B3", "Images/Collection 2/bluezenith.png");
         paths.put("B4", "Images/Collection 2/censored.png");
@@ -28,7 +28,7 @@ public class ImageManager {
         paths.put("B6", "Images/Collection 2/freedomdive.png");
         paths.put("B7", "Images/Collection 2/gc.png");
         paths.put("B8", "Images/Collection 2/haruclover.png");
-        paths.put("B9", "Images/Collection 2/lagtrain.png");
+        paths.put("B9", "Images/Collection 2/dftm.png");
         paths.put("B10", "Images/Collection 2/notitle.png");
 
         paths.put("C1", "Images/Collection 3/des321.png");
@@ -94,20 +94,20 @@ public class ImageManager {
         paths.put("H6", "Images/Collection 8/override.png");
         paths.put("H7", "Images/Collection 8/sbz.png");
         paths.put("H8", "Images/Collection 8/styaos.png");
-        paths.put("H9", "Images/Collection 8/tivohm.png");
+        paths.put("H9", "Images/Collection 8/lagtrain.png");
         paths.put("H10", "Images/Collection 8/ttb.png");
 
         // New music collection - add images here
-        paths.put("I1", "Images/Collection 9/");
-        paths.put("I2", "Images/Collection 9/");
-        paths.put("I3", "Images/Collection 9/");
-        paths.put("I4", "Images/Collection 9/");
-        paths.put("I5", "Images/Collection 9/");
-        paths.put("I6", "Images/Collection 9/");
-        paths.put("I7", "Images/Collection 9/");
-        paths.put("I8", "Images/Collection 9/");
-        paths.put("I9", "Images/Collection 9/");
-        paths.put("I10", "Images/Collection 9/");
+        paths.put("I1", "Images/Collection 9/climax.png");
+        paths.put("I2", "Images/Collection 9/cthugha.png");
+        paths.put("I3", "Images/Collection 9/cyaegha.png");
+        paths.put("I4", "Images/Collection 9/dead or die.png");
+        paths.put("I5", "Images/Collection 9/invisible frenzy.png");
+        paths.put("I6", "Images/Collection 9/izana.png");
+        paths.put("I7", "Images/Collection 9/knight rider.png");
+        paths.put("I8", "Images/Collection 9/outrage.png");
+        paths.put("I9", "Images/Collection 9/red to red.png");
+        paths.put("I10", "Images/Collection 9/vs.png");
 
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
