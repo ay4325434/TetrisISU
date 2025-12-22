@@ -1,7 +1,8 @@
 import java.awt.*;
 
 public class IPiece extends Mino{
-    public IPiece(){
+    public IPiece(GameManager gm){
+        super(gm);
         create(Color.CYAN);
         type = "I";
     }

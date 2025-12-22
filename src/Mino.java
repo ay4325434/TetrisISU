@@ -24,6 +24,12 @@ public abstract class Mino {
     public boolean spin = false;
     public boolean rotatedDuringLockDelay = false;
 
+    protected GameManager gm;
+
+    public Mino(GameManager gm){
+        this.gm = gm;
+    }
+
     public void create(Color c){ // Set distinct colors for each piece
         for(int i=0; i<4; i++){
             b[i] = new Block(c);
@@ -58,7 +64,7 @@ public abstract class Mino {
             pieceGridY[i] = b[i].y / Block.SIZE;
         }
         // Scale block positions to match indices, then check for collision
-        for (Block placed : GameManager.placedBlocks) {
+        for (Block placed : gm.getPlacedBlocks()) {
             int targetGridX = placed.x / Block.SIZE;
             int targetGridY = placed.y / Block.SIZE;
 
@@ -77,7 +83,7 @@ public abstract class Mino {
     private boolean rotationBlockCollision;
     public void checkRotationBlockCollision() { // check rotation collision with blocks
         rotationBlockCollision = false;
-        for (Block placed : GameManager.placedBlocks) {
+        for (Block placed : gm.getPlacedBlocks()) {
             for (int j = 0; j < 4; j++) {
                 if (temp[j].x == placed.x && temp[j].y == placed.y) {
                     rotationBlockCollision = true;
@@ -267,11 +273,11 @@ public abstract class Mino {
                     spin = true;
                     System.out.println("T-spin detected");
                     if (direction == 1) {
-                        GameManager.spinMessage = "Mini" + type + "-Spin";
+                        gm.setSpinMessage("Mini" + type + "-Spin");
                     } else {
-                        GameManager.spinMessage = type + "-Spin";
+                        gm.setSpinMessage(type + "-Spin");
                     }
-                    GameManager.spinMessageTimer = 120;
+                    gm.setSpinMessageTimer(120);
                 }
                 deactivateCounter = 0; // reset all values
                 deactivating = false;
@@ -287,7 +293,7 @@ public abstract class Mino {
 
     public void update() {
         // ignore when user is not playing
-        if (GameManager.gameState != GameManager.PLAYING) return;
+        if (!gm.isPlaying()) return;
 
         leftCollision = rightCollision = bottomCollision = false;
         rotationBlockCollision = false;
@@ -321,7 +327,7 @@ public abstract class Mino {
         // Soft drop
         if (KeyHandler.downPressed && !deactivating) {
             if (movePieceDown()) {
-                GameManager.score++;
+                gm.increment();
                 deactivateCounter = 0;
                 deactivating = false; }
             else { checkMovementCollision(); checkBlockCollision(); deactivating = true; }
@@ -332,12 +338,22 @@ public abstract class Mino {
         checkBlockCollision();
         if (bottomCollision || rotationBlockCollision) deactivating = true;
 
-        if (KeyHandler.shiftPressed) { GameManager.hold = true; KeyHandler.shiftPressed = false; }
+        if (KeyHandler.shiftPressed) {
+            gm.setHold(false);
+            KeyHandler.shiftPressed = false;
+        }
 
         autoDropCounter++;
-        if (autoDropCounter >= GameManager.dropInterval) {
-            if (!movePieceDown()) { checkMovementCollision(); checkBlockCollision(); deactivating = true; }
-            else { deactivateCounter = 0; deactivating = false; }
+        if (autoDropCounter >= gm.getDropInterval()) {
+            if (!movePieceDown()) {
+                checkMovementCollision();
+                checkBlockCollision();
+                deactivating = true;
+            }
+            else {
+                deactivateCounter = 0;
+                deactivating = false;
+            }
             autoDropCounter = 0;
         }
 
@@ -361,7 +377,7 @@ public abstract class Mino {
             if (newY >= GameManager.bottomY) return false;
 
             // Placed blocks
-            for (Block placed : GameManager.placedBlocks) {
+            for (Block placed : gm.getPlacedBlocks()) {
                 if (placed.x == newX && placed.y == newY) return false;
             }
         }
@@ -385,7 +401,8 @@ public abstract class Mino {
         for (int i = 0; i < 4; i++) {
             int newY = b[i].y + Block.SIZE;
             if (newY >= GameManager.bottomY) return false;
-            for (Block placed : GameManager.placedBlocks) if (placed.x == b[i].x && placed.y == newY) return false;
+            for (Block placed : gm.getPlacedBlocks())
+                if (placed.x == b[i].x && placed.y == newY) return false;
         }
         return true;
     }
@@ -406,13 +423,22 @@ public abstract class Mino {
             boolean willCollide = false;
             for (Block blk : b) {
                 int nextY = blk.y + Block.SIZE;
-                if (nextY >= GameManager.bottomY) { willCollide = true; break; }
-                for (Block placed : GameManager.placedBlocks) if (blk.x == placed.x && nextY == placed.y) { willCollide = true; break; }
+                if (nextY >= GameManager.bottomY) {
+                    willCollide = true;
+                    break;
+                }
+                for (Block placed : gm.getPlacedBlocks())
+                    if (blk.x == placed.x && nextY == placed.y) {
+                        willCollide = true;
+                        break;
+                    }
                 if (willCollide) break;
             }
             if (willCollide || safety > 100) break;
-            for (Block blk : b) blk.y += Block.SIZE;
-            safety++; GameManager.score++;
+            for (Block blk : b)
+                blk.y += Block.SIZE;
+            safety++;
+            gm.increment();
         }
         deactivateCounter = 45; bottomCollision = true; deactivating = true; deactivate();
     }

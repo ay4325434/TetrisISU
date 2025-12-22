@@ -6,6 +6,9 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Board extends JPanel implements Runnable, MouseListener, MouseMotionListener {
     public static final int WIDTH = 1280;
@@ -18,14 +21,15 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     Thread gameThread;
     GameManager gm;
     public Board(){
+        gm = new GameManager();
+        KeyHandler k = new KeyHandler(gm);
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         this.setBackground(Color.BLACK);
         this.setLayout(null);
-        this.addKeyListener(new KeyHandler());
+        this.addKeyListener(k);
         this.setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
-        gm = new GameManager();
     }
 
     @Override
@@ -35,7 +39,6 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         long lastTime = System.nanoTime();
         long currentTime;
         long timer = 0;
-        int drawCount = 0;
         while (gameThread != null) {
             currentTime = System.nanoTime();
             delta += (currentTime - lastTime) / drawInterval;
@@ -56,10 +59,8 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 }
                 repaint();
                 delta--;
-                drawCount++;
             }
             if (timer >= 1_000_000_000) {   // 1 second
-                drawCount = 0;
                 timer = 0;
             }
         }
@@ -85,198 +86,147 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     @Override
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
-        if(gm.gameState == gm.INITIALIZE && screen.contains(p)){
-            gm.gameState = gm.MENU;
+        if(gm.isInitializing() && screen.contains(p)){
+            gm.goToMenu();
             return;
         }
-        if(gm.musicSelectButton.contains(p) && gm.gameState == gm.MENU){
-            gm.gameState = gm.MUSIC_SELECT;
-            return;
-        }
-        else if(gm.credsButton.contains(p) && gm.gameState == gm.MENU){
-            gm.page = 1;
-            gm.gameState = gm.CREDITS;
-        }
-        else if(gm.insButton.contains(p) && gm.gameState == gm.MENU){
-            gm.page = 1;
-            gm.gameState = gm.INSTRUCTIONS;
-        }
-        else if(gm.otherButton.contains(p) && gm.gameState == gm.MENU){
-            gm.page = 1;
-            gm.gameState = gm.OTHER;
-        }
-        else if (gm.gameState == gm.MENU){
-            gm.gameState = gm.PLAYING;
+        if (gm.isInMenu()) { // outer check
+            if (gm.musicSelectButton.contains(p)) {
+                gm.goToSelection();
+                return;
+            }
+            else if (gm.credsButton.contains(p)) {
+                gm.resetPage();
+                gm.goToCredits();
+            }
+            else if (gm.insButton.contains(p)) {
+                gm.resetPage();
+                gm.goToInstructions();
+            }
+            else if (gm.otherButton.contains(p)) {
+                gm.resetPage();
+                gm.goToOther();
+            }
+            else if (gm.scoreButton.contains(p)) {
+                // Add functions later
+            }
+            else {
+                gm.play();
+            }
         }
         if(gm.backButton.contains(p)){
-            if(gm.gameState == gm.MUSIC_SELECT || gm.gameState == gm.CREDITS || gm.gameState == gm.INSTRUCTIONS || gm.gameState == gm.OTHER) {
-                gm.gameState = gm.MENU;
+            if (gm.isInSongs()){
+                gm.goToSelection();
             }
-            else if (gm.gameState == gm.SONGS){
-                gm.gameState = gm.MUSIC_SELECT;
+            else if(!gm.isPlaying()) {
+                gm.goToMenu();
             }
         }
-        if(gm.gameState == gm.MUSIC_SELECT) {
+        if(gm.isSelectingSong()) {
             if (gm.mc1.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(1);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 1;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(1);
                 }
             }
 
             if (gm.mc2.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(2);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 2;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(2);
                 }
             }
 
             if (gm.mc3.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(3);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 3;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(3);
                 }
             }
             if (gm.mc4.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(4);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 4;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(4);
                 }
             }
             if (gm.mc5.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(5);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 5;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(5);
                 }
             }
             if (gm.mc6.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(6);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 6;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(6);
                 }
             }
             if (gm.mc7.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(7);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 7;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(7);
                 }
             }
             if (gm.mc8.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(8);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 8;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(8);
                 }
             }
             if (gm.mc9.contains(p)) {
-                if(gm.selectionActivated){
+                if(gm.isSelectionActivated()){
                     gm.saveSongCollection(9);
-                    gm.selectionActivated = false;
                 }
                 else {
-                    gm.gameState = gm.SONGS;
-                    gm.collection = 9;
-                    gm.song = 1;
-                    gm.currentBackground = 1;
+                    gm.selectCollection(9);
                 }
             }
-            if(gm.select.contains(p) && gm.gameState == gm.MUSIC_SELECT){
-                gm.selectionActivated = true;
+            if(gm.select.contains(p) && gm.isSelectingSong()){
+                gm.select();
             }
         }
-        if(gm.leftButton.contains(p) && gm.gameState == gm.SONGS){
-            gm.currentBackground--;
-            gm.song--;
-            if (gm.song < 1) {
-                gm.song = 10;
-            }
-            if (gm.currentBackground < 1) {
-                gm.currentBackground = 10;
-            }
+        if(gm.leftButton.contains(p) && gm.isInSongs()){
+            gm.previousSong();
         }
-        if(gm.rightButton.contains(p) && gm.gameState == gm.SONGS){
-            gm.currentBackground++;
-            gm.song++;
-            if (gm.song > 10) {
-                gm.song = 1;
-            }
-            if (gm.currentBackground > 10) {
-                gm.currentBackground = 1;
-            }
+        if(gm.rightButton.contains(p) && gm.isInSongs()){
+            gm.nextSong();
         }
-        if(gm.rightButton.contains(p) && gm.gameState == gm.CREDITS){
-            gm.page++;
-            if(gm.page > 6) gm.page = 1;
+        else if(gm.rightButton.contains(p)){
+            gm.nextPage();
         }
-        if(gm.leftButton.contains(p) && gm.gameState == gm.CREDITS){
-            gm.page--;
-            if(gm.page < 1) gm.page = 6;
+        else if(gm.leftButton.contains(p)){
+            gm.previousPage();
         }
-        if(gm.rightButton.contains(p) && gm.gameState == gm.INSTRUCTIONS){
-            gm.page++;
-            if(gm.page > 4) gm.page = 1;
+
+        if (gm.isGameOver()) {
+            gm.goToMenu();
         }
-        if(gm.leftButton.contains(p) && gm.gameState == gm.INSTRUCTIONS){
-            gm.page--;
-            if(gm.page < 1) gm.page = 4;
-        }
-        if(gm.rightButton.contains(p) && gm.gameState == gm.OTHER){
-            gm.page++;
-            if(gm.page > 3) gm.page = 1;
-        }
-        if(gm.leftButton.contains(p) && gm.gameState == gm.OTHER){
-            gm.page--;
-            if(gm.page < 1) gm.page = 3;
-        }
-        if (gm.gameState == gm.GAME_OVER) {
-            gm.gameState = gm.MENU;
+    }
+
+    public void saveScore(int score){
+        try {
+            String name = JOptionPane.showInputDialog(this, "Enter your name:").trim();
+            if(name.isEmpty()) name = "Player";
+            PrintWriter out = new PrintWriter(new FileWriter("scores.txt", true));
+            out.println(name + " " + gm.getScore());
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -308,15 +258,8 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     @Override
     public void mouseMoved(MouseEvent e) {
         Point p = e.getPoint();
-        if(gm.selectionActivated){
-            gm.hover = true;
-            if(gm.mc1.contains(p)) gm.hoveredCollection = 1;
-            else if(gm.mc2.contains(p)) gm.hoveredCollection = 2;
-            else if(gm.mc3.contains(p)) gm.hoveredCollection = 3;
-            else if(gm.mc4.contains(p)) gm.hoveredCollection = 4;
-            else if(gm.mc5.contains(p)) gm.hoveredCollection = 5;
-            else if(gm.mc6.contains(p)) gm.hoveredCollection = 6;
-            else if(gm.mc7.contains(p)) gm.hoveredCollection = 7;
+        if(gm.isSelectionActivated()){
+            gm.updateHover(p);
         }
     }
 }

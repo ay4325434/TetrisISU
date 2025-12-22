@@ -1,8 +1,7 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 import java.util.StringTokenizer;
 
 public class GameManager{
@@ -17,8 +16,8 @@ public class GameManager{
 
     private int lines = 0;
     private int linesCleared = 0;
-    public static int level = 1;
-    public static int score = 0;
+    private int level = 1;
+    private int score = 0;
 
     //Piece properties
     private Mino currentMino;
@@ -33,35 +32,42 @@ public class GameManager{
     private int nextX5, nextY5;
 
     //Other properties
-    public static int dropInterval = 60;
+    private int dropInterval = 60;
 
-    public static ArrayList<Block> placedBlocks = new ArrayList<>();
-    public static ArrayList<Mino> startingMinos = new ArrayList<>();
+    private ArrayList<Block> placedBlocks = new ArrayList<>();
+    private ArrayList<Mino> startingMinos = new ArrayList<>();
     private ArrayList<Mino> minos = new ArrayList<>(startingMinos);
 
-    public static boolean hold = false;
-    private static boolean alreadyHeld = false;
+    private boolean hold = false;
+    private boolean alreadyHeld = false;
     private Mino holdMino = null;
-    public static boolean selectionActivated = false;
+    private boolean selectionActivated = false;
+
+    private Map<GameState, Integer> pages = new HashMap<>();
+    private Map<Rectangle, Integer> collectionAreas = new HashMap<>();
 
     //Game states
-    public static final int MENU = 0;
-    public static final int PLAYING = 1;
-    public static final int GAME_OVER = 2;
-    public static final int INSTRUCTIONS = 3;
-    public static final int MUSIC_SELECT = 4;
-    public static final int CREDITS = 5;
-    public static final int SONGS = 6;
-    public static final int OTHER = 7;
-    public static final int INITIALIZE = 8;
-    public static int gameState = MENU;
+    public enum GameState {
+        MENU,
+        PLAYING,
+        GAME_OVER,
+        INSTRUCTIONS,
+        MUSIC_SELECT,
+        CREDITS,
+        SONGS,
+        OTHER,
+        INITIALIZE
+    }
+    private GameState gameState = GameState.MENU;
 
-    public static int currentBackground = 1; // Iterates through the music collections
-    public static int song = 1;
-    public static int collection = 1;
+    private int currentBackground = 1; // Iterates through the music collections
+    private int song = 1;
+    private int collection = 1;
+
+    private static final int SONGS = 10;
 
     private MusicManager mm = new MusicManager();
-    public String currentSong = "";
+    private String currentSong = "";
     private ImageManager im = new ImageManager();
 
     // Buttons for user selection
@@ -70,6 +76,7 @@ public class GameManager{
     public Rectangle credsButton = new Rectangle(180, 0, 100, 30);
     public Rectangle insButton = new Rectangle(330, 0, 140, 30);
     public Rectangle otherButton = new Rectangle(480, 0, 100, 30);
+    public Rectangle scoreButton = new Rectangle(600, 0, 100, 30);
     public Rectangle mc1 = new Rectangle(0, 40, 500, 80);
     public Rectangle mc2 = new Rectangle(0, 140, 500, 80);
     public Rectangle mc3 = new Rectangle(0, 240, 500, 80);
@@ -89,12 +96,12 @@ public class GameManager{
     public Image menu, musicSelect, credits;
 
     // When in the playing state, keeps track of the current song.
-    public int page = 1;
-    public static int playCollection = 1;
+    private int page = 1;
+    private int playCollection = 1;
 
     // Music selection properties
-    public boolean hover = false;
-    public static int hoveredCollection = 1;
+    private boolean hover = false;
+    private int hoveredCollection = 1;
 
     // In Tetris, the B2B combo and normal combos actually start at -1, not 0.
     private int b2b = -1;
@@ -121,6 +128,11 @@ public class GameManager{
         nextX5 = rightX + 150;
         nextY5 = topY + 480;
 
+        pages.put(GameState.CREDITS, 6);
+        pages.put(GameState.INSTRUCTIONS, 4);
+        pages.put(GameState.OTHER, 3);
+
+        initCollections();
         reset();
 
         try{
@@ -144,13 +156,13 @@ public class GameManager{
         }
         else{
             // Restablishing the bag of 7 different pieces
-            minos.add(new LPiece());
-            minos.add(new JPiece());
-            minos.add(new IPiece());
-            minos.add(new SPiece());
-            minos.add(new ZPiece());
-            minos.add(new TPiece());
-            minos.add(new OPiece());
+            minos.add(new LPiece(this));
+            minos.add(new JPiece(this));
+            minos.add(new IPiece(this));
+            minos.add(new SPiece(this));
+            minos.add(new ZPiece(this));
+            minos.add(new TPiece(this));
+            minos.add(new OPiece(this));
             m = minos.getFirst();
             minos.removeFirst();
         }
@@ -158,10 +170,10 @@ public class GameManager{
     }
 
     private String lineClearMessage = ""; // message to display
-    public static String spinMessage = "";
+    private String spinMessage = "";
     private String pcMessage = "";
     private int messageTimer = 0;         // counts frames or updates
-    public static int spinMessageTimer = 0;
+    private int spinMessageTimer = 0;
     private final int MESSAGE_DURATION = 120; // frames to display (2 seconds at 60 FPS)
 
     /**
@@ -314,14 +326,14 @@ public class GameManager{
 
     public void update() throws Exception {
         // Menu music
-        if (gameState == MENU && !"menu".equals(currentSong)) {
+        if (gameState == GameState.MENU && !"menu".equals(currentSong)) {
             mm.stop();
             mm.loop("menu");
             currentSong = "menu";
         }
 
         // Gameplay
-        if (gameState == PLAYING) {
+        if (gameState == GameState.PLAYING) {
             if (!KeyHandler.pausePressed) {
                 // --- Background music per collection/level ---
                 String levelKey = "collection" + (char)('A' + playCollection - 1) + (level / 2 + 1);
@@ -341,7 +353,7 @@ public class GameManager{
 
                     // Check for game over
                     if (currentMino.b[0].x == startX && currentMino.b[0].y == startY) {
-                        gameState = GAME_OVER;
+                        gameState = GameState.GAME_OVER;
                     } else {
                         currentMino.deactivating = false;
 
@@ -421,7 +433,7 @@ public class GameManager{
         }
 
         // Play the audio snippet to preview song
-        if (gameState == SONGS) {
+        if (gameState == GameState.SONGS) {
             String collectionKey = String.valueOf((char)('A' + collection - 1)); // "A", "B", etc.
             Snippet snippet = mm.getSnippet(collectionKey, song); // lookup in nested map
 
@@ -439,26 +451,26 @@ public class GameManager{
         }
 
         // OTHER GAME STATES
-        else if (gameState == MUSIC_SELECT) {
+        else if (gameState == GameState.MUSIC_SELECT) {
             mm.stop();
             currentSong = "";
         }
-        else if (gameState == GAME_OVER) {
+        else if (gameState == GameState.GAME_OVER) {
             mm.stop();
             currentSong = "";
             reset(); // reset the progress once game ends
         }
-        else if (gameState == CREDITS && !"credits".equals(currentSong)) {
+        else if (gameState == GameState.CREDITS && !"credits".equals(currentSong)) {
             mm.stop();
             mm.loop("credits");
             currentSong = "credits";
         }
-        else if (gameState == INSTRUCTIONS && !"instructions".equals(currentSong)) {
+        else if (gameState == GameState.INSTRUCTIONS && !"instructions".equals(currentSong)) {
             mm.stop();
             mm.loop("instructions");
             currentSong = "instructions";
         }
-        else if (gameState == OTHER && !"other".equals(currentSong)) {
+        else if (gameState == GameState.OTHER && !"other".equals(currentSong)) {
             mm.stop();
             mm.loop("other");
             currentSong = "other";
@@ -510,7 +522,7 @@ public class GameManager{
     }
     public void draw(Graphics2D g2) {
         Image img;
-        if(gameState == MENU){
+        if(gameState == GameState.MENU){
             if(menu != null){
                 g2.drawImage(menu, 0, 0 , 1280, 720, null);
             }
@@ -521,6 +533,7 @@ public class GameManager{
             g2.drawString("Credits", 200, 20);
             g2.drawString("Instructions", 350, 20);
             g2.drawString("Other", 500, 20);
+            g2.drawString("Scores", 620, 20);
             g2.setFont(new Font("Sans Serif Collection", Font.PLAIN, 16));
             g2.drawString("Now Playing:", 880, 580);
             g2.drawString("by uma vs. Morimori Atsushi", 880, 680);
@@ -531,8 +544,9 @@ public class GameManager{
             g2.drawRect(credsButton.x, credsButton.y, credsButton.width, credsButton.height);
             g2.drawRect(insButton.x, insButton.y, insButton.width, insButton.height);
             g2.drawRect(otherButton.x, otherButton.y, otherButton.width, otherButton.height);
+            g2.drawRect(scoreButton.x, scoreButton.y, scoreButton.width, scoreButton.height);
         }
-        if(gameState == PLAYING) {
+        if(gameState == GameState.PLAYING) {
             g2.setColor(Color.WHITE);
             g2.setStroke(new BasicStroke(4f));
             g2.drawRect(leftX - 4, topY - 4, WIDTH + 8, HEIGHT + 8);
@@ -640,7 +654,7 @@ public class GameManager{
                 holdMino.draw(g2);
             }
         }
-        if (gameState == MUSIC_SELECT) {
+        if (gameState == GameState.MUSIC_SELECT) {
             g2.drawImage(musicSelect, 0, 0, 1280, 720, null);
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
@@ -696,7 +710,7 @@ public class GameManager{
                 g2.drawString("YOUR VOLUME!", 700, 620);
             }
         }
-        if(gameState == SONGS){
+        if(gameState == GameState.SONGS){
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("SansSerif", Font.PLAIN, 20));
             g2.drawRect(placeholder.x, placeholder.y, placeholder.width, placeholder.height);
@@ -1143,12 +1157,14 @@ public class GameManager{
             g2.setColor(Color.WHITE);
 
         }
-        if (gameState == GAME_OVER) {
+        if (gameState == GameState.GAME_OVER) {
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.PLAIN, 80));
             g2.drawString("GAME OVER", Board.WIDTH / 2 - 220, Board.HEIGHT / 2);
+            g2.setFont(new Font("Arial", Font.BOLD, 25));
+            g2.drawString("Score:" + score, Board.WIDTH / 2 - 80, Board.HEIGHT / 2 + 80);
         }
-        if(gameState == INSTRUCTIONS){
+        if(gameState == GameState.INSTRUCTIONS){
             if(page == 1){
                 img = im.getImage("ins1");
                 g2.drawImage(img, 0, 0, 1280, 720, null);
@@ -1172,7 +1188,7 @@ public class GameManager{
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
         }
-        if(gameState == CREDITS){
+        if(gameState == GameState.CREDITS){
             if(page == 1) {
                 g2.drawImage(credits, 0, 0, 1280, 720, null);
                 g2.setColor(Color.WHITE);
@@ -1211,7 +1227,7 @@ public class GameManager{
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
         }
-        if(gameState == OTHER){
+        if(gameState == GameState.OTHER){
             if(page == 1){
                 img = im.getImage("other1");
                 g2.drawImage(img, 0, 0, 1280, 720, null);
@@ -1231,7 +1247,7 @@ public class GameManager{
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
         }
-        else if (gameState == INITIALIZE){
+        else if (gameState == GameState.INITIALIZE){
             img = im.getImage("initialize1");
             g2.drawImage(img, 0, 0, 1280, 720, null);
         }
@@ -1245,13 +1261,13 @@ public class GameManager{
         score = 0;
         level = 1;
         // Adding the starting bag of pieces (each piece must appear )
-        startingMinos.add(new LPiece());
-        startingMinos.add(new JPiece());
-        startingMinos.add(new IPiece());
-        startingMinos.add(new SPiece());
-        startingMinos.add(new ZPiece());
-        startingMinos.add(new TPiece());
-        startingMinos.add(new OPiece());
+        startingMinos.add(new LPiece(this));
+        startingMinos.add(new JPiece(this));
+        startingMinos.add(new IPiece(this));
+        startingMinos.add(new SPiece(this));
+        startingMinos.add(new ZPiece(this));
+        startingMinos.add(new TPiece(this));
+        startingMinos.add(new OPiece(this));
 
         Collections.shuffle(startingMinos); // Randomizing the starting bag
 
@@ -1281,11 +1297,182 @@ public class GameManager{
         }
     }
     public void saveSongCollection(int collection) {
-        try (PrintWriter out = new PrintWriter(new FileWriter("save.txt"))) {
+        try {
+            PrintWriter out = new PrintWriter(new FileWriter("save.txt"));
             out.println(collection);
+            selectionActivated = false;
             reset();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void resetPage(){
+        page = 1;
+    }
+
+    public void selectCollection(int collectionId) {
+        collection = collectionId;
+        song = 1;
+        currentBackground = 1;
+        gameState = GameState.SONGS;
+    }
+
+    public void previousSong(){
+        song--;
+        currentBackground--;
+        if(song < 1) song = SONGS;
+        if(currentBackground < 1) currentBackground = SONGS;
+    }
+
+    public void nextSong(){
+        song++;
+        currentBackground++;
+        if(song > SONGS) song = 1;
+        if(currentBackground > SONGS) currentBackground = 1;
+    }
+    public void nextPage() {
+        int max = pages.getOrDefault(gameState, 1);
+        if (max <= 1) return;
+
+        page++;
+        if (page > max) page = 1;
+    }
+
+    public void previousPage() {
+        int max = pages.getOrDefault(gameState, 1);
+        if (max <= 1) return;
+
+        page--;
+        if (page < 1) page = max;
+    }
+
+    public void initCollections() {
+        collectionAreas.put(mc1, 1);
+        collectionAreas.put(mc2, 2);
+        collectionAreas.put(mc3, 3);
+        collectionAreas.put(mc4, 4);
+        collectionAreas.put(mc5, 5);
+        collectionAreas.put(mc6, 6);
+        collectionAreas.put(mc7, 7);
+    }
+
+    public void updateHover(Point p) {
+        if (!selectionActivated) {
+            hover = false;
+            hoveredCollection = 0;
+            return;
+        }
+
+        hover = false;
+        hoveredCollection = 0;
+
+        // Iterate over each rectangle in the map
+        for (Rectangle rect : collectionAreas.keySet()) {
+            if (rect.contains(p)) {
+                hover = true;
+                hoveredCollection = collectionAreas.get(rect);
+                break; // stop after finding the first match
+            }
+        }
+    }
+
+    public void increment(){
+        score++;
+    }
+
+    // * Getters and Setters *
+    public int getScore() {
+        return score;
+    }
+
+    public int getDropInterval(){
+        return dropInterval;
+    }
+
+    public ArrayList<Block> getPlacedBlocks(){
+        return placedBlocks;
+    }
+
+    public boolean isInitializing() {
+        return gameState == GameState.INITIALIZE;
+    }
+
+    public boolean isPlaying() {
+        return gameState == GameState.PLAYING;
+    }
+
+    public boolean isInMenu() {
+        return gameState == GameState.MENU;
+    }
+
+    public boolean isInSongs(){
+        return gameState == GameState.SONGS;
+    }
+
+    public boolean isGameOver() {
+        return gameState == GameState.GAME_OVER;
+    }
+
+    public boolean isSelectingSong(){
+        return gameState == GameState.MUSIC_SELECT;
+    }
+
+    public boolean isSelectionActivated(){
+        return selectionActivated;
+    }
+
+    // These go-to methods act as setters because they change the game state.
+    // However, they only execute during certain conditions.
+    public void goToMenu(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.MENU;
+        }
+    }
+    public void goToSelection(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.MUSIC_SELECT;
+        }
+    }
+    public void goToSongs(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.SONGS;
+        }
+    }
+    public void goToCredits(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.CREDITS;
+        }
+    }
+    public void goToInstructions(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.INSTRUCTIONS;
+        }
+    }
+    public void goToOther(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.OTHER;
+        }
+    }
+    public void play(){
+        gameState = GameState.PLAYING;
+    }
+
+    public void select(){
+        if (gameState == GameState.MUSIC_SELECT) {
+            selectionActivated = true;
+        }
+    }
+
+    public void setSpinMessage(String spinMessage){
+        this.spinMessage = spinMessage;
+    }
+
+    public void setSpinMessageTimer(int spinMessageTimer){
+        this.spinMessageTimer = spinMessageTimer;
+    }
+
+    public void setHold(boolean hold){
+        this.hold = hold;
     }
 }

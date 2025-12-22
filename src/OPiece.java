@@ -1,7 +1,8 @@
 import java.awt.*;
 
 public class OPiece extends Mino{
-    public OPiece(){
+    public OPiece(GameManager gm){
+        super(gm);
         create(Color.YELLOW);
         type = "O";
     }

@@ -6,6 +6,13 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener{
     public static boolean upPressed, downPressed, leftPressed, rightPressed, zPressed, aPressed, shiftPressed, spacePressed, pausePressed = false;
+
+    private GameManager gm;
+
+    public KeyHandler(GameManager gm){
+        this.gm = gm;
+    }
+
     @Override
     public void keyTyped(KeyEvent e) {
 
@@ -36,7 +43,7 @@ public class KeyHandler implements KeyListener{
             shiftPressed = true;
         }
         if(code == KeyEvent.VK_SPACE){
-            if(GameManager.gameState == GameManager.PLAYING) {
+            if(gm.isPlaying()) {
                 spacePressed = true;
             }
         }

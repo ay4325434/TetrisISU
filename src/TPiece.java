@@ -1,7 +1,8 @@
 import java.awt.*;
 
 public class TPiece extends Mino{
-    public TPiece(){
+    public TPiece(GameManager gm){
+        super(gm);
         create(Color.MAGENTA);
         type = "T";
     }

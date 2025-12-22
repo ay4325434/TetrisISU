@@ -1,7 +1,8 @@
 import java.awt.*;
 
 public class SPiece extends Mino{
-    public SPiece(){
+    public SPiece(GameManager gm){
+        super(gm);
         create(Color.GREEN);
         type = "S";
     }

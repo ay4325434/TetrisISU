@@ -1,7 +1,8 @@
 import java.awt.*;
 
 public class ZPiece extends Mino{
-    public ZPiece(){
+    public ZPiece(GameManager gm){
+        super(gm);
         create(Color.RED);
         type = "Z";
     }
