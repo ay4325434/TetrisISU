@@ -60,13 +60,13 @@ public class MusicManager {
         songPaths.put("collectionC10", "Music Collection 3/You are the Miserable.wav");
 
         // Collection D (Music Collection 4)
-        songPaths.put("collectionD1", "Music Collection 4/At the Speed of Light.wav");
-        songPaths.put("collectionD2", "Music Collection 4/Isolation.wav");
-        songPaths.put("collectionD3", "Music Collection 4/Nhelv.wav");
-        songPaths.put("collectionD4", "Music Collection 4/Pagoda.wav");
-        songPaths.put("collectionD5", "Music Collection 4/Reanimate.wav");
-        songPaths.put("collectionD6", "Music Collection 4/Shiawase - VIP.wav");
-        songPaths.put("collectionD7", "Music Collection 4/Skystrike.wav");
+        songPaths.put("collectionD1", "Music Collection 4/Isolation.wav");
+        songPaths.put("collectionD2", "Music Collection 4/Nhelv.wav");
+        songPaths.put("collectionD3", "Music Collection 4/Pagoda.wav");
+        songPaths.put("collectionD4", "Music Collection 4/Reanimate.wav");
+        songPaths.put("collectionD5", "Music Collection 4/Shiawase - VIP.wav");
+        songPaths.put("collectionD6", "Music Collection 4/Skystrike.wav");
+        songPaths.put("collectionD7", "Music Collection 4/At the Speed of Light.wav");
         songPaths.put("collectionD8", "Music Collection 4/The Calling.wav");
         songPaths.put("collectionD9", "Music Collection 4/Time Leaper.wav");
         songPaths.put("collectionD10", "Music Collection 4/Unity.wav");

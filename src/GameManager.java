@@ -795,7 +795,7 @@ public class GameManager{
                 }
                 if(song == 9){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 25));
-                    g2.drawString("Don't Fight the Music", placeholder.x + 15, placeholder.y + 50);
+                    g2.drawString("Don't Fight the Music", placeholder.x + 15, placeholder.y + 35);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by Chroma", placeholder.x + 15, placeholder.y + 85);
                 }
