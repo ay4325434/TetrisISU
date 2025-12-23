@@ -27,6 +27,7 @@ public abstract class Mino {
     protected GameManager gm;
 
     public Mino(GameManager gm){
+        // we have to pass this GM to all the major classes to prevent multiple instances from running.
         this.gm = gm;
     }
 

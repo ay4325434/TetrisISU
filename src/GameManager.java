@@ -151,8 +151,7 @@ public class GameManager{
     private Mino pickMino(){
         Mino m;
         if(!minos.isEmpty()){
-            m = minos.getFirst();
-            minos.removeFirst(); // Use the starting bag of pieces first
+            m = minos.removeFirst();
         }
         else{
             // Restablishing the bag of 7 different pieces
@@ -163,8 +162,7 @@ public class GameManager{
             minos.add(new ZPiece(this));
             minos.add(new TPiece(this));
             minos.add(new OPiece(this));
-            m = minos.getFirst();
-            minos.removeFirst();
+            m = minos.removeFirst();
         }
         return m;
     }
@@ -1136,13 +1134,134 @@ public class GameManager{
                 img = im.getImage("H" + currentBackground);
                 g2.drawImage(img, 470, 150, 720, 405, null);
                 g2.drawString("Music Collection 8", 560, 30);
-                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+                if(song == 1){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Bring it on", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Giga", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 2){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Gimme x Gimme", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Hachioji P x Giga", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 3){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Hibana", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by DECO*27", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 4){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Lagtrain", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by inabakumori", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 5){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 20));
+                    g2.drawString("Luka Luka ☆", placeholder.x + 15, placeholder.y + 30);
+                    g2.drawString("Night Fever", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by samfree", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 6){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Monitoring", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by DECO*27", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 7){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Override", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Yoshida Yasei", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 8){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Senbonzakura", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Kurousa-P", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 9){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 20));
+                    g2.drawString("Six Trillion Years", placeholder.x + 15, placeholder.y + 30);
+                    g2.drawString("and Overnight Story", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by kemu ft. IA", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 10){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Tokyo Teddy Bear", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Neru", placeholder.x + 15, placeholder.y + 85);
+                }
             }
             if(collection == 9){
                 img = im.getImage("I" + currentBackground);
                 g2.drawImage(img, 470, 150, 720, 405, null);
                 g2.drawString("Music Collection 9", 560, 30);
                 g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+                if(song == 1){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Climax", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by USAO", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 2){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Cthugha", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by USAO", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 3){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Cyaegha", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by USAO", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 4){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("DEAD or DIE", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by REDALiCE", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 5){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Invisible Frenzy", placeholder.x + 15, placeholder.y + 40);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Kobaryo", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 6){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("IZANA", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by t+pazolite vs. P*Light", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 7){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Knight Rider", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by USAO", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 8){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("OUTRAGE", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by DJ Myosuke vs. USAO", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 9){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("RED to RED", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by REDALiCE", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 10){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Viyella's Scream", placeholder.x + 15, placeholder.y + 40);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Laur", placeholder.x + 15, placeholder.y + 85);
+                }
             }
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.drawString("<", 20, 350);
