@@ -1,4 +1,0 @@
-/* Format of the scores table will be:
-Name Score
-abc 1000
-*/

@@ -19,7 +19,7 @@ public class MusicManager {
     public MusicManager() {
         // Menu and sidebar music
         songPaths.put("menu", "Re End of a Dream.wav");
-        songPaths.put("credits", "Aleph-0.wav");
+        songPaths.put("credits", "Doppelganger.wav");
         songPaths.put("instructions", "Nulctrl EX.wav");
         songPaths.put("other", "Chronomia.wav");
 
@@ -60,7 +60,7 @@ public class MusicManager {
         songPaths.put("collectionC10", "Music Collection 3/You are the Miserable.wav");
 
         // Collection D (Music Collection 4)
-        songPaths.put("collectionD1", "Music Collection 4/Isolation.wav");
+        songPaths.put("collectionD1", "Music Collection 4/Lost Memory.wav");
         songPaths.put("collectionD2", "Music Collection 4/Nhelv.wav");
         songPaths.put("collectionD3", "Music Collection 4/Pagoda.wav");
         songPaths.put("collectionD4", "Music Collection 4/Reanimate.wav");
@@ -99,7 +99,7 @@ public class MusicManager {
         songPaths.put("collectionG3", "Music Collection 7/Cheatreal.wav");
         songPaths.put("collectionG4", "Music Collection 7/Chrome VOX.wav");
         songPaths.put("collectionG5", "Music Collection 7/Garakuta Doll Play.wav");
-        songPaths.put("collectionG6", "Music Collection 7/KABOOOOOM!!!!.wav");
+        songPaths.put("collectionG6", "Music Collection 7/Twisted Drop Party.wav");
         songPaths.put("collectionG7", "Music Collection 7/Oshama Scramble.wav");
         songPaths.put("collectionG8", "Music Collection 7/QZKago Requiem.wav");
         songPaths.put("collectionG9", "Music Collection 7/Tempestissimo.wav");
@@ -108,15 +108,14 @@ public class MusicManager {
         songPaths.put("collectionH1", "Music Collection 8/Bring it on.wav");
         songPaths.put("collectionH2", "Music Collection 8/Gimme x Gimme.wav");
         songPaths.put("collectionH3", "Music Collection 8/Hibana.wav");
-        songPaths.put("collectionH4", "Music Collection 8/Luka Luka Night Fever.wav");
-        songPaths.put("collectionH5", "Music Collection 8/Monitoring.wav");
-        songPaths.put("collectionH6", "Music Collection 8/Override.wav");
-        songPaths.put("collectionH7", "Music Collection 8/Senbonzakura.wav");
-        songPaths.put("collectionH8", "Music Collection 8/Six Trillion Years and Overnight Story.wav");
-        songPaths.put("collectionH9", "Music Collection 8/Lagtrain.wav");
+        songPaths.put("collectionH4", "Music Collection 8/Lagtrain.wav");
+        songPaths.put("collectionH5", "Music Collection 8/Luka Luka Night Fever.wav");
+        songPaths.put("collectionH6", "Music Collection 8/Monitoring.wav");
+        songPaths.put("collectionH7", "Music Collection 8/Override.wav");
+        songPaths.put("collectionH8", "Music Collection 8/Senbonzakura.wav");
+        songPaths.put("collectionH9", "Music Collection 8/Six Trillion Years and Overnight Story.wav");
         songPaths.put("collectionH10", "Music Collection 8/Tokyo Teddy Bear.wav");
 
-        // Files not decided yet for Collection 9 - add later
         songPaths.put("collectionI1", "Music Collection 9/Climax.wav");
         songPaths.put("collectionI2", "Music Collection 9/Cthugha.wav");
         songPaths.put("collectionI3", "Music Collection 9/Cyaegha.wav");
@@ -126,7 +125,18 @@ public class MusicManager {
         songPaths.put("collectionI7", "Music Collection 9/Knight Rider.wav");
         songPaths.put("collectionI8", "Music Collection 9/OUTRAGE.wav");
         songPaths.put("collectionI9", "Music Collection 9/Red to Red.wav");
-        songPaths.put("collectionI10", "Music Collection 9/Viyella's Scream.wav");
+        songPaths.put("collectionI10", "Music Collection 9/Saikyo Stronger.wav");
+
+        songPaths.put("collectionJ1", "Music Collection 10/");
+        songPaths.put("collectionJ2", "Music Collection 10/");
+        songPaths.put("collectionJ3", "Music Collection 10/");
+        songPaths.put("collectionJ4", "Music Collection 10/");
+        songPaths.put("collectionJ5", "Music Collection 10/");
+        songPaths.put("collectionJ6", "Music Collection 10/");
+        songPaths.put("collectionJ7", "Music Collection 10/");
+        songPaths.put("collectionJ8", "Music Collection 10/");
+        songPaths.put("collectionJ9", "Music Collection 10/");
+        songPaths.put("collectionJ10", "Music Collection 10/");
 
         // Collection A snippets
         snippetRanges.put("collectionA1", new int[]{40, 65});
@@ -165,12 +175,12 @@ public class MusicManager {
         snippetRanges.put("collectionC10", new int[]{200, 230});
 
         // Collection D
-        snippetRanges.put("collectionD1", new int[]{90, 120});
+        snippetRanges.put("collectionD1", new int[]{80, 120});
         snippetRanges.put("collectionD2", new int[]{90, 120});
         snippetRanges.put("collectionD3", new int[]{90, 120});
         snippetRanges.put("collectionD4", new int[]{75, 105});
         snippetRanges.put("collectionD5", new int[]{90, 120});
-        snippetRanges.put("collectionD6", new int[]{90, 120});
+        snippetRanges.put("collectionD6", new int[]{145, 175});
         snippetRanges.put("collectionD7", new int[]{110, 140});
         snippetRanges.put("collectionD8", new int[]{90, 120});
         snippetRanges.put("collectionD9", new int[]{80, 110});

@@ -46,6 +46,9 @@ public class GameManager{
     private Map<GameState, Integer> pages = new HashMap<>();
     private Map<Rectangle, Integer> collectionAreas = new HashMap<>();
 
+    private ArrayList<Player> scores = new ArrayList<>();
+
+
     //Game states
     public enum GameState {
         MENU,
@@ -86,6 +89,7 @@ public class GameManager{
     public Rectangle mc7 = new Rectangle(0, 640, 500, 80);
     public Rectangle mc8 = new Rectangle(550, 40, 500, 80);
     public Rectangle mc9 = new Rectangle(550, 140, 500, 80);
+    public Rectangle mc10 = new Rectangle(550, 240, 500, 80);
     public Rectangle select = new Rectangle(80, 0, 80, 30);
 
     public Rectangle leftButton = new Rectangle(20, 220, 50, 200);
@@ -134,6 +138,7 @@ public class GameManager{
 
         initCollections();
         reset();
+        readScores();
 
         try{
             menu = ImageIO.read(new File("Images/menu.png"));
@@ -669,6 +674,7 @@ public class GameManager{
             g2.drawString("Music Collection 7", 20, 700);
             g2.drawString("Music Collection 8", 570, 100);
             g2.drawString("Music Collection 9", 570, 200);
+            g2.drawString("Music Collection 10", 570, 300);
             if(selectionActivated){
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
                 g2.drawString("Click to select", 670, 550);
@@ -890,9 +896,9 @@ public class GameManager{
                 g2.drawString("Music Collection 4", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("Isolation", placeholder.x + 15, placeholder.y + 50);
+                    g2.drawString("Lost Memory", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by Nighthawk22", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by Sakuzyo", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 2){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -1087,8 +1093,8 @@ public class GameManager{
                 img = im.getImage("G" + currentBackground);
                 g2.drawImage(img, 470, 150, 720, 405, null);
                 g2.drawString("Music Collection 7", 560, 30);
-                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
-                g2.drawString("by t+pazolite", placeholder.x+15, placeholder.y + 85);
+                g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                g2.drawString("by t+pazolite", placeholder.x + 15, placeholder.y + 85);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 35));
                     g2.drawString("Angelic Jelly", placeholder.x + 15, placeholder.y + 50);
@@ -1110,8 +1116,8 @@ public class GameManager{
                     g2.drawString("Garakuta Doll Play", placeholder.x + 15, placeholder.y + 40);
                 }
                 if(song == 6){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
-                    g2.drawString("KABOOOOOM!!!!", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Twisted Drop Party", placeholder.x + 15, placeholder.y + 40);
                 }
                 if(song == 7){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 30));
@@ -1191,8 +1197,8 @@ public class GameManager{
                     g2.drawString("by kemu ft. IA", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 10){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
-                    g2.drawString("Tokyo Teddy Bear", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Tokyo Teddy Bear", placeholder.x + 15, placeholder.y + 40);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by Neru", placeholder.x + 15, placeholder.y + 85);
                 }
@@ -1248,7 +1254,7 @@ public class GameManager{
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
                     g2.drawString("OUTRAGE", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by DJ Myosuke vs. USAO", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by USAO vs. DJ Myosuke", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 9){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -1258,9 +1264,9 @@ public class GameManager{
                 }
                 if(song == 10){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 30));
-                    g2.drawString("Viyella's Scream", placeholder.x + 15, placeholder.y + 40);
+                    g2.drawString("Saikyo Stronger", placeholder.x + 15, placeholder.y + 40);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by Laur", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by REDALiCE vs. USAO", placeholder.x + 15, placeholder.y + 85);
                 }
             }
             g2.setFont(new Font("Arial", Font.BOLD, 80));
@@ -1314,10 +1320,10 @@ public class GameManager{
                 g2.setFont(new Font("Sans Serif Collection", Font.BOLD, 100));
                 g2.drawString("CREDITS!!!", 100, 100);
                 g2.setFont(new Font("Sans Serif Collection", Font.BOLD, 20));
-                g2.drawString("Now Playing:", 1000, 550);
-                g2.drawString("by LeaF", 1000, 650);
+                g2.drawString("Now Playing:", 700, 350);
+                g2.drawString("by LeaF", 700, 450);
                 g2.setFont(new Font("Sans Serif Collection", Font.BOLD, 60));
-                g2.drawString("Aleph-0", 1000, 615);
+                g2.drawString("Doppelganger", 700, 415);
             }
             if(page == 2){
                 img = im.getImage("credits1");
@@ -1423,6 +1429,36 @@ public class GameManager{
             reset();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void saveScore(String name) throws IOException {
+        Player p = new Player(name, score);
+        scores.add(p);
+        scores.sort(new SortByScore());
+        PrintWriter out = new PrintWriter(new FileWriter("scores.txt"));
+        for(Player q : scores){
+            out.println(q);
+        }
+        out.close();
+    }
+
+    public void readScores() {
+        try{
+            Scanner sc = new Scanner(new File("scores.txt"));
+            while(sc.hasNextLine()){
+                StringTokenizer st = new StringTokenizer(sc.nextLine(), " ");
+                String name = st.nextToken();
+                int score = Integer.parseInt(st.nextToken());
+                Player p = new Player(name, score);
+                scores.add(p);
+            }
+        } catch (IOException e){
+
+        } catch (NoSuchElementException e){
+
+        } catch (NumberFormatException e) {
+
         }
     }
 

@@ -197,6 +197,14 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(9);
                 }
             }
+//            if (gm.mc10.contains(p)) {
+//                if(gm.isSelectionActivated()){
+//                    gm.saveSongCollection(10);
+//                }
+//                else {
+//                    gm.selectCollection(10);
+//                }
+//            }
             if(gm.select.contains(p) && gm.isSelectingSong()){
                 gm.select();
             }
@@ -215,19 +223,19 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         }
 
         if (gm.isGameOver()) {
+            try {
+                saveScore();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             gm.goToMenu();
         }
     }
 
-    public void saveScore(int score){
-        try {
-            String name = JOptionPane.showInputDialog(this, "Enter your name:").trim();
-            if(name.isEmpty()) name = "Player";
-            PrintWriter out = new PrintWriter(new FileWriter("scores.txt", true));
-            out.println(name + " " + gm.getScore());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void saveScore() throws IOException {
+        String name = JOptionPane.showInputDialog(this, "Enter your name:").trim();
+        if(name.isEmpty()) name = "Player";
+        gm.saveScore(name);
     }
 
     @Override
