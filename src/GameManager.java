@@ -461,7 +461,6 @@ public class GameManager{
         else if (gameState == GameState.GAME_OVER) {
             mm.stop();
             currentSong = "";
-            reset(); // reset the progress once game ends
         }
         else if (gameState == GameState.CREDITS && !"credits".equals(currentSong)) {
             mm.stop();
@@ -525,6 +524,7 @@ public class GameManager{
     }
     public void draw(Graphics2D g2) {
         Image img;
+        int alpha = 200;
         if(gameState == GameState.MENU){
             if(menu != null){
                 g2.drawImage(menu, 0, 0 , 1280, 720, null);
@@ -550,6 +550,11 @@ public class GameManager{
             g2.drawRect(scoreButton.x, scoreButton.y, scoreButton.width, scoreButton.height);
         }
         if(gameState == GameState.PLAYING) {
+            g2.setColor(new Color(0, 0, 0, 200));
+            String collectionKey = String.valueOf((char)('A' + playCollection - 1)) + (level / 2 + 1);
+            img = im.getImage(collectionKey);
+            g2.drawImage(img, 0, 0, 1280, 720, null);
+            g2.fillRect(0, 0, 1280, 720);
             g2.setColor(Color.WHITE);
             g2.setStroke(new BasicStroke(4f));
             g2.drawRect(leftX - 4, topY - 4, WIDTH + 8, HEIGHT + 8);
@@ -705,6 +710,12 @@ public class GameManager{
                         case 8:
                             g2.drawRect(mc8.x, mc8.y, mc8.width, mc8.height);
                             break;
+                        case 9:
+                            g2.drawRect(mc9.x, mc9.y, mc9.width, mc9.height);
+                            break;
+                        case 10:
+                            g2.drawRect(mc10.x, mc10.y, mc10.width, mc10.height);
+                            break;
                     }
                 }
             }
@@ -715,19 +726,13 @@ public class GameManager{
             }
         }
         if(gameState == GameState.SONGS){
-            g2.setColor(Color.WHITE);
-            g2.setFont(new Font("SansSerif", Font.PLAIN, 20));
-            g2.drawRect(placeholder.x, placeholder.y, placeholder.width, placeholder.height);
-            g2.drawRect(stuff.x, stuff.y, stuff.width, stuff.height);
-            g2.drawString("Track", stuff.x + 25, stuff.y + 20);
-            g2.setFont(new Font("SansSerif", Font.BOLD, 60));
-            g2.drawString(song + "", stuff.x + 30, stuff.y + 80);
-            g2.setFont(new Font("Arial", Font.PLAIN, 20));
-
             if(collection == 1){
                 img = im.getImage("A" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
-
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 1", 560, 25);
                 g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
                 g2.drawString("by Camellia", placeholder.x+15, placeholder.y + 85);
@@ -760,7 +765,11 @@ public class GameManager{
             }
             if(collection == 2){
                 img = im.getImage("B" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 2", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -819,14 +828,18 @@ public class GameManager{
                 }
                 if(song == 10){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("No Title", placeholder.x + 15, placeholder.y + 50);
+                    g2.drawString("Synthesis.", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by Reol", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by tn-shi", placeholder.x + 15, placeholder.y + 85);
                 }
             }
             if(collection == 3){
                 img = im.getImage("C" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 3", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 25));
@@ -892,7 +905,11 @@ public class GameManager{
             }
             if(collection == 4){
                 img = im.getImage("D" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 4", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -958,7 +975,11 @@ public class GameManager{
             }
             if(collection == 5){
                 img = im.getImage("E" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 5", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -1026,7 +1047,11 @@ public class GameManager{
             }
             if(collection == 6){
                 img = im.getImage("F" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 6", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 35));
@@ -1091,7 +1116,11 @@ public class GameManager{
             }
             if(collection == 7){
                 img = im.getImage("G" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 7", 560, 30);
                 g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                 g2.drawString("by t+pazolite", placeholder.x + 15, placeholder.y + 85);
@@ -1138,7 +1167,11 @@ public class GameManager{
             }
             if(collection == 8){
                 img = im.getImage("H" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 8", 560, 30);
                 if(song == 1){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
@@ -1205,7 +1238,11 @@ public class GameManager{
             }
             if(collection == 9){
                 img = im.getImage("I" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
                 g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
                 g2.drawString("Music Collection 9", 560, 30);
                 g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
                 if(song == 1){
@@ -1269,6 +1306,27 @@ public class GameManager{
                     g2.drawString("by REDALiCE vs. USAO", placeholder.x + 15, placeholder.y + 85);
                 }
             }
+            if(collection == 10){
+                if(song == 1){}
+                if(song == 2){}
+                if(song == 3){}
+                if(song == 4){}
+                if(song == 5){}
+                if(song == 6){}
+                if(song == 7){}
+                if(song == 8){}
+                if(song == 9){}
+                if(song == 10){}
+            }
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("SansSerif", Font.PLAIN, 20));
+            g2.drawRect(placeholder.x, placeholder.y, placeholder.width, placeholder.height);
+            g2.drawRect(stuff.x, stuff.y, stuff.width, stuff.height);
+            g2.drawString("Track", stuff.x + 25, stuff.y + 20);
+            g2.setFont(new Font("SansSerif", Font.BOLD, 60));
+            g2.drawString(song + "", stuff.x + 30, stuff.y + 80);
+            g2.setFont(new Font("Arial", Font.PLAIN, 20));
+
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.drawString("<", 20, 350);
             g2.drawString(">", 1200, 350);
@@ -1417,8 +1475,10 @@ public class GameManager{
             br.close();
         } catch (NumberFormatException e){
             playCollection = 1;
-        } catch (IOException e){
+        } catch (IOException e) {
             playCollection = 1;
+        } catch (NullPointerException e) {
+
         }
     }
     public void saveSongCollection(int collection) {
@@ -1426,6 +1486,7 @@ public class GameManager{
             PrintWriter out = new PrintWriter(new FileWriter("save.txt"));
             out.println(collection);
             selectionActivated = false;
+            out.close();
             reset();
         } catch (IOException e) {
             e.printStackTrace();
@@ -1510,6 +1571,9 @@ public class GameManager{
         collectionAreas.put(mc5, 5);
         collectionAreas.put(mc6, 6);
         collectionAreas.put(mc7, 7);
+        collectionAreas.put(mc8, 8);
+        collectionAreas.put(mc9, 9);
+        collectionAreas.put(mc10, 10);
     }
 
     public void updateHover(Point p) {

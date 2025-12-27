@@ -45,7 +45,7 @@ public class MusicManager {
         songPaths.put("collectionB7", "Music Collection 2/Galaxy Collapse.wav");
         songPaths.put("collectionB8", "Music Collection 2/Harumachi Clover.wav");
         songPaths.put("collectionB9", "Music Collection 2/Don't Fight The Music.wav");
-        songPaths.put("collectionB10", "Music Collection 2/No Title.wav");
+        songPaths.put("collectionB10", "Music Collection 2/Synthesis.wav");
 
         // Collection C (Music Collection 3)
         songPaths.put("collectionC1", "Music Collection 3/Destruction 3,2,1.wav");
@@ -127,16 +127,16 @@ public class MusicManager {
         songPaths.put("collectionI9", "Music Collection 9/Red to Red.wav");
         songPaths.put("collectionI10", "Music Collection 9/Saikyo Stronger.wav");
 
-        songPaths.put("collectionJ1", "Music Collection 10/");
-        songPaths.put("collectionJ2", "Music Collection 10/");
-        songPaths.put("collectionJ3", "Music Collection 10/");
-        songPaths.put("collectionJ4", "Music Collection 10/");
-        songPaths.put("collectionJ5", "Music Collection 10/");
-        songPaths.put("collectionJ6", "Music Collection 10/");
-        songPaths.put("collectionJ7", "Music Collection 10/");
-        songPaths.put("collectionJ8", "Music Collection 10/");
-        songPaths.put("collectionJ9", "Music Collection 10/");
-        songPaths.put("collectionJ10", "Music Collection 10/");
+        songPaths.put("collectionJ1", "Music Collection 10/4 Challenges.wav");
+        songPaths.put("collectionJ2", "Music Collection 10/CYBERPUNK.wav");
+        songPaths.put("collectionJ3", "Music Collection 10/Exitium.wav");
+        songPaths.put("collectionJ4", "Music Collection 10/Hajimari Beat.wav");
+        songPaths.put("collectionJ5", "Music Collection 10/Internet Yamero.wav");
+        songPaths.put("collectionJ6", "Music Collection 10/Let you DIVE.wav");
+        songPaths.put("collectionJ7", "Music Collection 10/Lyrical Strike.wav");
+        songPaths.put("collectionJ8", "Music Collection 10/Mirror.wav");
+        songPaths.put("collectionJ9", "Music Collection 10/New Year's Entropy.wav");
+        songPaths.put("collectionJ10", "Music Collection 10/round and round.wav");
 
         // Collection A snippets
         snippetRanges.put("collectionA1", new int[]{40, 65});
@@ -160,7 +160,7 @@ public class MusicManager {
         snippetRanges.put("collectionB7", new int[]{165, 195});
         snippetRanges.put("collectionB8", new int[]{90, 120});
         snippetRanges.put("collectionB9", new int[]{90, 120});
-        snippetRanges.put("collectionB10", new int[]{90, 120});
+        snippetRanges.put("collectionB10", new int[]{60, 90});
 
         // Collection C
         snippetRanges.put("collectionC1", new int[]{90, 120});
@@ -245,6 +245,17 @@ public class MusicManager {
         snippetRanges.put("collectionI8", new int[]{60, 90});
         snippetRanges.put("collectionI9", new int[]{60, 90});
         snippetRanges.put("collectionI10", new int[]{60, 90});
+
+        snippetRanges.put("collectionJ1", new int[]{60, 90});
+        snippetRanges.put("collectionJ2", new int[]{60, 90});
+        snippetRanges.put("collectionJ3", new int[]{60, 90});
+        snippetRanges.put("collectionJ4", new int[]{60, 90});
+        snippetRanges.put("collectionJ5", new int[]{60, 90});
+        snippetRanges.put("collectionJ6", new int[]{60, 90});
+        snippetRanges.put("collectionJ7", new int[]{60, 90});
+        snippetRanges.put("collectionJ8", new int[]{60, 90});
+        snippetRanges.put("collectionJ9", new int[]{60, 90});
+        snippetRanges.put("collectionJ10", new int[]{60, 90});
 
         initSnippets();
     }
@@ -383,7 +394,12 @@ public class MusicManager {
         for(int i = 1; i <= 10; i++){
             collectionI.put(i, new Snippet(snippetRanges.get("collectionI" + i)[0], snippetRanges.get("collectionI" + i)[1], 1500));
         }
-        snippetMap.put("I", collectionH);
+        snippetMap.put("I", collectionI);
+        Map<Integer, Snippet> collectionJ = new HashMap<>();
+        for(int i = 1; i <= 10; i++){
+            collectionJ.put(i, new Snippet(snippetRanges.get("collectionJ" + i)[0], snippetRanges.get("collectionJ" + i)[1], 1500));
+        }
+        snippetMap.put("J", collectionJ);
     }
 
     /**

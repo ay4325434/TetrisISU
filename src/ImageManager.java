@@ -29,7 +29,7 @@ public class ImageManager {
         paths.put("B7", "Images/Collection 2/gc.png");
         paths.put("B8", "Images/Collection 2/haruclover.png");
         paths.put("B9", "Images/Collection 2/dftm.png");
-        paths.put("B10", "Images/Collection 2/notitle.png");
+        paths.put("B10", "Images/Collection 2/synthesis.png");
 
         paths.put("C1", "Images/Collection 3/des321.png");
         paths.put("C2", "Images/Collection 3/distortedfate.png");
@@ -144,6 +144,7 @@ public class ImageManager {
      * @return The image
      */
     public Image getImage(String imageId) {
+        if(cache.size() > 10) clearCache();
         if (!cache.containsKey(imageId)) {
             String path = paths.get(imageId);
             if (path == null) {

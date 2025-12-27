@@ -197,14 +197,14 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(9);
                 }
             }
-//            if (gm.mc10.contains(p)) {
-//                if(gm.isSelectionActivated()){
-//                    gm.saveSongCollection(10);
-//                }
-//                else {
-//                    gm.selectCollection(10);
-//                }
-//            }
+            if (gm.mc10.contains(p)) {
+                if(gm.isSelectionActivated()){
+                    gm.saveSongCollection(10);
+                }
+                else {
+                    gm.selectCollection(10);
+                }
+            }
             if(gm.select.contains(p) && gm.isSelectingSong()){
                 gm.select();
             }
@@ -228,6 +228,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
+            gm.reset();
             gm.goToMenu();
         }
     }
