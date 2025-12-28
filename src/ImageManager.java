@@ -49,7 +49,7 @@ public class ImageManager {
         paths.put("D5", "Images/Collection 4/shiawasevip.png");
         paths.put("D6", "Images/Collection 4/skystrike.png");
         paths.put("D7", "Images/Collection 4/speedoflight.png");
-        paths.put("D8", "Images/Collection 4/thecalling.png");
+        paths.put("D8", "Images/Collection 4/realms.png");
         paths.put("D9", "Images/Collection 4/timeleaper.png");
         paths.put("D10", "Images/Collection 4/unity.png");
 
@@ -109,16 +109,16 @@ public class ImageManager {
         paths.put("I9", "Images/Collection 9/red to red.png");
         paths.put("I10", "Images/Collection 9/saikyo stronger.png");
 
-        paths.put("J1", "Images/Collection 10/");
-        paths.put("J2", "Images/Collection 10/");
-        paths.put("J3", "Images/Collection 10/");
-        paths.put("J4", "Images/Collection 10/");
-        paths.put("J5", "Images/Collection 10/");
-        paths.put("J6", "Images/Collection 10/");
-        paths.put("J7", "Images/Collection 10/");
-        paths.put("J8", "Images/Collection 10/");
-        paths.put("J9", "Images/Collection 10/");
-        paths.put("J10", "Images/Collection 10/");
+        paths.put("J1", "Images/Collection 10/4 challenges.png");
+        paths.put("J2", "Images/Collection 10/cyberpunk.png");
+        paths.put("J3", "Images/Collection 10/exitium.png");
+        paths.put("J4", "Images/Collection 10/hajimari beat.png");
+        paths.put("J5", "Images/Collection 10/internet yamero.png");
+        paths.put("J6", "Images/Collection 10/let you dive.png");
+        paths.put("J7", "Images/Collection 10/lyrical strike.png");
+        paths.put("J8", "Images/Collection 10/mirror.png");
+        paths.put("J9", "Images/Collection 10/nye.png");
+        paths.put("J10", "Images/Collection 10/round and round.png");
 
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");

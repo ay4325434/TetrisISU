@@ -67,7 +67,7 @@ public class MusicManager {
         songPaths.put("collectionD5", "Music Collection 4/Shiawase - VIP.wav");
         songPaths.put("collectionD6", "Music Collection 4/Skystrike.wav");
         songPaths.put("collectionD7", "Music Collection 4/At the Speed of Light.wav");
-        songPaths.put("collectionD8", "Music Collection 4/The Calling.wav");
+        songPaths.put("collectionD8", "Music Collection 4/Realms.wav");
         songPaths.put("collectionD9", "Music Collection 4/Time Leaper.wav");
         songPaths.put("collectionD10", "Music Collection 4/Unity.wav");
 
@@ -247,15 +247,15 @@ public class MusicManager {
         snippetRanges.put("collectionI10", new int[]{60, 90});
 
         snippetRanges.put("collectionJ1", new int[]{60, 90});
-        snippetRanges.put("collectionJ2", new int[]{60, 90});
+        snippetRanges.put("collectionJ2", new int[]{30, 60});
         snippetRanges.put("collectionJ3", new int[]{60, 90});
         snippetRanges.put("collectionJ4", new int[]{60, 90});
-        snippetRanges.put("collectionJ5", new int[]{60, 90});
+        snippetRanges.put("collectionJ5", new int[]{90, 120});
         snippetRanges.put("collectionJ6", new int[]{60, 90});
-        snippetRanges.put("collectionJ7", new int[]{60, 90});
+        snippetRanges.put("collectionJ7", new int[]{80, 110});
         snippetRanges.put("collectionJ8", new int[]{60, 90});
         snippetRanges.put("collectionJ9", new int[]{60, 90});
-        snippetRanges.put("collectionJ10", new int[]{60, 90});
+        snippetRanges.put("collectionJ10", new int[]{80, 110});
 
         initSnippets();
     }
