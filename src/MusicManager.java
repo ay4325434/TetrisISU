@@ -22,6 +22,7 @@ public class MusicManager {
         songPaths.put("credits", "Doppelganger.wav");
         songPaths.put("instructions", "Nulctrl EX.wav");
         songPaths.put("other", "Chronomia.wav");
+        songPaths.put("scores", "Protoflicker.wav");
 
         // Collection A (Music Collection 1)
         songPaths.put("collectionA1", "Music Collection 1/#1f1e33.wav");

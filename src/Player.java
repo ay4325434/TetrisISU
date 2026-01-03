@@ -5,6 +5,7 @@ public class Player implements Comparable<Player>{
     private String name;
     private int score;
     public Player(String name, int score){
+        if(score < 0) score = 0;
         this.name = name;
         this.score = score;
     }

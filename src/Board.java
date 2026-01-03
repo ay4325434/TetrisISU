@@ -14,13 +14,13 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
 
-    final int FPS = 60;
+    static final int FPS = 60;
 
-    public Rectangle screen = new Rectangle(0, 0, WIDTH, HEIGHT);
+    public static final Rectangle screen = new Rectangle(0, 0, WIDTH, HEIGHT);
 
     Thread gameThread;
     GameManager gm;
-    public Board(){
+    public Board() throws IOException {
         gm = new GameManager();
         KeyHandler k = new KeyHandler(gm);
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
@@ -91,30 +91,30 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
             return;
         }
         if (gm.isInMenu()) { // outer check
-            if (gm.musicSelectButton.contains(p)) {
+            if (GameManager.musicSelectButton.contains(p)) {
                 gm.goToSelection();
                 return;
             }
-            else if (gm.credsButton.contains(p)) {
+            else if (GameManager.credsButton.contains(p)) {
                 gm.resetPage();
                 gm.goToCredits();
             }
-            else if (gm.insButton.contains(p)) {
+            else if (GameManager.insButton.contains(p)) {
                 gm.resetPage();
                 gm.goToInstructions();
             }
-            else if (gm.otherButton.contains(p)) {
+            else if (GameManager.otherButton.contains(p)) {
                 gm.resetPage();
                 gm.goToOther();
             }
-            else if (gm.scoreButton.contains(p)) {
-                // Add functions later
+            else if (GameManager.scoreButton.contains(p)) {
+                gm.goToScores();
             }
             else {
                 gm.play();
             }
         }
-        if(gm.backButton.contains(p)){
+        if(GameManager.backButton.contains(p)){
             if (gm.isInSongs()){
                 gm.goToSelection();
             }
@@ -123,7 +123,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
             }
         }
         if(gm.isSelectingSong()) {
-            if (gm.mc1.contains(p)) {
+            if (GameManager.mc1.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(1);
                 }
@@ -132,7 +132,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 }
             }
 
-            if (gm.mc2.contains(p)) {
+            if (GameManager.mc2.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(2);
                 }
@@ -141,7 +141,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 }
             }
 
-            if (gm.mc3.contains(p)) {
+            if (GameManager.mc3.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(3);
                 }
@@ -149,7 +149,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(3);
                 }
             }
-            if (gm.mc4.contains(p)) {
+            if (GameManager.mc4.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(4);
                 }
@@ -157,7 +157,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(4);
                 }
             }
-            if (gm.mc5.contains(p)) {
+            if (GameManager.mc5.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(5);
                 }
@@ -165,7 +165,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(5);
                 }
             }
-            if (gm.mc6.contains(p)) {
+            if (GameManager.mc6.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(6);
                 }
@@ -173,7 +173,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(6);
                 }
             }
-            if (gm.mc7.contains(p)) {
+            if (GameManager.mc7.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(7);
                 }
@@ -181,7 +181,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(7);
                 }
             }
-            if (gm.mc8.contains(p)) {
+            if (GameManager.mc8.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(8);
                 }
@@ -189,7 +189,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(8);
                 }
             }
-            if (gm.mc9.contains(p)) {
+            if (GameManager.mc9.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(9);
                 }
@@ -197,7 +197,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(9);
                 }
             }
-            if (gm.mc10.contains(p)) {
+            if (GameManager.mc10.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(10);
                 }
@@ -205,20 +205,20 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                     gm.selectCollection(10);
                 }
             }
-            if(gm.select.contains(p) && gm.isSelectingSong()){
+            if(GameManager.select.contains(p) && gm.isSelectingSong()){
                 gm.select();
             }
         }
-        if(gm.leftButton.contains(p) && gm.isInSongs()){
+        if(GameManager.leftButton.contains(p) && gm.isInSongs()){
             gm.previousSong();
         }
-        if(gm.rightButton.contains(p) && gm.isInSongs()){
+        if(GameManager.rightButton.contains(p) && gm.isInSongs()){
             gm.nextSong();
         }
-        else if(gm.rightButton.contains(p)){
+        else if(GameManager.rightButton.contains(p)){
             gm.nextPage();
         }
-        else if(gm.leftButton.contains(p)){
+        else if(GameManager.leftButton.contains(p)){
             gm.previousPage();
         }
 
@@ -234,9 +234,14 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     }
 
     public void saveScore() throws IOException {
-        String name = JOptionPane.showInputDialog(this, "Enter your name:").trim();
-        if(name.isEmpty()) name = "Player";
-        gm.saveScore(name);
+        try {
+            String name = JOptionPane.showInputDialog(this, "Enter your name:").trim();
+            if (name.isEmpty()) name = "Player";
+            gm.saveScore(name);
+        } catch (NullPointerException e) {
+            // User cancelled input dialog
+            gm.saveScore("Player");
+        }
     }
 
     @Override

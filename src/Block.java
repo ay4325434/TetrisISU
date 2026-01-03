@@ -3,17 +3,20 @@
  */
 
 import java.awt.*;
-public class Block extends Rectangle{
-    public int x, y;
+public class Block extends Rectangle {
     public static final int SIZE = 30;
     public Color color;
 
-    public Block(Color color){
+    public Block(Color color) {
         this.color = color;
+        this.width = SIZE;
+        this.height = SIZE;
     }
-    public void draw(Graphics2D g2){
+
+    public void draw(Graphics2D g2) {
         int margin = 2;
         g2.setColor(color);
         g2.fillRect(x + margin, y + margin, SIZE - 2*margin, SIZE - 2*margin);
     }
 }
+

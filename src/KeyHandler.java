@@ -5,7 +5,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener{
-    public static boolean upPressed, downPressed, leftPressed, rightPressed, zPressed, aPressed, shiftPressed, spacePressed, pausePressed = false;
+    public static boolean upPressed, downPressed, leftPressed, rightPressed,
+            zPressed, aPressed, shiftPressed, spacePressed, pausePressed, escPressed = false;
 
     private GameManager gm;
 
@@ -48,11 +49,19 @@ public class KeyHandler implements KeyListener{
             }
         }
 
-        if (code == KeyEvent.VK_P && !pausePressed) {
-            pausePressed = true;
+        if (code == KeyEvent.VK_P) {
+            if(!pausePressed) {
+                pausePressed = true;
+            }
+            else{
+                pausePressed = false;
+            }
         }
-        else{
-            pausePressed = false;
+
+        if(code == KeyEvent.VK_ESCAPE){
+            if(gm.isPaused() && gm.isPlaying()) {
+                escPressed = true;
+            }
         }
     }
 

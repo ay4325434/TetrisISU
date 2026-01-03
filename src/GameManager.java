@@ -5,6 +5,11 @@ import java.util.*;
 import java.util.StringTokenizer;
 
 public class GameManager{
+    // Hiding the scores file deep into the project
+    private static String FILE_PATH = "Don't open/I told you not to open/Why are you still here/" +
+            "Go back/Stop clicking/Are you seriously still there/WHAT ARE YOU DOING/STOP IT/" +
+            "WHY ARE YOU STILL CLICKING/GO BACK NOW/okay i see you/you just love to click/" +
+            "HOW HAVE YOU NOT GIVEN UP YET/STOP CLICKING/okay fine i give up";
 
     //Game window properties
     public static final int WIDTH = 300;
@@ -21,33 +26,32 @@ public class GameManager{
 
     //Piece properties
     private Mino currentMino;
-    private int startX;
-    private int startY;
+    private final int startX;
+    private final int startY;
 
     private Mino nextMino1, nextMino2, nextMino3, nextMino4, nextMino5, nextMino6;
-    private int nextX1, nextY1;
-    private int nextX2, nextY2;
-    private int nextX3, nextY3;
-    private int nextX4, nextY4;
-    private int nextX5, nextY5;
+    private final int nextX1, nextY1;
+    private final int nextX2, nextY2;
+    private final int nextX3, nextY3;
+    private final int nextX4, nextY4;
+    private final int nextX5, nextY5;
 
     //Other properties
     private int dropInterval = 60;
 
-    private ArrayList<Block> placedBlocks = new ArrayList<>();
-    private ArrayList<Mino> startingMinos = new ArrayList<>();
-    private ArrayList<Mino> minos = new ArrayList<>(startingMinos);
+    private final ArrayList<Block> placedBlocks = new ArrayList<>();
+    private final ArrayList<Mino> startingMinos = new ArrayList<>();
+    private final ArrayList<Mino> minos = new ArrayList<>(startingMinos);
 
-    private boolean hold = false;
+    private boolean hold;
     private boolean alreadyHeld = false;
     private Mino holdMino = null;
     private boolean selectionActivated = false;
 
-    private Map<GameState, Integer> pages = new HashMap<>();
-    private Map<Rectangle, Integer> collectionAreas = new HashMap<>();
+    private final Map<GameState, Integer> pages = new HashMap<>();
+    private final Map<Rectangle, Integer> collectionAreas = new HashMap<>();
 
     private ArrayList<Player> scores = new ArrayList<>();
-
 
     //Game states
     public enum GameState {
@@ -59,9 +63,11 @@ public class GameManager{
         CREDITS,
         SONGS,
         OTHER,
-        INITIALIZE
+        INITIALIZE,
+        SCORES
     }
     private GameState gameState = GameState.MENU;
+    private boolean paused = false;
 
     private int currentBackground = 1; // Iterates through the music collections
     private int song = 1;
@@ -69,33 +75,33 @@ public class GameManager{
 
     private static final int SONGS = 10;
 
-    private MusicManager mm = new MusicManager();
+    private final MusicManager mm = new MusicManager();
     private String currentSong = "";
-    private ImageManager im = new ImageManager();
+    private final ImageManager im = new ImageManager();
 
     // Buttons for user selection
-    public Rectangle musicSelectButton = new Rectangle(0, 0, 170, 30);
-    public Rectangle backButton = new Rectangle(0, 0, 50, 30);
-    public Rectangle credsButton = new Rectangle(180, 0, 100, 30);
-    public Rectangle insButton = new Rectangle(330, 0, 140, 30);
-    public Rectangle otherButton = new Rectangle(480, 0, 100, 30);
-    public Rectangle scoreButton = new Rectangle(600, 0, 100, 30);
-    public Rectangle mc1 = new Rectangle(0, 40, 500, 80);
-    public Rectangle mc2 = new Rectangle(0, 140, 500, 80);
-    public Rectangle mc3 = new Rectangle(0, 240, 500, 80);
-    public Rectangle mc4 = new Rectangle(0, 340, 500, 80);
-    public Rectangle mc5 = new Rectangle(0, 440, 500, 80);
-    public Rectangle mc6 = new Rectangle(0, 540, 500, 80);
-    public Rectangle mc7 = new Rectangle(0, 640, 500, 80);
-    public Rectangle mc8 = new Rectangle(550, 40, 500, 80);
-    public Rectangle mc9 = new Rectangle(550, 140, 500, 80);
-    public Rectangle mc10 = new Rectangle(550, 240, 500, 80);
-    public Rectangle select = new Rectangle(80, 0, 80, 30);
+    public static final Rectangle musicSelectButton = new Rectangle(0, 0, 170, 30);
+    public static final Rectangle backButton = new Rectangle(0, 0, 50, 30);
+    public static final Rectangle credsButton = new Rectangle(180, 0, 100, 30);
+    public static final Rectangle insButton = new Rectangle(330, 0, 140, 30);
+    public static final Rectangle otherButton = new Rectangle(480, 0, 100, 30);
+    public static final Rectangle scoreButton = new Rectangle(600, 0, 100, 30);
+    public static final Rectangle mc1 = new Rectangle(0, 40, 500, 80);
+    public static final Rectangle mc2 = new Rectangle(0, 140, 500, 80);
+    public static final Rectangle mc3 = new Rectangle(0, 240, 500, 80);
+    public static final Rectangle mc4 = new Rectangle(0, 340, 500, 80);
+    public static final Rectangle mc5 = new Rectangle(0, 440, 500, 80);
+    public static final Rectangle mc6 = new Rectangle(0, 540, 500, 80);
+    public static final Rectangle mc7 = new Rectangle(0, 640, 500, 80);
+    public static final Rectangle mc8 = new Rectangle(550, 40, 500, 80);
+    public static final Rectangle mc9 = new Rectangle(550, 140, 500, 80);
+    public static final Rectangle mc10 = new Rectangle(550, 240, 500, 80);
+    public static final Rectangle select = new Rectangle(80, 0, 80, 30);
 
-    public Rectangle leftButton = new Rectangle(20, 220, 50, 200);
-    public Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
-    public Rectangle placeholder = new Rectangle(80, 280, 380, 100);
-    public Rectangle stuff = new Rectangle(360, 280, 100, 100);
+    public static final Rectangle leftButton = new Rectangle(20, 220, 50, 200);
+    public static final Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
+    public static final Rectangle placeholder = new Rectangle(80, 280, 380, 100);
+    public static final Rectangle stuff = new Rectangle(360, 280, 100, 100);
 
     public Image menu, musicSelect, credits;
 
@@ -111,7 +117,7 @@ public class GameManager{
     private int b2b = -1;
     private int combo = -1;
 
-    public GameManager(){
+    public GameManager() throws IOException {
         leftX = (Board.WIDTH / 2) - (WIDTH / 2);
         topY = 30;
         rightX = leftX + WIDTH;
@@ -136,6 +142,12 @@ public class GameManager{
         pages.put(GameState.INSTRUCTIONS, 4);
         pages.put(GameState.OTHER, 3);
 
+        File nestedFolders = new File(FILE_PATH);
+        if(!nestedFolders.exists()){
+            boolean created = nestedFolders.mkdirs();
+            if(created) System.out.println("Success!");
+        }
+
         initCollections();
         reset();
         readScores();
@@ -147,7 +159,6 @@ public class GameManager{
         } catch (IOException e) {
             throw new RuntimeException("Failed to load image");
         }
-
     }
     /**
      * Picks a random piece after the starting bag has been used up.
@@ -159,7 +170,7 @@ public class GameManager{
             m = minos.removeFirst();
         }
         else{
-            // Restablishing the bag of 7 different pieces
+            // Reestablishing the bag of 7 different pieces
             minos.add(new LPiece(this));
             minos.add(new JPiece(this));
             minos.add(new IPiece(this));
@@ -167,6 +178,7 @@ public class GameManager{
             minos.add(new ZPiece(this));
             minos.add(new TPiece(this));
             minos.add(new OPiece(this));
+            Collections.shuffle(minos);
             m = minos.removeFirst();
         }
         return m;
@@ -175,148 +187,90 @@ public class GameManager{
     private String lineClearMessage = ""; // message to display
     private String spinMessage = "";
     private String pcMessage = "";
-    private int messageTimer = 0;         // counts frames or updates
+    private int messageTimer = 0; // counts frames or updates
     private int spinMessageTimer = 0;
     private final int MESSAGE_DURATION = 120; // frames to display (2 seconds at 60 FPS)
 
     /**
      * Handles line clearing and perfect clears.
-     * @param linesCleared
+     * @param linesCleared the number of lines cleared at once
      */
     public void handleLineClear(int linesCleared) {
-        if(checkForTSpin()){ // Piece spin detected
-            if(currentMino.direction == 1){
-                spinMessage = "Mini " + currentMino.type + "-Spin";
-            }
-            else{
-                spinMessage = currentMino.type + "-Spin";
-            }
+        if (linesCleared == 0) {
+            lineClearMessage = "";
+            combo = -1; // reset combo
+            return;
         }
-        if(checkForAllClear()){
+
+        // Determine T-Spin / All Clear
+        boolean isTSpin = checkForTSpin();   // includes mini T-Spins
+        boolean isAllClear = checkForAllClear();
+        boolean countsForB2B = isTSpin || linesCleared == 4; // Quads always count
+
+        // Surge bonus check (for breaking a B2B streak >= 4)
+        if (!countsForB2B && b2b >= 4) {
+            int surgeBonus = b2b * level * 10;
+            score += surgeBonus;
+            // Optionally, display a message here like "SURGE BONUS!"
+        }
+
+        // Update B2B
+        if (countsForB2B) {
+            b2b++;
+        } else if (!isAllClear) {
+            b2b = -1; // reset on normal clears that aren't All Clear
+        }
+
+        // Set line clear message
+        switch (linesCleared) {
+            case 1: lineClearMessage = "SINGLE"; break;
+            case 2: lineClearMessage = "DOUBLE"; break;
+            case 3: lineClearMessage = "TRIPLE"; break;
+            case 4: lineClearMessage = "QUAD"; break;
+        }
+
+        // Base score for the clear
+        int baseScore = 0;
+        switch (linesCleared) {
+            case 1: baseScore = 100 * level; break;
+            case 2: baseScore = 200 * level; break;
+            case 3: baseScore = 300 * level; break;
+            case 4: baseScore = 800 * level; break;
+        }
+        score += baseScore;
+
+        // Apply T-Spin / Quad B2B bonus
+        if (countsForB2B) {
+            int b2bBonusMultiplier = (b2b > 1 ? 5 : 1);
+            int allClearMultiplier = (isAllClear ? 20 : 1);
+
+            int bonus = 0;
+            switch (linesCleared) {
+                case 1: bonus = 100 * level * b2bBonusMultiplier * allClearMultiplier; break;
+                case 2: bonus = 200 * level * b2bBonusMultiplier * allClearMultiplier; break;
+                case 3: bonus = 400 * level * b2bBonusMultiplier * allClearMultiplier; break;
+                case 4: if (isAllClear) bonus = 1000 * level * allClearMultiplier; break;
+            }
+            score += bonus;
+        }
+
+        // Combo increment
+        combo++;
+        if (combo > 1) {
+            score += combo * level;
+        }
+
+        // All Clear message
+        if (isAllClear) {
             pcMessage = "ALL CLEAR";
         }
-        StringTokenizer st = new StringTokenizer(spinMessage, " "); // check to see if a mini or a regular spin occurred
-        switch(linesCleared) {
-            case 1:
-                lineClearMessage = "SINGLE";
-                // Score calculation
-                if(checkForTSpin() || checkForAllClear()){
-                    b2b++;
-                    if(!st.nextToken().equalsIgnoreCase("Mini")){
-                        if(b2b > 1) {
-                            score += (100 * b2b * level * 5);
-                        }
-                        else{
-                            score += 100 * level * 5;
-                        }
-                    }
-                    if(checkForAllClear()){
-                        if(b2b > 1) {
-                            score += (100 * b2b * level * 20);
-                        }
-                        else {
-                            score += (100 * level * 20);
-                        }
-                    }
-                }
-                else {
-                    score += 100 * level;
-                    if(b2b > 4){
-                        score *= b2b;
-                        b2b = -1;
-                    }
-                }
-                combo++;
-                if(combo > 1){
-                    score += combo * level;
-                }
-                break;
-            case 2:
-                lineClearMessage = "DOUBLE";
-                if(checkForTSpin() || checkForAllClear()){
-                    b2b++;
-                    if(!st.nextToken().equalsIgnoreCase("Mini")){
-                        if(b2b > 1) {
-                            score += (200 * b2b * level * 5);
-                        }
-                        else{
-                            score += 200 * level * 5;
-                        }
-                    }
-                    if(checkForAllClear()){
-                        if(b2b > 1) {
-                            score += (200 * b2b * level * 20);
-                        }
-                        else {
-                            score += (200 * level * 20);
-                        }
-                    }
-                }
-                else {
-                    if(b2b > 4){
-                        score *= b2b;
-                        b2b = -1;
-                    }
-                }
-                combo++;
-                if(combo > 1){
-                    score += combo * level;
-                }
-                break;
-            case 3:
-                if(!st.nextToken().equalsIgnoreCase("Mini")){
-                    b2b++;
-                    if(spinMessage.equals("T-Spin")){
-                        if(b2b > 1) {
-                            score += (400 * b2b * level * 5);
-                        }
-                        else{
-                            score += 400 * level * 5;
-                        }
-                    }
-                    if(checkForAllClear()){
-                        if(b2b > 1) {
-                            score += (400 * b2b * level * 20);
-                        }
-                        else {
-                            score += (400 * level * 20);
-                        }
-                    }
-                }
-                else {
-                    if(b2b > 4){
-                        score *= b2b;
-                        b2b = -1;
-                    }
-                }
-                combo++;
-                if(combo > 1){
-                    score += combo * level;
-                }
-                break;
-            case 4:
-                lineClearMessage = "QUAD";
-                b2b++;
-                if(checkForAllClear()){
-                    score += (1000 * level * 20);
-                }
-                combo++;
-                if(combo > 1){
-                    score += combo * level;
-                }
-                break;
-            default:
-                lineClearMessage = "";
-                spinMessage = "";
-                pcMessage = "";
-                combo = -1;
-                break;
-        }
-        messageTimer = MESSAGE_DURATION; // reset timer
+
+        // Reset message timer
+        messageTimer = MESSAGE_DURATION;
     }
 
     private boolean checkForTSpin(){
-        return currentMino.rotatedDuringLockDelay && currentMino.type.equals("T");
+        return currentMino.isSpin();
     }
 
     /**
@@ -347,7 +301,7 @@ public class GameManager{
                 }
 
                 // Piece has landed
-                if (!currentMino.active) {
+                if (!currentMino.isActive()) {
                     alreadyHeld = false;
 
                     // Add blocks to placed
@@ -359,14 +313,12 @@ public class GameManager{
                     if (currentMino.b[0].x == startX && currentMino.b[0].y == startY) {
                         gameState = GameState.GAME_OVER;
                     } else {
-                        currentMino.deactivating = false;
-
+                        clearLines();
                         // Shift next pieces
                         currentMino = nextMino1;
-                        currentMino.spin = false;
-                        currentMino.justRotated = false;
+                        currentMino.setDeactivating(false);
+                        currentMino.setSpin(false);
                         currentMino.setXY(startX, startY);
-
                         nextMino1 = nextMino2;
                         nextMino1.setXY(nextX1, nextY1);
                         nextMino2 = nextMino3;
@@ -379,19 +331,21 @@ public class GameManager{
                         nextMino5.setXY(nextX5, nextY5);
                         nextMino6 = pickMino();
                         nextMino6.setXY(0, 0);
-
-                        clearLines();
                     }
                 } else {
                     // Holding logic
                     if (KeyHandler.shiftPressed && !alreadyHeld) {
-                        alreadyHeld = true; // user can only hold once per piece
-                        if (!hold) { // no piece in hold slot
+                        alreadyHeld = true; // prevent multiple swaps per drop
+
+                        if (holdMino == null) {
+                            // No piece in hold yet — store current piece
                             holdMino = currentMino;
                             holdMino.setXY(leftX - 150, topY + 80);
+
                             currentMino = nextMino1;
                             currentMino.setXY(startX, startY);
 
+                            // Shift the next pieces
                             nextMino1 = nextMino2;
                             nextMino1.setXY(nextX1, nextY1);
                             nextMino2 = nextMino3;
@@ -406,14 +360,15 @@ public class GameManager{
                             nextMino6.setXY(0, 0);
 
                             hold = true;
-                        } else { // swap the previously held piece with the current piece
+                        } else {
+                            // Swap with the held piece
                             Mino temp = currentMino;
                             currentMino = holdMino;
                             currentMino.setXY(startX, startY);
                             holdMino = temp;
                             holdMino.setXY(leftX - 150, topY + 80);
                         }
-                    }
+                }
 
                     // Hard drop
                     if (KeyHandler.spacePressed) {
@@ -425,6 +380,15 @@ public class GameManager{
                     currentMino.update();
                 }
             }
+            else{
+                paused = true;
+                if(KeyHandler.escPressed){
+                    gameState = GameState.MENU;
+                    KeyHandler.escPressed = false;
+                    KeyHandler.pausePressed = false;
+                    reset();
+                }
+            }
 
             // Message timer
             if (messageTimer > 0) {
@@ -432,6 +396,7 @@ public class GameManager{
                 if (messageTimer == 0) {
                     lineClearMessage = "";
                     pcMessage = "";
+                    spinMessage = "";
                 }
             }
         }
@@ -459,6 +424,11 @@ public class GameManager{
             mm.stop();
             currentSong = "";
         }
+        else if (gameState == GameState.SCORES && !"scores".equals(currentSong)) {
+            mm.stop();
+            mm.loop("scores");
+            currentSong = "scores";
+        }
         else if (gameState == GameState.GAME_OVER) {
             mm.stop();
             currentSong = "";
@@ -479,7 +449,6 @@ public class GameManager{
             currentSong = "other";
         }
     }
-
     /**
      * Clears lines when a row is fully filled.
      */
@@ -506,8 +475,8 @@ public class GameManager{
                 linesCleared++; // use this to determine how many lines were cleared at once
                 if(lines % 10 == 0 && dropInterval > 1){
                     level++;
-                    if(dropInterval > 10) dropInterval -= 5;
-                    else if (dropInterval > 5) dropInterval -= 3;
+                    if(dropInterval > 40) dropInterval -= 5;
+                    else if(dropInterval > 20) dropInterval -= 3;
                     else dropInterval--;
                 }
                 // Drop blocks above
@@ -519,13 +488,13 @@ public class GameManager{
             } else {
                 y -= Block.SIZE; // move up
             }
-            handleLineClear(linesCleared);
         }
+        handleLineClear(linesCleared);
         linesCleared = 0; // Reset for next potential clear
     }
     public void draw(Graphics2D g2) {
         Image img;
-        int alpha = 200;
+        int alpha = 150;
         if(gameState == GameState.MENU){
             if(menu != null){
                 g2.drawImage(menu, 0, 0 , 1280, 720, null);
@@ -551,7 +520,7 @@ public class GameManager{
             g2.drawRect(scoreButton.x, scoreButton.y, scoreButton.width, scoreButton.height);
         }
         if(gameState == GameState.PLAYING) {
-            g2.setColor(new Color(0, 0, 0, 200));
+            g2.setColor(new Color(0, 0, 0, alpha));
             int index = level / 2;
             String imgKey = SongConstants.IMAGE_ORDERS.get(playCollection).get(index);
             img = im.getImage(imgKey);
@@ -659,29 +628,43 @@ public class GameManager{
                 g2.setColor(Color.WHITE);
                 g2.setFont(new Font("Arial", Font.PLAIN, 80));
                 g2.drawString("PAUSED", Board.WIDTH / 2 - 150, Board.HEIGHT / 2);
+                g2.setFont(new Font("Arial", Font.PLAIN, 25));
+                g2.drawString("Press ESC to return to menu", Board.WIDTH / 2 - 150, Board.HEIGHT / 2 - 100);
             }
             if (holdMino != null) {
                 holdMino.draw(g2);
             }
         }
         if (gameState == GameState.MUSIC_SELECT) {
+            int x1 = 20;
+            int x2 = 570;
             g2.drawImage(musicSelect, 0, 0, 1280, 720, null);
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
             g2.drawString("Select", select.x + 5, select.y + 20);
             g2.drawRect(select.x, select.y, select.width, select.height);
-            g2.setFont(new Font("Arial", Font.BOLD, 50));
-            g2.drawString("Music Collection 1", 20, 100);
-            g2.drawString("Music Collection 2", 20, 200);
-            g2.drawString("Music Collection 3", 20, 300);
-            g2.drawString("Music Collection 4", 20, 400);
-            g2.drawString("Music Collection 5", 20, 500);
-            g2.drawString("Music Collection 6", 20, 600);
-            g2.drawString("Music Collection 7", 20, 700);
-            g2.drawString("Music Collection 8", 570, 100);
-            g2.drawString("Music Collection 9", 570, 200);
-            g2.drawString("Music Collection 10", 570, 300);
+            g2.setFont(new Font("Arial", Font.BOLD, 25));
+            g2.drawString("Music Collection 1", x1, 70);
+            g2.drawString("(Camellia Album)", x1, 95);
+            g2.drawString("Music Collection 2", x1, 170);
+            g2.drawString("(osu! Album)", x1, 195);
+            g2.drawString("Music Collection 3", x1, 270);
+            g2.drawString("(Phigros Album)", x1, 295);
+            g2.drawString("Music Collection 4", x1, 370);
+            g2.drawString("(Geometry Dash Album)", x1, 395);
+            g2.drawString("Music Collection 5", x1, 470);
+            g2.drawString("(Miscellaneous)", x1, 495);
+            g2.drawString("Music Collection 6", x1, 570);
+            g2.drawString("(maimai DX Album)", x1, 595);
+            g2.drawString("Music Collection 7", x1, 670);
+            g2.drawString("(t+pazolite Album)", x1, 695);
+            g2.drawString("Music Collection 8", x2, 70);
+            g2.drawString("(VOCALOID Album)", x2, 95);
+            g2.drawString("Music Collection 9", x2, 170);
+            g2.drawString("(HARDCORE TANO*C Album)", x2, 195);
+            g2.drawString("Music Collection 10", x2, 270);
+            g2.drawString("(D4DJ Album)", x2, 295);
             if(selectionActivated){
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
                 g2.drawString("Click to select", 670, 550);
@@ -728,6 +711,7 @@ public class GameManager{
             }
         }
         if(gameState == GameState.SONGS){
+            g2.setFont(new Font("Arial", Font.PLAIN, 20));
             if(collection == 1){
                 img = im.getImage("A" + currentBackground);
                 g2.drawImage(img, 0, 0, 1280, 720, null);
@@ -958,9 +942,9 @@ public class GameManager{
                 }
                 if(song == 8){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("The Calling", placeholder.x + 15, placeholder.y + 50);
+                    g2.drawString("Realms", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 18));
-                    g2.drawString("by TheFatRat x Laura Brehm", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by Hinkik & A Himitsu", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 9){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 35));
@@ -1143,12 +1127,12 @@ public class GameManager{
                     g2.drawString("Chrome VOX", placeholder.x + 15, placeholder.y + 50);
                 }
                 if(song == 5){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
-                    g2.drawString("Garakuta Doll Play", placeholder.x + 15, placeholder.y + 40);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
+                    g2.drawString("Garakuta Doll Play", placeholder.x + 15, placeholder.y + 35);
                 }
                 if(song == 6){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
-                    g2.drawString("Twisted Drop Party", placeholder.x + 15, placeholder.y + 40);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
+                    g2.drawString("Twisted Drop Party", placeholder.x + 15, placeholder.y + 35);
                 }
                 if(song == 7){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 30));
@@ -1439,10 +1423,10 @@ public class GameManager{
                 g2.setFont(new Font("Sans Serif Collection", Font.BOLD, 100));
                 g2.drawString("CREDITS!!!", 100, 100);
                 g2.setFont(new Font("Sans Serif Collection", Font.BOLD, 20));
-                g2.drawString("Now Playing:", 700, 350);
-                g2.drawString("by LeaF", 700, 450);
+                g2.drawString("Now Playing:", 800, 500);
+                g2.drawString("by LeaF", 800, 600);
                 g2.setFont(new Font("Sans Serif Collection", Font.BOLD, 60));
-                g2.drawString("Doppelganger", 700, 415);
+                g2.drawString("Doppelganger", 800, 565);
             }
             if(page == 2){
                 img = im.getImage("credits1");
@@ -1495,12 +1479,33 @@ public class GameManager{
             img = im.getImage("initialize1");
             g2.drawImage(img, 0, 0, 1280, 720, null);
         }
+        else if (gameState == GameState.SCORES){
+            img = im.getImage("scores");
+            g2.drawImage(img, 0, 0, 1280, 720, null);
+            g2.setColor(new Color(0, 0, 0, 200));
+            g2.fillRect(320, 0, 640, 720);
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 60));
+            g2.drawString("TOP SCORES", 450, 70);
+            g2.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2.drawString("Back", 20, 20);
+            int y = 100;
+            for(int i = 0; i < Math.min(15, scores.size()); i++){
+                // display either the top 15 players or how many players have played if less than 15
+                String name = scores.get(i).getName();
+                int playerScore = scores.get(i).getScore();
+                String formatted = String.format("%s%102d", name, playerScore);
+                g2.drawString(formatted, 340, y);
+                y += 30;
+            }
+        }
     }
     public void reset(){
         placedBlocks.clear();
         startingMinos.clear();
         holdMino = null;
         hold = false;
+        paused = false;
         lines = 0;
         score = 0;
         level = 1;
@@ -1558,16 +1563,16 @@ public class GameManager{
         Player p = new Player(name, score);
         scores.add(p);
         scores.sort(new SortByScore());
-        PrintWriter out = new PrintWriter(new FileWriter("scores.txt"));
+        PrintWriter out = new PrintWriter(new FileWriter(FILE_PATH + "/scores.txt", true));
         for(Player q : scores){
             out.println(q);
         }
         out.close();
     }
 
-    public void readScores() {
+    public void readScores() throws IOException {
         try{
-            Scanner sc = new Scanner(new File("scores.txt"));
+            Scanner sc = new Scanner(new File(FILE_PATH + "/scores.txt"));
             while(sc.hasNextLine()){
                 StringTokenizer st = new StringTokenizer(sc.nextLine(), " ");
                 String name = st.nextToken();
@@ -1575,13 +1580,16 @@ public class GameManager{
                 Player p = new Player(name, score);
                 scores.add(p);
             }
-        } catch (IOException e){
-
-        } catch (NoSuchElementException e){
-
-        } catch (NumberFormatException e) {
-
+            scores.sort(new SortByScore());
+            // Reset the file if any corruption is detected
+        } catch (IOException | NoSuchElementException | NumberFormatException e){
+            resetFile();
         }
+    }
+
+    public void resetFile() throws IOException {
+        PrintWriter out = new PrintWriter(new FileWriter(FILE_PATH + "/scores.txt"));
+        out.close();
     }
 
     public void resetPage(){
@@ -1666,6 +1674,10 @@ public class GameManager{
         return score;
     }
 
+    public boolean isPaused(){
+        return paused;
+    }
+
     public int getDropInterval(){
         return dropInterval;
     }
@@ -1714,9 +1726,9 @@ public class GameManager{
             gameState = GameState.MUSIC_SELECT;
         }
     }
-    public void goToSongs(){
+    public void goToScores(){
         if(gameState != GameState.PLAYING){
-            gameState = GameState.SONGS;
+            gameState = GameState.SCORES;
         }
     }
     public void goToCredits(){

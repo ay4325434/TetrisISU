@@ -136,6 +136,7 @@ public class ImageManager {
         paths.put("other3", "Images/Other/other3.png");
 
         paths.put("initialize1", "Images/Initialize/initialize1.png");
+        paths.put("scores", "Images/scores.png");
     }
 
     /**
