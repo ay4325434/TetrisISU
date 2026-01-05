@@ -3,8 +3,29 @@
  */
 
 import java.awt.*;
+import java.util.*;
 
 public abstract class Mino {
+
+    public static final Map<String, Color> PIECE_COLORS = Map.of(
+        "I", Color.CYAN,
+        "J", Color.BLUE,
+        "L", Color.ORANGE,
+        "O", Color.YELLOW,
+        "S", Color.GREEN,
+        "T", Color.MAGENTA,
+        "Z", Color.RED
+    );
+
+    public static final Map<String, Integer> MINI_SPIN_DIRECTIONS = Map.of(
+        "I", 0,
+        "J", 2,
+        "L", 4,
+        "S", 1,
+        "Z", 1,
+        "T", 1,
+        "O", 0
+    );
 
     public Block[] b = new Block[4]; // One piece, which is composed of four blocks
     public Block[] temp = new Block[4]; // Use to determine if a move is valid
@@ -313,9 +334,10 @@ public abstract class Mino {
             if (deactivateCounter >= lockDelay) {
                 active = false;
                 if (!canMove()) {
+                    gm.setPreviousMino(this);
                     spin = true;
                     System.out.println(type + " spin detected");
-                    if (direction == 1) {
+                    if (direction == MINI_SPIN_DIRECTIONS.get(type)) {
                         gm.setSpinMessage("Mini " + type + "-Spin");
                     } else {
                         gm.setSpinMessage(type + "-Spin");
@@ -552,6 +574,9 @@ public abstract class Mino {
         }
     }
 
+    public String getType() {
+        return type;
+    }
     public boolean isActive() {
         return active;
     }

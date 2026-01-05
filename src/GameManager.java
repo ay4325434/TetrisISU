@@ -2,6 +2,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class GameManager{
@@ -26,6 +27,7 @@ public class GameManager{
 
     //Piece properties
     private Mino currentMino;
+    private Mino previousMino;
     private final int startX;
     private final int startY;
 
@@ -97,11 +99,15 @@ public class GameManager{
     public static final Rectangle mc9 = new Rectangle(550, 140, 500, 80);
     public static final Rectangle mc10 = new Rectangle(550, 240, 500, 80);
     public static final Rectangle select = new Rectangle(80, 0, 80, 30);
-
+    public static final List<Rectangle> MUSIC_COLLECTION_AREAS = Arrays.asList(
+            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10
+    );
     public static final Rectangle leftButton = new Rectangle(20, 220, 50, 200);
     public static final Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
     public static final Rectangle placeholder = new Rectangle(80, 280, 380, 100);
     public static final Rectangle stuff = new Rectangle(360, 280, 100, 100);
+
+    private Rectangle selectedMusicCollection;
 
     public Image menu, musicSelect, credits;
 
@@ -241,16 +247,7 @@ public class GameManager{
 
         // Apply T-Spin / Quad B2B bonus
         if (countsForB2B) {
-            int b2bBonusMultiplier = (b2b > 1 ? 5 : 1);
-            int allClearMultiplier = (isAllClear ? 20 : 1);
-
-            int bonus = 0;
-            switch (linesCleared) {
-                case 1: bonus = 100 * level * b2bBonusMultiplier * allClearMultiplier; break;
-                case 2: bonus = 200 * level * b2bBonusMultiplier * allClearMultiplier; break;
-                case 3: bonus = 400 * level * b2bBonusMultiplier * allClearMultiplier; break;
-                case 4: if (isAllClear) bonus = 1000 * level * allClearMultiplier; break;
-            }
+            int bonus = getBonus(linesCleared, isAllClear);
             score += bonus;
         }
 
@@ -267,6 +264,22 @@ public class GameManager{
 
         // Reset message timer
         messageTimer = MESSAGE_DURATION;
+    }
+
+    private int getBonus(int linesCleared, boolean isAllClear) {
+        int b2bBonusMultiplier = (b2b > 1 ? 5 : 1);
+        int allClearMultiplier = (isAllClear ? 20 : 1);
+
+        int bonus = 0;
+        switch (linesCleared) {
+            case 1: bonus = 100 * level * b2bBonusMultiplier * allClearMultiplier; break;
+            case 2: bonus = 200 * level * b2bBonusMultiplier * allClearMultiplier; break;
+            case 3: bonus = 400 * level * b2bBonusMultiplier * allClearMultiplier; break;
+        }
+        if(isAllClear){
+            bonus += 1000 * level * b2bBonusMultiplier;
+        }
+        return bonus;
     }
 
     private boolean checkForTSpin(){
@@ -294,6 +307,7 @@ public class GameManager{
             if (!KeyHandler.pausePressed) {
                 // --- Background music per collection/level ---
                 int index = level / 2;
+                if(index > 9) index = 9;
                 String songKey = SongConstants.SONG_ORDERS.get(playCollection).get(index);
                 if (!songKey.equals(currentSong)) {
                     mm.loop(songKey);
@@ -303,7 +317,6 @@ public class GameManager{
                 // Piece has landed
                 if (!currentMino.isActive()) {
                     alreadyHeld = false;
-
                     // Add blocks to placed
                     for (int i = 0; i < 4; i++) {
                         placedBlocks.add(currentMino.b[i]);
@@ -410,7 +423,7 @@ public class GameManager{
                 String key = "collection" + collectionKey + song; // for tracking/looping
                 if (!key.equals(currentSong)) {
                     mm.stopLoop();
-                    mm.loopSnippet(key, snippet.start, snippet.end, snippet.loopDelay);
+                    mm.loopSnippet(key, snippet.getStart(), snippet.getEnd(), snippet.getLoopDelay());
                     currentSong = key;
                     System.out.println("Playing: " + key);
                 }
@@ -475,9 +488,8 @@ public class GameManager{
                 linesCleared++; // use this to determine how many lines were cleared at once
                 if(lines % 10 == 0 && dropInterval > 1){
                     level++;
-                    if(dropInterval > 40) dropInterval -= 5;
-                    else if(dropInterval > 20) dropInterval -= 3;
-                    else dropInterval--;
+                    if(dropInterval > 9) dropInterval -= 3;
+                    else if (dropInterval > 1) dropInterval--;
                 }
                 // Drop blocks above
                 for (int i = 0; i < placedBlocks.size(); i++) {
@@ -522,6 +534,7 @@ public class GameManager{
         if(gameState == GameState.PLAYING) {
             g2.setColor(new Color(0, 0, 0, alpha));
             int index = level / 2;
+            if(index >= 10) index = 9;
             String imgKey = SongConstants.IMAGE_ORDERS.get(playCollection).get(index);
             img = im.getImage(imgKey);
             g2.drawImage(img, 0, 0, 1280, 720, null);
@@ -538,6 +551,11 @@ public class GameManager{
 
             int holdX = leftX - 210;
             int holdY = topY;
+            if(alreadyHeld){
+                g2.setColor(new Color(255, 0, 0, 200));
+                g2.fillRect(holdX, holdY, 200, 200);
+            }
+            g2.setColor(Color.WHITE);
             g2.drawRect(holdX, holdY, 200, 200);
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
             g2.drawString("HOLD", holdX + 20, holdY + 40);
@@ -556,7 +574,7 @@ public class GameManager{
             }
 
             if(!spinMessage.isEmpty() && spinMessageTimer > 0){
-                g2.setColor(Color.MAGENTA);
+                g2.setColor(Mino.PIECE_COLORS.get(previousMino.getType()));
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.drawString(spinMessage, leftX - 200, topY + 250);
                 spinMessageTimer--;
@@ -596,7 +614,8 @@ public class GameManager{
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.drawString("B2B x" + b2b, leftX - 200, topY + 350);
             }
-            if(combo > 1){
+            if(combo >= 1){
+                g2.setColor(Color.WHITE);
                 g2.setFont(new Font("Arial", Font.BOLD, 30));
                 g2.drawString(combo + " COMBO", leftX - 200, topY + 400);
             }
@@ -639,6 +658,8 @@ public class GameManager{
             int x1 = 20;
             int x2 = 570;
             g2.drawImage(musicSelect, 0, 0, 1280, 720, null);
+            g2.setColor(Color.GREEN);
+            g2.drawRect(selectedMusicCollection.x, selectedMusicCollection.y, selectedMusicCollection.width, selectedMusicCollection.height);
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
@@ -954,9 +975,9 @@ public class GameManager{
                 }
                 if(song == 10){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("Unity", placeholder.x + 15, placeholder.y + 50);
+                    g2.drawString("Solar Wind", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by TheFatRat", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by Jumper", placeholder.x + 15, placeholder.y + 85);
                 }
             }
             if(collection == 5){
@@ -1487,16 +1508,16 @@ public class GameManager{
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 60));
             g2.drawString("TOP SCORES", 450, 70);
-            g2.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2.setFont(new Font("Consolas", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
             int y = 100;
             for(int i = 0; i < Math.min(15, scores.size()); i++){
                 // display either the top 15 players or how many players have played if less than 15
                 String name = scores.get(i).getName();
                 int playerScore = scores.get(i).getScore();
-                String formatted = String.format("%s%102d", name, playerScore);
+                String formatted = String.format("%-30s%24d", name, playerScore);
                 g2.drawString(formatted, 340, y);
-                y += 30;
+                y += 40;
             }
         }
     }
@@ -1546,8 +1567,10 @@ public class GameManager{
         } catch (NullPointerException e) {
 
         }
+        selectedMusicCollection = MUSIC_COLLECTION_AREAS.get(playCollection - 1);
     }
     public void saveSongCollection(int collection) {
+        selectedMusicCollection = MUSIC_COLLECTION_AREAS.get(collection - 1);
         try {
             PrintWriter out = new PrintWriter(new FileWriter("save.txt"));
             out.println(collection);
@@ -1585,6 +1608,14 @@ public class GameManager{
         } catch (IOException | NoSuchElementException | NumberFormatException e){
             resetFile();
         }
+    }
+
+    public int pause(){
+        return mm.pause();
+    }
+
+    public void resume(int framePosition){
+        mm.resume(framePosition);
     }
 
     public void resetFile() throws IOException {
@@ -1766,5 +1797,8 @@ public class GameManager{
 
     public void setHold(boolean hold){
         this.hold = hold;
+    }
+    public void setPreviousMino(Mino previousMino){
+        this.previousMino = previousMino;
     }
 }

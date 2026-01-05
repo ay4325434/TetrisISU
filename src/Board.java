@@ -225,11 +225,11 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         if (gm.isGameOver()) {
             try {
                 saveScore();
+                gm.reset();
+                gm.goToMenu();
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-            gm.reset();
-            gm.goToMenu();
         }
     }
 

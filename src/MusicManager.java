@@ -70,7 +70,7 @@ public class MusicManager {
         songPaths.put("collectionD7", "Music Collection 4/At the Speed of Light.wav");
         songPaths.put("collectionD8", "Music Collection 4/Realms.wav");
         songPaths.put("collectionD9", "Music Collection 4/Time Leaper.wav");
-        songPaths.put("collectionD10", "Music Collection 4/Unity.wav");
+        songPaths.put("collectionD10", "Music Collection 4/Solar Wind.wav");
 
         // Collection E (Music Collection 5)
         songPaths.put("collectionE1", "Music Collection 5/Brain Fluid Explosion Girl.wav");
@@ -331,6 +331,19 @@ public class MusicManager {
         loopThread.setDaemon(true);
         loopThread.start();
         currentSong = songId;
+    }
+    public int pause() {
+        if (currentClip != null && currentClip.isRunning()) {
+            currentClip.stop();
+            return currentClip.getFramePosition();
+        }
+        return -1;
+    }
+    public void resume(int framePosition) {
+        if (currentClip != null) {
+            currentClip.setFramePosition(framePosition);
+            currentClip.start();
+        }
     }
 
     private void initSnippets() {

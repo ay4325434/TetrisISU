@@ -9,6 +9,7 @@ public class KeyHandler implements KeyListener{
             zPressed, aPressed, shiftPressed, spacePressed, pausePressed, escPressed = false;
 
     private GameManager gm;
+    private int frames;
 
     public KeyHandler(GameManager gm){
         this.gm = gm;
@@ -48,13 +49,14 @@ public class KeyHandler implements KeyListener{
                 spacePressed = true;
             }
         }
-
         if (code == KeyEvent.VK_P) {
             if(!pausePressed) {
                 pausePressed = true;
+                frames = gm.pause();
             }
             else{
                 pausePressed = false;
+                gm.resume(frames);
             }
         }
 

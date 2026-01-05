@@ -6,6 +6,7 @@ public class Player implements Comparable<Player>{
     private int score;
     public Player(String name, int score){
         if(score < 0) score = 0;
+        if(name.length() > 20) name = name.substring(0,20) + "...";
         this.name = name;
         this.score = score;
     }

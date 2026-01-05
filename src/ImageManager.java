@@ -51,7 +51,7 @@ public class ImageManager {
         paths.put("D7", "Images/Collection 4/speedoflight.png");
         paths.put("D8", "Images/Collection 4/realms.png");
         paths.put("D9", "Images/Collection 4/timeleaper.png");
-        paths.put("D10", "Images/Collection 4/unity.png");
+        paths.put("D10", "Images/Collection 4/solar wind.png");
 
         paths.put("E1", "Images/Collection 5/bfeg.png");
         paths.put("E2", "Images/Collection 5/golden.png");
