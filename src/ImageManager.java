@@ -135,7 +135,7 @@ public class ImageManager {
         paths.put("other2", "Images/Other/other2.png");
         paths.put("other3", "Images/Other/other3.png");
 
-        paths.put("initialize1", "Images/Initialize/initialize1.png");
+        paths.put("settings", "Images/settings.png");
         paths.put("scores", "Images/scores.png");
     }
 
@@ -161,11 +161,6 @@ public class ImageManager {
             }
         }
         return cache.get(imageId);
-    }
-
-    /** Optional: remove a single image from cache */
-    public void unloadImage(String imageId) {
-        cache.remove(imageId);
     }
 
     /** Optional: clear all cached images */

@@ -7,6 +7,17 @@ import java.util.*;
 
 public abstract class Mino {
 
+    // Horizontal movement
+    private int dasLeft = 0;
+    private int arrLeft = 0;
+    private int dasRight = 0;
+    private int arrRight = 0;
+
+    private int dasDirection = 0; // 0: none, 1: left, 2: right
+    private int dcdCounter = 0;
+    private int sdfCounter = 0;
+
+
     public static final Map<String, Color> PIECE_COLORS = Map.of(
         "I", Color.CYAN,
         "J", Color.BLUE,
@@ -27,18 +38,19 @@ public abstract class Mino {
         "O", 0
     );
 
-    public Block[] b = new Block[4]; // One piece, which is composed of four blocks
-    public Block[] temp = new Block[4]; // Use to determine if a move is valid
+    protected Block[] b = new Block[4]; // One piece, which is composed of four blocks
+    private Block[] temp = new Block[4]; // Use to determine if a move is valid
 
-    int autoDropCounter = 0;
-    public int direction = 1; // 1: up, 2: right, 3: down, 4: left
+    private int autoDropCounter = 0;
+    private int direction = 1; // 1: up, 2: right, 3: down, 4: left
 
-    boolean leftCollision, rightCollision, bottomCollision; // collision flags
+    private boolean leftCollision, rightCollision, bottomCollision; // collision flags
+    private boolean rotationBlockCollision;
 
     // Piece properties
     private boolean active = true;
     private boolean deactivating;
-    int deactivateCounter = 0;
+    private int deactivateCounter = 0;
     protected String type;
     private boolean spin = false;
 
@@ -49,7 +61,7 @@ public abstract class Mino {
         this.gm = gm;
     }
 
-    public void create(Color c){ // Set distinct colors for each piece
+    protected void create(Color c){ // Set distinct colors for each piece
         for(int i=0; i<4; i++){
             b[i] = new Block(c);
             temp[i] = new Block(c);
@@ -57,7 +69,7 @@ public abstract class Mino {
     }
 
     /**
-     * Sets the piece on a certain spot on the graphics window.
+     * Sets the piece's position and block positions.
      * @param x the x-coordinate of the piece
      * @param y the y-coordinate of the piece
      */
@@ -99,7 +111,6 @@ public abstract class Mino {
         }
     }
 
-    private boolean rotationBlockCollision;
     public void checkRotationBlockCollision() { // check rotation collision with blocks
         rotationBlockCollision = false;
         for (Block placed : gm.getPlacedBlocks()) {
@@ -186,12 +197,13 @@ public abstract class Mino {
             case 2: rotateTemp180(); break;
         }
 
-        int toDir = switch (rotationType) {
-            case 0 -> (fromDir % 4) + 1;
-            case 1 -> (fromDir == 1 ? 4 : fromDir - 1);
-            case 2 -> ((fromDir + 1) % 4) + 1;
-            default -> fromDir;
-        };
+        int toDir;
+        switch (rotationType){
+            case 0: toDir = (fromDir % 4) + 1; break; // CW
+            case 1: toDir = (fromDir - 2 + 4) % 4 + 1; break; // CCW
+            case 2: toDir = (fromDir + 1) % 4 + 1; break; // 180°
+            default: toDir = fromDir; break;
+        }
 
         // Try kicks WITHOUT committing direction yet
         if (attemptRotationWithKicks(fromDir, toDir, rotationType)) {
@@ -206,13 +218,13 @@ public abstract class Mino {
 
     /**
      * Attempts to rotate a piece using wall kicks. Fails if all resulting cases still result in collisions.
-     * @param fromDir The original direction of the piece
-     * @param toDir The direction of intended rotation
+     * @param from The original direction of the piece
+     * @param to The direction of intended rotation
      * @param rotationType The type of rotation
      * @return whether the rotation can be executed
      */
-    private boolean attemptRotationWithKicks(int fromDir, int toDir, int rotationType) {
-        int[][] kicks = getWallKicks(fromDir, toDir, rotationType);
+    private boolean attemptRotationWithKicks(int from, int to, int rotationType) {
+        int[][] kicks = getWallKicks(from, to, rotationType);
 
         // Save rotated state once
         int[] baseX = new int[4];
@@ -242,7 +254,6 @@ public abstract class Mino {
                 return true; // temp[] is valid and rotated
             }
         }
-
         return false;
     }
 
@@ -256,7 +267,7 @@ public abstract class Mino {
      */
     private int[][] getWallKicks(int from, int to, int rotationType) {
         boolean isI = type.equals("I");
-
+        // Wall kick tables
         int[][] JLSTZ_0R = {{0,0}, {-1,0}, {-1,1}, {0,2}, {-1,2}};
         int[][] JLSTZ_R0 = {{0,0}, {1,0}, {1,1}, {0,-2}, {1,-2}};
         int[][] JLSTZ_R2 = {{0,0}, {1,0}, {1,1}, {0,-2}, {1,-2}};
@@ -266,39 +277,78 @@ public abstract class Mino {
         int[][] JLSTZ_L0 = {{0,0}, {-1,0}, {-1,1}, {0,-2}, {-1,-2}};
         int[][] JLSTZ_0L = {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}};
 
-        int[][] I_0R = { {0,0}, {-2,0}, {1,0}, {-2,1}, {1,-2} };
-        int[][] I_R0 = { {0,0}, {2,0}, {-1,0}, {2,-1}, {-1,2} };
-        int[][] I_R2 = { {0,0}, {-1,0}, {2,0}, {-1,-2}, {2,1} };
-        int[][] I_2R = { {0,0}, {1,0}, {-2,0}, {1,2}, {-2,-1} };
-        int[][] I_2L = { {0,0}, {2,0}, {-1,0}, {2,-1}, {-1,2} };
-        int[][] I_L2 = { {0,0}, {-2,0}, {1,0}, {-2,1}, {1,-2} };
-        int[][] I_L0 = { {0,0}, {1,0}, {-2,0}, {1,2}, {-2,-1} };
-        int[][] I_0L = { {0,0}, {-1,0}, {2,0}, {-1,-2}, {2,1} };
-
+        int[][] I_0R = { {-1,0}, {-3,0}, {0,0}, {-3,1}, {0,-2} };
+        int[][] I_R0 = { {1,0}, {3,0}, {0,0}, {3,-1}, {0,2} };
+        int[][] I_R2 = { {-2,0}, {-3,0}, {1,0}, {-2,-2}, {1,1} };
+        int[][] I_2R = { {0,0}, {0,0}, {-3,0}, {0,2}, {-3,-1} };
+        int[][] I_2L = { {1,0}, {3,0}, {0,0}, {3,-1}, {0,2} };
+        int[][] I_L2 = { {-3,0}, {-1,0}, {0,0}, {-3,1}, {0,-2} };
+        int[][] I_L0 = { {0,0}, {2,0}, {-1,0}, {0,2}, {-3,-1} };
+        int[][] I_0L = { {-2,0}, {0,0}, {1,0}, {-2,-2}, {2,1} };
 
         // === 180° rotation offsets (simplified) ===
         int[][] JLSTZ_180 = {{0,0}, {-1,0}, {1,0}, {0,-1}, {0,1}, {-1,-1}, {1,-1}, {-1,1}, {1,1}};
-        int[][] I_180 = {{0,0}, {-2,0}, {2,0}, {0,-1}, {0,1}, {-2,-1}, {2,-1}, {-2,1}, {2,1}};
+        int[][] I_180 = {
+                {-1,0}, {-3,0}, {1,0}, {-1,-1}, {-1,1},
+                {-3,-1}, {1,-1}, {-3,1}, {1,1}
+        };
+
 
         // Handle 180° rotation
         if (rotationType == 2) {
-            return isI ? I_180 : JLSTZ_180;
+            if(isI){
+                return I_180;
+            } else {
+                return JLSTZ_180;
+            }
         }
 
         // Handle 90° rotations
         if (isI) {
             switch(from) {
-                case 1: if (to == 2) return I_0R; if (to == 4) return I_0L; break;
-                case 2: if (to == 3) return I_R2; if (to == 1) return I_R0; break;
-                case 3: if (to == 4) return I_2R; if (to == 2) return I_2L; break;
-                case 4: if (to == 1) return I_L0; if (to == 3) return I_L2; break;
+                case 1: {
+                    if (to == 2) return I_0R;
+                    if (to == 4) return I_0L;
+                    break;
+                }
+                case 2: {
+                    if (to == 3) return I_R2;
+                    if (to == 1) return I_R0;
+                    break;
+                }
+                case 3: {
+                    if (to == 4) return I_2R;
+                    if (to == 2) return I_2L;
+                    break;
+                }
+                case 4: {
+                    if (to == 1) return I_L0;
+                    if (to == 3) return I_L2;
+                    break;
+                }
             }
         } else {
             switch(from) {
-                case 1: if (to == 2) return JLSTZ_0R; if (to == 4) return JLSTZ_0L; break;
-                case 2: if (to == 3) return JLSTZ_R2; if (to == 1) return JLSTZ_R0; break;
-                case 3: if (to == 4) return JLSTZ_2R; if (to == 2) return JLSTZ_2L; break;
-                case 4: if (to == 1) return JLSTZ_L0; if (to == 3) return JLSTZ_L2; break;
+                case 1: {
+                    if (to == 2) return JLSTZ_0R;
+                    if (to == 4) return JLSTZ_0L;
+                    break;
+                }
+                case 2: {
+                    if (to == 3) return JLSTZ_R2;
+                    if (to == 1) return JLSTZ_R0;
+                    break;
+                }
+                case 3: {
+                    if (to == 4) return JLSTZ_2R;
+                    if (to == 2) return JLSTZ_2L;
+                    break;
+                }
+                case 4: {
+                    if (to == 1) return JLSTZ_L0;
+                    if (to == 3) return JLSTZ_L2;
+                    break;
+                }
             }
         }
 
@@ -313,7 +363,7 @@ public abstract class Mino {
         updateCurrentCollisions();
 
         // HARD DROP: immediately start lock
-        if (KeyHandler.spacePressed && active) {
+        if (gm.getKeyHandler().isSpacePressed() && active) {
             deactivateCounter = lockDelay; // force immediate lock
             deactivating = true;
         }
@@ -334,6 +384,7 @@ public abstract class Mino {
             if (deactivateCounter >= lockDelay) {
                 active = false;
                 if (!canMove()) {
+                    // A "spin" has occurred - the piece has rotated into a position where it cannot move
                     gm.setPreviousMino(this);
                     spin = true;
                     System.out.println(type + " spin detected");
@@ -358,76 +409,177 @@ public abstract class Mino {
     }
 
     public void update() {
-        // ignore when user is not playing
         if (!gm.isPlaying()) return;
 
+        // Reset collision flags each frame
         leftCollision = rightCollision = bottomCollision = false;
         rotationBlockCollision = false;
+
         checkMovementCollision();
         checkBlockCollision();
 
-        if (deactivating) deactivate(); // piece cannot move down any further
+        if (deactivating) deactivate(); // piece cannot move down further
 
-        // check for rotation
-        if (KeyHandler.upPressed) { rotate(0); KeyHandler.upPressed = false; }
-        if (KeyHandler.zPressed) { rotate(1); KeyHandler.zPressed = false; }
-        if (KeyHandler.aPressed) { rotate(2); KeyHandler.aPressed = false; }
-
-        // move left
-        if (KeyHandler.leftPressed) {
-            if (canMove(-Block.SIZE, 0)) {
-                for (Block blk : b) blk.x -= Block.SIZE;
-            }
-            KeyHandler.leftPressed = false; // only allow one input at a time
+        // ---- ROTATION ----
+        if (gm.getKeyHandler().isUpPressed()) {
+            rotate(0);
+            gm.getKeyHandler().resetUpPressed();
+        }
+        if (gm.getKeyHandler().isZPressed()) {
+            rotate(1);
+            gm.getKeyHandler().resetZPressed();
+        }
+        if (gm.getKeyHandler().isAPressed()) {
+            rotate(2);
+            gm.getKeyHandler().resetAPressed();
         }
 
-        // right
-        if (KeyHandler.rightPressed) {
-            if (canMove(Block.SIZE, 0)) {
-                for (Block blk : b) blk.x += Block.SIZE;
-            }
-            KeyHandler.rightPressed = false;
+        // ---- HORIZONTAL MOVEMENT WITH DAS/ARR ----
+
+// LEFT
+        int newDirection = 0;
+        if (gm.getKeyHandler().isLeftPressed()) newDirection = 1;
+        if (gm.getKeyHandler().isRightPressed()) newDirection = 2;
+
+        if (newDirection != dasDirection && newDirection != 0) {
+            // switched direction -> start DCD
+            dasDirection = newDirection;
+            dcdCounter = 0;
+
+            // reset ARR (important)
+            arrLeft = 0;
+            arrRight = 0;
         }
-        // Soft drop
-        if (KeyHandler.downPressed && !deactivating) {
-            if (movePieceDown()) {
-                gm.increment(); // increase score for soft drop
-                deactivateCounter = 0;
-                deactivating = false;
+
+        boolean leftPressed = gm.getKeyHandler().isLeftPressed();
+
+        if (leftPressed) {
+            if (!gm.getKeyHandler().isLeftWasPressedLastFrame()) {
+                // First frame of press
+                if (canMove(-Block.SIZE, 0)) moveLeft();
+                dasLeft = 0;
+                arrLeft = 0;
+            } else {
+                // Held
+                if (dasLeft < gm.getDas()) {
+                    dasLeft++;
+                } else {
+                    if(dcdCounter < gm.getDcd()){
+                        dcdCounter++;
+                    }
+                    else {
+                        if (gm.getArr() == 0) {
+                            // Instant movement
+                            while (canMove(-Block.SIZE, 0)) {
+                                moveLeft();
+                            }
+                        } else {
+                            arrLeft++;
+                            if (arrLeft >= gm.getArr()) {
+                                if (canMove(-Block.SIZE, 0)) moveLeft();
+                                arrLeft = 0;
+                            }
+                        }
+                    }
+                }
             }
+        }
+
+        gm.getKeyHandler().setLeftWasPressedLastFrame(leftPressed);
+
+
+// RIGHT
+        boolean rightPressed = gm.getKeyHandler().isRightPressed();
+
+        if (rightPressed) {
+
+            if (!gm.getKeyHandler().isRightWasPressedLastFrame()) {
+                if (canMove(Block.SIZE, 0)) moveRight();
+                dasRight = 0;
+                arrRight = 0;
+            } else {
+                if (dasRight < gm.getDas()) {
+                    dasRight++;
+                } else {
+                    if(dcdCounter < gm.getDcd()){
+                        dcdCounter++;
+                    }
+                    else {
+                        if (gm.getArr() == 0) {
+                            // Instant movement
+                            while (canMove(Block.SIZE, 0)) {
+                                moveRight();
+                            }
+                        } else {
+                            arrRight++;
+                            if (arrRight >= gm.getArr()) {
+                                if (canMove(Block.SIZE, 0)) moveRight();
+                                arrRight = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        gm.getKeyHandler().setRightWasPressedLastFrame(rightPressed);
+
+        // ---- SOFT DROP ----
+        if (gm.getKeyHandler().isDownPressed() && !deactivating) {
+            if(gm.getSdf() == 0) hardDrop();
             else {
-                checkMovementCollision();
-                checkBlockCollision();
-                deactivating = true;
+                sdfCounter++;
+                if (sdfCounter >= gm.getSdf()) {
+                    if (movePieceDown()) {
+                        gm.increment(); // score for soft drop
+                        deactivateCounter = 0;
+                        deactivating = false;
+                    } else {
+                        checkMovementCollision();
+                        checkBlockCollision();
+                        deactivating = true;
+                    }
+                }
             }
-            KeyHandler.downPressed = false;
         }
 
-        checkMovementCollision();
-        checkBlockCollision();
-        if (bottomCollision || rotationBlockCollision) deactivating = true;
-
-        if (KeyHandler.shiftPressed) {
+        // ---- HOLD ----
+        if (gm.getKeyHandler().isShiftPressed()) {
             gm.setHold(false);
-            KeyHandler.shiftPressed = false;
+            gm.getKeyHandler().resetShiftPressed();
         }
 
+        // ---- AUTO DROP ----
         autoDropCounter++;
         if (autoDropCounter >= gm.getDropInterval()) {
             if (!movePieceDown()) {
                 checkMovementCollision();
                 checkBlockCollision();
                 deactivating = true;
-            }
-            else {
+            } else {
                 deactivateCounter = 0;
                 deactivating = false;
             }
             autoDropCounter = 0;
         }
 
+        // ---- FINAL COLLISION CHECK ----
+        checkMovementCollision();
+        checkBlockCollision();
+        if (bottomCollision || rotationBlockCollision) deactivating = true;
+
         if (deactivating) deactivate();
     }
+
+    // ---- HELPER METHODS ----
+    private void moveLeft() {
+        for (Block blk : b) blk.x -= Block.SIZE;
+    }
+
+    private void moveRight() {
+        for (Block blk : b) blk.x += Block.SIZE;
+    }
+
 
     /**
      * Check if the piece can move in any direction (down, left, right, up).
@@ -480,21 +632,20 @@ public abstract class Mino {
     }
 
     private boolean canMoveDown() {
-        boolean result = true;
         for (int i = 0; i < 4; i++) {
             int newY = b[i].y + Block.SIZE;
 
             // Check bottom of the field
-            if (newY >= GameManager.bottomY) result = false;
+            if (newY >= GameManager.bottomY) return false;
 
             // Check collisions with placed blocks
             for (Block placed : gm.getPlacedBlocks()) {
                 if (placed.x == b[i].x && placed.y <= newY && newY < placed.y + Block.SIZE) {
-                    result = false;
+                    return false;
                 }
             }
         }
-        return result;
+        return true;
     }
 
 
@@ -541,9 +692,6 @@ public abstract class Mino {
             gm.increment();
             if (++safety > 100) break;
         }
-
-        // Immediately lock after hard drop
-        deactivateCounter = 45;
         bottomCollision = true;
         deactivating = true;
         deactivate();

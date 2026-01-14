@@ -4,17 +4,18 @@
 
 import javax.sound.sampled.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MusicManager {
 
-    public Clip currentClip = null;
-    private Map<String, String> songPaths = new HashMap<>();
+    private Clip currentClip = null;
+    private final Map<String, String> songPaths = new HashMap<>();
     private Thread loopThread;
     private String currentSong = "";
-    private Map<String, int[]> snippetRanges = new HashMap<>();
-    private Map<String, Map<Integer, Snippet>> snippetMap = new HashMap<>();
+    private final Map<String, int[]> snippetRanges = new HashMap<>();
+    private final Map<String, Map<Integer, Snippet>> snippetMap = new HashMap<>();
 
     public MusicManager() {
         // Menu and sidebar music
@@ -23,6 +24,7 @@ public class MusicManager {
         songPaths.put("instructions", "Nulctrl EX.wav");
         songPaths.put("other", "Chronomia.wav");
         songPaths.put("scores", "Protoflicker.wav");
+        songPaths.put("settings", "Calamity Fortune.wav");
 
         // Collection A (Music Collection 1)
         songPaths.put("collectionA1", "Music Collection 1/#1f1e33.wav");
@@ -245,7 +247,7 @@ public class MusicManager {
         snippetRanges.put("collectionI7", new int[]{60, 90});
         snippetRanges.put("collectionI8", new int[]{60, 90});
         snippetRanges.put("collectionI9", new int[]{60, 90});
-        snippetRanges.put("collectionI10", new int[]{60, 90});
+        snippetRanges.put("collectionI10", new int[]{90, 120});
 
         snippetRanges.put("collectionJ1", new int[]{60, 90});
         snippetRanges.put("collectionJ2", new int[]{30, 60});
@@ -281,7 +283,7 @@ public class MusicManager {
     // --------------------
     // Full song loop
     // --------------------
-    public void loop(String songId) throws Exception {
+    public void loop(String songId) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         if (songId.equals(currentSong)) return;
         stop();
         String path = songPaths.get(songId);
@@ -297,7 +299,7 @@ public class MusicManager {
     // --------------------
     // Loop snippet with start/stop in seconds + gap
     // --------------------
-    public void loopSnippet(String songId, double startSec, double stopSec, int gapMs) throws Exception {
+    public void loopSnippet(String songId, double start, double stop, int gapMs) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         if (songId.equals(currentSong)) return;
         stopLoop();
 
@@ -311,8 +313,8 @@ public class MusicManager {
         AudioFormat format = currentClip.getFormat();
         float frameRate = format.getFrameRate();
 
-        int startFrame = (int) (startSec * frameRate);
-        int stopFrame = (int) (stopSec * frameRate);
+        int startFrame = (int) (start * frameRate);
+        int stopFrame = (int) (stop * frameRate);
         long snippetDurationMs = (long) ((stopFrame - startFrame) / frameRate * 1000);
 
         loopThread = new Thread(() -> {

@@ -1,4 +1,7 @@
-
+/*
+This class represents the main game board for a Tetris game bsed on
+rhythm game songs. It handles the game loop, rendering, and user input.
+ */
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
@@ -6,23 +9,20 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class Board extends JPanel implements Runnable, MouseListener, MouseMotionListener {
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
-
     static final int FPS = 60;
-
-    public static final Rectangle screen = new Rectangle(0, 0, WIDTH, HEIGHT);
-
-    Thread gameThread;
-    GameManager gm;
+    private Thread gameThread;
+    private GameManager gm;
+    private KeyHandler k;
     public Board() throws IOException {
+        k = new KeyHandler(null);
         gm = new GameManager();
-        KeyHandler k = new KeyHandler(gm);
+        k.setGameManager(gm);
+        gm.setKeyHandler(k);
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         this.setBackground(Color.BLACK);
         this.setLayout(null);
@@ -70,6 +70,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         gameThread.start();
     }
     private void update() throws Exception {
+        setCursor(gm.getCursor());
         gm.update();
         repaint();
     }
@@ -86,10 +87,6 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     @Override
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
-        if(gm.isInitializing() && screen.contains(p)){
-            gm.goToMenu();
-            return;
-        }
         if (gm.isInMenu()) { // outer check
             if (GameManager.musicSelectButton.contains(p)) {
                 gm.goToSelection();
@@ -110,8 +107,11 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
             else if (GameManager.scoreButton.contains(p)) {
                 gm.goToScores();
             }
-            else {
+            else if (GameManager.playButton.contains(p)){
                 gm.play();
+            }
+            else if (GameManager.settingsButton.contains(p)) {
+                gm.goToSettings();
             }
         }
         if(GameManager.backButton.contains(p)){
@@ -209,6 +209,37 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 gm.select();
             }
         }
+        if(gm.isInSettings()){
+            try {
+                if (GameManager.dasButton.contains(p)) {
+                    int das = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new DAS (in frames):"));
+                    if(das < 1) das = 1;
+                    if(das > 30) das = 30;
+                    gm.setDas(das);
+                }
+                if (GameManager.arrButton.contains(p)) {
+                    int arr = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new ARR (in frames):"));
+                    if(arr < 0) arr = 0;
+                    if(arr > 30) arr = 30;
+                    gm.setArr(arr);
+                }
+                if (GameManager.dcdButton.contains(p)) {
+                    int dcd = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new DCD (in frames):"));
+                    if(dcd < 0) dcd = 0;
+                    if(dcd > 30) dcd = 30;
+                    gm.setDcd(dcd);
+                }
+                if (GameManager.sdfButton.contains(p)) {
+                    int sdf = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new SDF (in frames):"));
+                    if(sdf < 0) sdf = 0;
+                    if(sdf > 30) sdf = 30;
+                    gm.setSdf(sdf);
+                }
+                gm.saveSettings();
+            } catch (NumberFormatException | NullPointerException | IOException ex) {
+                // User cancelled input dialog or entered invalid number
+            }
+        }
         if(GameManager.leftButton.contains(p) && gm.isInSongs()){
             gm.previousSong();
         }
@@ -274,6 +305,9 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         Point p = e.getPoint();
         if(gm.isSelectionActivated()){
             gm.updateHover(p);
+        }
+        else{
+            gm.updateHoverOnButtons(p);
         }
     }
 }

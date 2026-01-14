@@ -9,7 +9,7 @@ public class SongConstants {
     public static final Map<Integer, List<String>> SONG_ORDERS = Map.of(
             1, List.of("collectionA8", "collectionA2", "collectionA3", "collectionA10", "collectionA7",
                     "collectionA4", "collectionA5", "collectionA1", "collectionA6", "collectionA9"),
-            2, List.of("collectionB1", "collectionB8", "collectionB2", "collectionB3", "collectionB5",
+            2, List.of("collectionB8", "collectionB1", "collectionB2", "collectionB3", "collectionB5",
                     "collectionB6", "collectionB10", "collectionB9", "collectionB4", "collectionB7"),
             3, List.of("collectionC9", "collectionC8", "collectionC10", "collectionC4", "collectionC3",
                     "collectionC5", "collectionC6", "collectionC7", "collectionC1", "collectionC2"),
@@ -31,7 +31,7 @@ public class SongConstants {
     // Matches the songs with its corresponding image
     public static final Map<Integer, List<String>> IMAGE_ORDERS = Map.of(
             1, List.of("A8", "A2", "A3", "A10", "A7", "A4", "A5", "A1", "A6", "A9"),
-            2, List.of("B1", "B8", "B2", "B3", "B5", "B6", "B10", "B9", "B4", "B7"),
+            2, List.of("B8", "B1", "B2", "B3", "B5", "B6", "B10", "B9", "B4", "B7"),
             3, List.of("C9", "C8", "C10", "C4", "C3", "C5", "C6", "C7", "C1", "C2"),
             4, List.of("D10", "D1", "D3", "D5", "D7", "D8", "D9", "D4", "D6", "D2"),
             5, List.of("E10", "E3", "E2", "E4", "E6", "E8", "E9", "E5", "E7", "E1"),

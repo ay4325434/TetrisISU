@@ -20,6 +20,7 @@ public class GameManager{
     public static int rightX;
     public static int bottomY;
 
+    private int das, dcd, sdf, arr;
     private int lines = 0;
     private int linesCleared = 0;
     private int level = 1;
@@ -43,19 +44,20 @@ public class GameManager{
 
     private final ArrayList<Block> placedBlocks = new ArrayList<>();
     private final ArrayList<Mino> startingMinos = new ArrayList<>();
-    private final ArrayList<Mino> minos = new ArrayList<>(startingMinos);
+    private final ArrayList<Mino> minos = new ArrayList<>();
 
     private boolean hold;
     private boolean alreadyHeld = false;
     private Mino holdMino = null;
+
     private boolean selectionActivated = false;
 
     private final Map<GameState, Integer> pages = new HashMap<>();
     private final Map<Rectangle, Integer> collectionAreas = new HashMap<>();
 
-    private ArrayList<Player> scores = new ArrayList<>();
+    private final ArrayList<Player> players = new ArrayList<>();
 
-    //Game states
+    //Game states (better than defining multiple static constants)
     public enum GameState {
         MENU,
         PLAYING,
@@ -65,8 +67,8 @@ public class GameManager{
         CREDITS,
         SONGS,
         OTHER,
-        INITIALIZE,
-        SCORES
+        SCORES,
+        SETTINGS
     }
     private GameState gameState = GameState.MENU;
     private boolean paused = false;
@@ -80,6 +82,7 @@ public class GameManager{
     private final MusicManager mm = new MusicManager();
     private String currentSong = "";
     private final ImageManager im = new ImageManager();
+    private Cursor c;
 
     // Buttons for user selection
     public static final Rectangle musicSelectButton = new Rectangle(0, 0, 170, 30);
@@ -88,6 +91,8 @@ public class GameManager{
     public static final Rectangle insButton = new Rectangle(330, 0, 140, 30);
     public static final Rectangle otherButton = new Rectangle(480, 0, 100, 30);
     public static final Rectangle scoreButton = new Rectangle(600, 0, 100, 30);
+    public static final Rectangle playButton = new Rectangle(790, 358, 453, 72);
+    public static final Rectangle settingsButton = new Rectangle(790, 449, 453, 72);
     public static final Rectangle mc1 = new Rectangle(0, 40, 500, 80);
     public static final Rectangle mc2 = new Rectangle(0, 140, 500, 80);
     public static final Rectangle mc3 = new Rectangle(0, 240, 500, 80);
@@ -99,13 +104,26 @@ public class GameManager{
     public static final Rectangle mc9 = new Rectangle(550, 140, 500, 80);
     public static final Rectangle mc10 = new Rectangle(550, 240, 500, 80);
     public static final Rectangle select = new Rectangle(80, 0, 80, 30);
-    public static final List<Rectangle> MUSIC_COLLECTION_AREAS = Arrays.asList(
-            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10
-    );
     public static final Rectangle leftButton = new Rectangle(20, 220, 50, 200);
     public static final Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
     public static final Rectangle placeholder = new Rectangle(80, 280, 380, 100);
-    public static final Rectangle stuff = new Rectangle(360, 280, 100, 100);
+    public static final Rectangle track = new Rectangle(360, 280, 100, 100);
+    public static final List<Rectangle> MUSIC_COLLECTION_AREAS = Arrays.asList(
+            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10
+    );
+    public static final Rectangle dasButton = new Rectangle(327, 114, 230, 103);
+    public static final Rectangle arrButton = new Rectangle(327, 254, 230, 113);
+    public static final Rectangle dcdButton = new Rectangle(327, 414, 230, 102);
+    public static final Rectangle sdfButton = new Rectangle(327, 550, 230, 103);
+    public static final List<Rectangle> MENU_BUTTONS = Arrays.asList(
+            musicSelectButton, credsButton, insButton, otherButton, scoreButton, playButton, settingsButton
+    );
+    public static final List<Rectangle> SETTINGS_BUTTONS = Arrays.asList(
+            dasButton, arrButton, dcdButton, sdfButton
+    );
+    public static final List<Rectangle> DIRECTION_BUTTONS = Arrays.asList(
+            leftButton, rightButton
+    );
 
     private Rectangle selectedMusicCollection;
 
@@ -122,6 +140,8 @@ public class GameManager{
     // In Tetris, the B2B combo and normal combos actually start at -1, not 0.
     private int b2b = -1;
     private int combo = -1;
+
+    KeyHandler k;
 
     public GameManager() throws IOException {
         leftX = (Board.WIDTH / 2) - (WIDTH / 2);
@@ -150,13 +170,14 @@ public class GameManager{
 
         File nestedFolders = new File(FILE_PATH);
         if(!nestedFolders.exists()){
-            boolean created = nestedFolders.mkdirs();
-            if(created) System.out.println("Success!");
+            // Creating the nested folders to store the scores file
+            nestedFolders.mkdirs();
         }
 
         initCollections();
         reset();
         readScores();
+        readSettings();
 
         try{
             menu = ImageIO.read(new File("Images/menu.png"));
@@ -195,7 +216,7 @@ public class GameManager{
     private String pcMessage = "";
     private int messageTimer = 0; // counts frames or updates
     private int spinMessageTimer = 0;
-    private final int MESSAGE_DURATION = 120; // frames to display (2 seconds at 60 FPS)
+    private static final int MESSAGE_DURATION = 120; // frames to display (2 seconds at 60 FPS)
 
     /**
      * Handles line clearing and perfect clears.
@@ -243,6 +264,7 @@ public class GameManager{
             case 3: baseScore = 300 * level; break;
             case 4: baseScore = 800 * level; break;
         }
+        if(isTSpin) baseScore *= 4;
         score += baseScore;
 
         // Apply T-Spin / Quad B2B bonus
@@ -266,9 +288,22 @@ public class GameManager{
         messageTimer = MESSAGE_DURATION;
     }
 
+    /**
+     * In Tetris, special bonuses are given for All Clears and T-Spins.
+     * @param linesCleared The number of lines cleared at once
+     * @param isAllClear Whether the entire board is cleared
+     * @return the bonus that is added to the score
+     */
     private int getBonus(int linesCleared, boolean isAllClear) {
-        int b2bBonusMultiplier = (b2b > 1 ? 5 : 1);
-        int allClearMultiplier = (isAllClear ? 20 : 1);
+        int b2bBonusMultiplier = 1;
+        if(b2b >= 1){
+            b2bBonusMultiplier = b2b;
+        }
+
+        int allClearMultiplier = 1;
+        if(isAllClear){
+            allClearMultiplier = 20;
+        }
 
         int bonus = 0;
         switch (linesCleared) {
@@ -304,7 +339,7 @@ public class GameManager{
 
         // Gameplay
         if (gameState == GameState.PLAYING) {
-            if (!KeyHandler.pausePressed) {
+            if (!k.isPausePressed()) {
                 // --- Background music per collection/level ---
                 int index = level / 2;
                 if(index > 9) index = 9;
@@ -347,7 +382,7 @@ public class GameManager{
                     }
                 } else {
                     // Holding logic
-                    if (KeyHandler.shiftPressed && !alreadyHeld) {
+                    if (k.isShiftPressed() && !alreadyHeld) {
                         alreadyHeld = true; // prevent multiple swaps per drop
 
                         if (holdMino == null) {
@@ -384,9 +419,9 @@ public class GameManager{
                 }
 
                     // Hard drop
-                    if (KeyHandler.spacePressed) {
+                    if (k.isSpacePressed()) {
                         currentMino.hardDrop();
-                        KeyHandler.spacePressed = false;
+                        k.resetSpacePressed();
                     }
 
                     // Update current piece
@@ -395,10 +430,10 @@ public class GameManager{
             }
             else{
                 paused = true;
-                if(KeyHandler.escPressed){
+                if(k.isEscPressed()){
                     gameState = GameState.MENU;
-                    KeyHandler.escPressed = false;
-                    KeyHandler.pausePressed = false;
+                    k.resetEscPressed();
+                    k.resetPausePressed();
                     reset();
                 }
             }
@@ -460,6 +495,11 @@ public class GameManager{
             mm.stop();
             mm.loop("other");
             currentSong = "other";
+        }
+        else if (gameState == GameState.SETTINGS && !"settings".equals(currentSong)) {
+            mm.stop();
+            mm.loop("settings");
+            currentSong = "settings";
         }
     }
     /**
@@ -530,6 +570,8 @@ public class GameManager{
             g2.drawRect(insButton.x, insButton.y, insButton.width, insButton.height);
             g2.drawRect(otherButton.x, otherButton.y, otherButton.width, otherButton.height);
             g2.drawRect(scoreButton.x, scoreButton.y, scoreButton.width, scoreButton.height);
+            g2.drawRect(playButton.x, playButton.y, playButton.width, playButton.height);
+            g2.drawRect(settingsButton.x, settingsButton.y, settingsButton.width, settingsButton.height);
         }
         if(gameState == GameState.PLAYING) {
             g2.setColor(new Color(0, 0, 0, alpha));
@@ -641,17 +683,17 @@ public class GameManager{
             for (Block block : placedBlocks) {
                 block.draw(g2);
             }
-            if (KeyHandler.pausePressed) {
+            if (holdMino != null) {
+                holdMino.draw(g2);
+            }
+            if (k.isPausePressed()) {
                 g2.setColor(new Color(0, 0, 0, 200));
                 g2.fillRect(0, 0, Board.WIDTH, Board.HEIGHT);
                 g2.setColor(Color.WHITE);
                 g2.setFont(new Font("Arial", Font.PLAIN, 80));
                 g2.drawString("PAUSED", Board.WIDTH / 2 - 150, Board.HEIGHT / 2);
                 g2.setFont(new Font("Arial", Font.PLAIN, 25));
-                g2.drawString("Press ESC to return to menu", Board.WIDTH / 2 - 150, Board.HEIGHT / 2 - 100);
-            }
-            if (holdMino != null) {
-                holdMino.draw(g2);
+                g2.drawString("Press ESC to return to menu or P to continue", Board.WIDTH / 2 - 230, Board.HEIGHT / 2 + 90);
             }
         }
         if (gameState == GameState.MUSIC_SELECT) {
@@ -727,8 +769,9 @@ public class GameManager{
             }
             else{
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
-                g2.drawString("TURN DOWN", 700, 550);
-                g2.drawString("YOUR VOLUME!", 700, 620);
+                g2.drawString("Click album", 730, 550);
+                g2.drawString("to access its", 730, 620);
+                g2.drawString("songs", 730, 690);
             }
         }
         if(gameState == GameState.SONGS){
@@ -867,8 +910,8 @@ public class GameManager{
                     g2.drawString("by Se-U-Ra", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 4){
-                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
-                    g2.drawString("GOODWORLD", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("GOODWORLD", placeholder.x + 15, placeholder.y + 45);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by EBIMAYO", placeholder.x + 15, placeholder.y + 85);
                 }
@@ -1387,10 +1430,10 @@ public class GameManager{
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("SansSerif", Font.PLAIN, 20));
             g2.drawRect(placeholder.x, placeholder.y, placeholder.width, placeholder.height);
-            g2.drawRect(stuff.x, stuff.y, stuff.width, stuff.height);
-            g2.drawString("Track", stuff.x + 25, stuff.y + 20);
+            g2.drawRect(track.x, track.y, track.width, track.height);
+            g2.drawString("Track", track.x + 25, track.y + 20);
             g2.setFont(new Font("SansSerif", Font.BOLD, 60));
-            g2.drawString(song + "", stuff.x + 30, stuff.y + 80);
+            g2.drawString(song + "", track.x + 30, track.y + 80);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
 
             g2.setFont(new Font("Arial", Font.BOLD, 80));
@@ -1496,10 +1539,6 @@ public class GameManager{
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
         }
-        else if (gameState == GameState.INITIALIZE){
-            img = im.getImage("initialize1");
-            g2.drawImage(img, 0, 0, 1280, 720, null);
-        }
         else if (gameState == GameState.SCORES){
             img = im.getImage("scores");
             g2.drawImage(img, 0, 0, 1280, 720, null);
@@ -1511,14 +1550,33 @@ public class GameManager{
             g2.setFont(new Font("Consolas", Font.PLAIN, 20));
             g2.drawString("Back", 20, 20);
             int y = 100;
-            for(int i = 0; i < Math.min(15, scores.size()); i++){
+            for(int i = 0; i < Math.min(15, players.size()); i++){
                 // display either the top 15 players or how many players have played if less than 15
-                String name = scores.get(i).getName();
-                int playerScore = scores.get(i).getScore();
+                String name = players.get(i).getName();
+                int playerScore = players.get(i).getScore();
                 String formatted = String.format("%-30s%24d", name, playerScore);
                 g2.drawString(formatted, 340, y);
                 y += 40;
             }
+        }
+        else if(gameState == GameState.SETTINGS){
+            img = im.getImage("settings");
+            g2.drawImage(img, 0, 0, 1280, 720, null);
+            g2.setFont(new Font("Arial", Font.PLAIN, 20));
+            g2.setColor(Color.WHITE);
+            g2.drawString("Back", 20, 20);
+            g2.setColor(Color.BLUE);
+            g2.setStroke(new BasicStroke(3));
+            g2.drawRect(dasButton.x, dasButton.y, dasButton.width, dasButton.height);
+            g2.drawRect(arrButton.x, arrButton.y, arrButton.width, arrButton.height);
+            g2.drawRect(dcdButton.x, dcdButton.y, dcdButton.width, dcdButton.height);
+            g2.drawRect(sdfButton.x, sdfButton.y, sdfButton.width, sdfButton.height);
+            g2.setColor(Color.WHITE);
+            g2.setFont(new Font("Arial", Font.BOLD, 80));
+            g2.drawString(String.valueOf(das), dasButton.x + 20, dasButton.y + 80);
+            g2.drawString(String.valueOf(arr), arrButton.x + 20, arrButton.y + 80);
+            g2.drawString(String.valueOf(dcd), dcdButton.x + 20, dcdButton.y + 80);
+            g2.drawString(String.valueOf(sdf), sdfButton.x + 20, sdfButton.y + 80);
         }
     }
     public void reset(){
@@ -1526,7 +1584,9 @@ public class GameManager{
         startingMinos.clear();
         holdMino = null;
         hold = false;
+        alreadyHeld = false;
         paused = false;
+        dropInterval = 60;
         lines = 0;
         score = 0;
         level = 1;
@@ -1584,12 +1644,21 @@ public class GameManager{
 
     public void saveScore(String name) throws IOException {
         Player p = new Player(name, score);
-        scores.add(p);
-        scores.sort(new SortByScore());
-        PrintWriter out = new PrintWriter(new FileWriter(FILE_PATH + "/scores.txt", true));
-        for(Player q : scores){
+        players.add(p);
+        players.sort(new SortByScore());
+        PrintWriter out = new PrintWriter(new FileWriter(FILE_PATH + "/scores.txt"));
+        for(Player q : players){
             out.println(q);
         }
+        out.close();
+    }
+
+    public void saveSettings() throws IOException{
+        PrintWriter out = new PrintWriter(new FileWriter("settings.txt"));
+        out.println(das);
+        out.println(arr);
+        out.println(dcd);
+        out.println(sdf);
         out.close();
     }
 
@@ -1599,14 +1668,30 @@ public class GameManager{
             while(sc.hasNextLine()){
                 StringTokenizer st = new StringTokenizer(sc.nextLine(), " ");
                 String name = st.nextToken();
-                int score = Integer.parseInt(st.nextToken());
-                Player p = new Player(name, score);
-                scores.add(p);
+                int playerScore = Integer.parseInt(st.nextToken());
+                Player p = new Player(name, playerScore);
+                players.add(p);
             }
-            scores.sort(new SortByScore());
+            sc.close();
+            players.sort(new SortByScore());
             // Reset the file if any corruption is detected
         } catch (IOException | NoSuchElementException | NumberFormatException e){
             resetFile();
+        }
+    }
+
+    public void readSettings(){
+        try{
+            Scanner sc = new Scanner(new File("settings.txt"));
+            das = Integer.parseInt(sc.nextLine().trim());
+            arr = Integer.parseInt(sc.nextLine().trim());
+            dcd = Integer.parseInt(sc.nextLine().trim());
+            sdf = Integer.parseInt(sc.nextLine().trim());
+        } catch (NumberFormatException | NullPointerException | FileNotFoundException | NoSuchElementException e) {
+            das = 10;
+            arr = 2;
+            dcd = 30;
+            sdf = 20;
         }
     }
 
@@ -1696,6 +1781,42 @@ public class GameManager{
         }
     }
 
+    public void updateHoverOnButtons(Point p) {
+        if(gameState == GameState.MENU){
+            hover = false;
+            c = new Cursor(Cursor.DEFAULT_CURSOR);
+            for(Rectangle r: MENU_BUTTONS){
+                if(r.contains(p)){
+                    hover = true;
+                    c = new Cursor(Cursor.HAND_CURSOR);
+                    break;
+                }
+            }
+        }
+        else if(gameState == GameState.MUSIC_SELECT){
+            for(Rectangle r: MUSIC_COLLECTION_AREAS) {
+                if (r.contains(p)) {
+                    hover = true;
+                    c = new Cursor(Cursor.HAND_CURSOR);
+                    break;
+                }
+            }
+        }
+        else if(gameState == GameState.INSTRUCTIONS || gameState == GameState.CREDITS || gameState == GameState.OTHER){
+            if(backButton.contains(p)){
+                hover = true;
+                c = new Cursor(Cursor.HAND_CURSOR);
+            }
+            for(Rectangle r: DIRECTION_BUTTONS){
+                if(r.contains(p)){
+                    hover = true;
+                    c = new Cursor(Cursor.HAND_CURSOR);
+                    break;
+                }
+            }
+        }
+    }
+
     public void increment(){
         score++;
     }
@@ -1713,16 +1834,37 @@ public class GameManager{
         return dropInterval;
     }
 
-    public ArrayList<Block> getPlacedBlocks(){
+    public KeyHandler getKeyHandler() {
+        return k;
+    }
+
+    public int getDas(){
+        return das;
+    }
+    public int getArr() {
+        return arr;
+    }
+    public int getDcd(){
+        return dcd;
+    }
+    public int getSdf(){
+        return sdf;
+    }
+
+    public List<Block> getPlacedBlocks(){
         return placedBlocks;
     }
 
-    public boolean isInitializing() {
-        return gameState == GameState.INITIALIZE;
+    public Cursor getCursor(){
+        return c;
     }
 
     public boolean isPlaying() {
         return gameState == GameState.PLAYING;
+    }
+
+    public boolean isInSettings(){
+        return gameState == GameState.SETTINGS;
     }
 
     public boolean isInMenu() {
@@ -1777,6 +1919,11 @@ public class GameManager{
             gameState = GameState.OTHER;
         }
     }
+    public void goToSettings(){
+        if(gameState != GameState.PLAYING){
+            gameState = GameState.SETTINGS;
+        }
+    }
     public void play(){
         gameState = GameState.PLAYING;
     }
@@ -1798,7 +1945,25 @@ public class GameManager{
     public void setHold(boolean hold){
         this.hold = hold;
     }
+
     public void setPreviousMino(Mino previousMino){
         this.previousMino = previousMino;
+    }
+
+    public void setKeyHandler(KeyHandler k){
+        this.k = k;
+    }
+
+    public void setDas(int das){
+        this.das = das;
+    }
+    public void setArr(int arr){
+        this.arr = arr;
+    }
+    public void setDcd(int dcd) {
+        this.dcd = dcd;
+    }
+    public void setSdf(int sdf){
+        this.sdf = sdf;
     }
 }
