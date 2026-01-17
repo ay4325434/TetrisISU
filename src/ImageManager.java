@@ -132,6 +132,18 @@ public class ImageManager {
         paths.put("K9", "Images/Collection 11/pjsk9.png");
         paths.put("K10", "Images/Collection 11/pjsk10.png");
 
+        // Collection L
+        paths.put("L1", "Images/Collection 12/blank.png");
+        paths.put("L2", "Images/Collection 12/dreams.png");
+        paths.put("L3", "Images/Collection 12/fearless.png");
+        paths.put("L4", "Images/Collection 12/feel good.png");
+        paths.put("L5", "Images/Collection 12/hay.png");
+        paths.put("L6", "Images/Collection 12/heroes tonight.png");
+        paths.put("L7", "Images/Collection 12/invincible.png");
+        paths.put("L8", "Images/Collection 12/royalty.png");
+        paths.put("L9", "Images/Collection 12/symbolism.png");
+        paths.put("L10", "Images/Collection 12/we are.png");
+
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
         paths.put("credits3", "Images/Credits/credits3.png");

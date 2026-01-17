@@ -107,13 +107,14 @@ public class GameManager{
     public static final Rectangle mc9 = new Rectangle(550, 140, 500, 80);
     public static final Rectangle mc10 = new Rectangle(550, 240, 500, 80);
     public static final Rectangle mc11 = new Rectangle(550, 340, 500, 80);
+    public static final Rectangle mc12 = new Rectangle(550, 440, 500, 80);
     public static final Rectangle select = new Rectangle(80, 0, 80, 30);
     public static final Rectangle leftButton = new Rectangle(20, 220, 50, 200);
     public static final Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
     public static final Rectangle placeholder = new Rectangle(80, 280, 380, 100);
     public static final Rectangle track = new Rectangle(360, 280, 100, 100);
     public static final List<Rectangle> MUSIC_COLLECTION_AREAS = Arrays.asList(
-            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10, mc11
+            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10, mc11, mc12
     );
     public static final Rectangle dasButton = new Rectangle(327, 114, 230, 103);
     public static final Rectangle arrButton = new Rectangle(327, 254, 230, 113);
@@ -746,9 +747,11 @@ public class GameManager{
             g2.drawString("(D4DJ Album)", x2, 295);
             g2.drawString("Music Collection 11", x2, 370);
             g2.drawString("(Extra songs + PJSK backgrounds)", x2, 395);
+            g2.drawString("Music Collection 12", x2, 470);
+            g2.drawString("(NCS Album)", x2, 495);
             if(selectionActivated){
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
-                g2.drawString("Click to select", 670, 550);
+                g2.drawString("Click to select", 710, 580);
                 if(hover){
                     g2.setColor(Color.BLUE);
                     switch (hoveredCollection){ // highlight hovered collection
@@ -785,19 +788,16 @@ public class GameManager{
                         case 11:
                             g2.drawRect(mc11.x, mc11.y, mc11.width, mc11.height);
                             break;
+                        case 12:
+                            g2.drawRect(mc12.x, mc12.y, mc12.width, mc12.height);
+                            break;
                     }
                 }
-            }
-            else{
-                g2.setFont(new Font("Tahoma", Font.BOLD, 60));
-                g2.drawString("Click album", 730, 550);
-                g2.drawString("to access its", 730, 620);
-                g2.drawString("songs", 730, 690);
             }
         }
         if(gameState == GameState.SONGS){
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
-            if(collection == 1){ // draw collection 1 songs (similar to all collections)
+            if(collection == 1){ // draw Collection 1 songs (similar to all collections)
                 img = im.getImage("A" + currentBackground);
                 g2.drawImage(img, 0, 0, 1280, 720, null);
                 g2.setColor(new Color(0,0,0, alpha));
@@ -1504,7 +1504,7 @@ public class GameManager{
                     g2.setFont(new Font("Tahoma", Font.BOLD, 40));
                     g2.drawString("Mobius", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
-                    g2.drawString("by Camellia vs USAO", placeholder.x + 15, placeholder.y + 85);
+                    g2.drawString("by USAO & Camellia", placeholder.x + 15, placeholder.y + 85);
                 }
                 if(song == 9){
                     g2.setFont(new Font("Tahoma", Font.BOLD, 20));
@@ -1518,6 +1518,76 @@ public class GameManager{
                     g2.drawString("White Aura", placeholder.x + 15, placeholder.y + 50);
                     g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
                     g2.drawString("by HyuN", placeholder.x + 15, placeholder.y + 85);
+                }
+            }
+            if(collection == 12){
+                img = im.getImage("L" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
+                g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
+                g2.drawString("Music Collection 12", 560, 30);
+                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+                if(song == 1){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Blank", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Disfigure", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 2){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Dreams", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Lost Sky", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 3){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Fearless", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Lost Sky", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 4){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Feel Good", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Syn Cole", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 5){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("H.A.Y", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Clarx", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 6){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Heroes Tonight", placeholder.x + 15, placeholder.y + 40);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Janji feat. Johnning", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 7){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Invincible", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by DEAF KEV", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 8){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Royalty", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Egzod & Maestro Chives", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 9){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Symbolism", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Electro-Light", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 10){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("We Are", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Jo Cohen & Whales", placeholder.x + 15, placeholder.y + 85);
                 }
             }
             g2.setColor(Color.WHITE);
@@ -1890,6 +1960,7 @@ public class GameManager{
         collectionAreas.put(mc9, 9);
         collectionAreas.put(mc10, 10);
         collectionAreas.put(mc11, 11);
+        collectionAreas.put(mc12, 12);
     }
 
     /**

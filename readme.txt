@@ -32,65 +32,48 @@ Space: Hard drop (instantly drops piece to the bottom or on another piece)
 Shift: Hold
 Z: Rotate counterclockwise
 A: Rotate 180 degrees
+P: Pause
+Esc: Return to main menu if paused
 
 Tips and tricks:
 - Clean stacking: Try to make your stack flat. It opens up more potential to clear lines.
-- T-spins: They give a score bonus. A T-spin double gives you the same score as a Quad.
+- Spins: Rotating a piece into a stuck position results in a Spin, which provides score bonuses.
+- Build a B2B chain: To get a higher score, build up a B2B chain by performing quads, spins, or All
+  Clears per consecutive line clear. Whenever you clear lines using this technique, your line clear
+  bonus is multiplied by your current B2B chain if greater than 1. If your B2B chain is greater than
+  4, breaking it allows for a surge bonus, equal to 100 * current level * B2B chain before breaking.
+- Playing quickly and efficiently: This essentially allows you to play infinitely because there is
+  a maximum gravity limit. There is no way to skip any levels.
 
 Bugs:
-- Rotation: Piece may rotate in the wrong direction or 180 degrees for no reason.
-- Blocks may phase into other blocks.
+- The I-piece doesn't rely on the SRS rotation systems. Wall kicks may be bugged for those pieces.
+- Bouncing: If you press any key, there is a small chance that it registers two presses. This can usually
+  be fixed by pressing the key a little harder.
+- The player level currently caps at 26 due to line clearing logic.
+- Back button may not register your clicks sometimes.
 
-Features being implemented:
-- Wall kicks: This feature looks for alternative spaces for a piece to fit in if the original
-  rotation will result in a collision. This makes T-spin triples possible. (Very buggy right now)
-- All-spin score bonus: This feature will recognize spins with all pieces (not just the T-piece).
-  However, an error-free wall kick system must be implemented before this.
-
-FAQs:
-
-What is a T-spin?
-- A T-spin is a feature in Tetris where the T piece is rotated into a slot that can't be reached
-  otherwise.
-  Example:
-  o o o o 1 2 o o o o
-  o o o 3 4 5 o o o o
-  o o o o 6 o o o o o
-  In the setup above, the T piece cannot be placed upside down on its own to clear the bottom two lines.
-  Instead, the piece must be placed pointing to its right. This covers slots 1, 4, 5, and 6.
-  Next, rotate it clockwise. Slots 3, 4, 5, and 6 will then be covered.
-  This process is known as a T-spin. It gives a score bonus.
-
-How does the game know when to increase the speed?
-- For every 10 lines cleared, the drop interval decreases.
-
-Is a T-spin triple possible?
-- Yes, but you need wall kicks.
-
-  o o 1 - o o o o o o
-  o 2 3 4 o o o o o o
-  o 5 o o o o o o o o
-  o 6 7 o o o o o o o
-  o 8 o o o o o o o o
-  o o o o o o o o o o
-
-  If you place the T-piece flat and insert to cover slots 1, 2, 3, and 4, you can rotate it left
-  to cover slots 5, 6, 7, and 8. This is only possible because any other case in the wall kick table
-  will result in a collision. This feature may or may not be implemented.
-
+Implemented features:
+- SRS rotation system with wall kicks
+- Music selection
+- Changing background music as player level increases
 
 Credits
 
 Music Library:
-Music Collection 1
-Music Collection 2
-Music Collection 3
-Music Collection 4
-Music Collection 5
-Music Collection 6
-Music Collection 7
-Music Collection 8
-Music Collection 9
+Music Collection 1 - Camellia Album
+Music Collection 2 - Osu! Album
+Music Collection 3 - Phigros Album
+Music Collection 4 - Geometry Dash Album
+Music Collection 5 - Miscellaneous
+Music Collection 6 - maimai DX Album
+Music Collection 7 - t+pazolite Album
+Music Collection 8 - Vocaloid Hits
+Music Collection 9 - HARDCORE TANO*C Album
+Music Collection 10 - D4DJ Album
+Music Collection 11 - Extra Collection with Project Sekai character backgrounds
+Music Collection 12 - NCS Album
+
+
 
 
 

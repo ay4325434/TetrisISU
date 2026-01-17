@@ -152,6 +152,17 @@ public class MusicManager {
         songPaths.put("collectionK9", "Music Collection 11/Pragmatism Resurrection.wav");
         songPaths.put("collectionK10", "Music Collection 11/White Aura.wav");
 
+        songPaths.put("collectionL1", "Music Collection 12/Blank.wav");
+        songPaths.put("collectionL2", "Music Collection 12/Dreams.wav");
+        songPaths.put("collectionL3", "Music Collection 12/Fearless.wav");
+        songPaths.put("collectionL4", "Music Collection 12/Feel Good.wav");
+        songPaths.put("collectionL5", "Music Collection 12/H.A.Y.wav");
+        songPaths.put("collectionL6", "Music Collection 12/Heroes Tonight.wav");
+        songPaths.put("collectionL7", "Music Collection 12/Invincible.wav");
+        songPaths.put("collectionL8", "Music Collection 12/Royalty.wav");
+        songPaths.put("collectionL9", "Music Collection 12/Symbolism.wav");
+        songPaths.put("collectionL10", "Music Collection 12/We Are.wav");
+
         // Collection A snippets
         snippetRanges.put("collectionA1", new int[]{40, 65});
         snippetRanges.put("collectionA2", new int[]{80, 110});
@@ -277,10 +288,21 @@ public class MusicManager {
         snippetRanges.put("collectionK4", new int[]{90, 120});
         snippetRanges.put("collectionK5", new int[]{60, 90});
         snippetRanges.put("collectionK6", new int[]{40, 70});
-        snippetRanges.put("collectionK7", new int[]{100, 130});
+        snippetRanges.put("collectionK7", new int[]{90, 120});
         snippetRanges.put("collectionK8", new int[]{60, 90});
         snippetRanges.put("collectionK9", new int[]{90, 120});
         snippetRanges.put("collectionK10", new int[]{25, 55});
+
+        snippetRanges.put("collectionL1", new int[]{20, 50});
+        snippetRanges.put("collectionL2", new int[]{60, 90});
+        snippetRanges.put("collectionL3", new int[]{30, 60});
+        snippetRanges.put("collectionL4", new int[]{90, 120});
+        snippetRanges.put("collectionL5", new int[]{60, 90});
+        snippetRanges.put("collectionL6", new int[]{60, 90});
+        snippetRanges.put("collectionL7", new int[]{100, 130});
+        snippetRanges.put("collectionL8", new int[]{60, 90});
+        snippetRanges.put("collectionL9", new int[]{90, 120});
+        snippetRanges.put("collectionL10", new int[]{60, 90});
 
         initSnippets(); // load the snippets
     }
@@ -447,6 +469,13 @@ public class MusicManager {
             collectionK.put(i, new Snippet(snippetRanges.get("collectionK" + i)[0], snippetRanges.get("collectionK" + i)[1], 1500));
         }
         snippetMap.put("K", collectionK);
+
+        // Collection L
+        Map<Integer, Snippet> collectionL = new HashMap<>();
+        for(int i = 1; i <= 10; i++) {
+            collectionL.put(i, new Snippet(snippetRanges.get("collectionL" + i)[0], snippetRanges.get("collectionL" + i)[1], 1500));
+        }
+        snippetMap.put("L", collectionL);
     }
 
     /**
