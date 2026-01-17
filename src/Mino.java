@@ -277,21 +277,19 @@ public abstract class Mino {
         int[][] JLSTZ_L0 = {{0,0}, {-1,0}, {-1,1}, {0,-2}, {-1,-2}};
         int[][] JLSTZ_0L = {{0,0}, {1,0}, {1,-1}, {0,2}, {1,2}};
 
-        int[][] I_0R = { {-1,0}, {-3,0}, {0,0}, {-3,1}, {0,-2} };
-        int[][] I_R0 = { {1,0}, {3,0}, {0,0}, {3,-1}, {0,2} };
-        int[][] I_R2 = { {-2,0}, {-3,0}, {1,0}, {-2,-2}, {1,1} };
-        int[][] I_2R = { {0,0}, {0,0}, {-3,0}, {0,2}, {-3,-1} };
-        int[][] I_2L = { {1,0}, {3,0}, {0,0}, {3,-1}, {0,2} };
-        int[][] I_L2 = { {-3,0}, {-1,0}, {0,0}, {-3,1}, {0,-2} };
-        int[][] I_L0 = { {0,0}, {2,0}, {-1,0}, {0,2}, {-3,-1} };
-        int[][] I_0L = { {-2,0}, {0,0}, {1,0}, {-2,-2}, {2,1} };
+        int[][] I_0R = { {0,0}, {-2,0}, {1,0}, {-2,1}, {1,-2} };
+        int[][] I_R0 = { {0,0}, {2,0}, {-1,0}, {2,-1}, {-1,2} };
+        int[][] I_R2 = { {0,0}, {-1,0}, {2,0}, {-1,-2}, {2,1} };
+        int[][] I_2R = { {0,0}, {1,0}, {-2,0}, {-1,2}, {-2,-1} };
+        int[][] I_2L = { {0,0}, {2,0}, {-1,0}, {2,-1}, {-1,2} };
+        int[][] I_L2 = { {0,0}, {-2,0}, {-1,0}, {-2,1}, {1,-2} };
+        int[][] I_L0 = { {0,0}, {1,0}, {-2,0}, {1,2}, {-2,-1} };
+        int[][] I_0L = { {0,0}, {-1,0}, {2,0}, {-1,-2}, {2,1} };
 
         // === 180° rotation offsets (simplified) ===
         int[][] JLSTZ_180 = {{0,0}, {-1,0}, {1,0}, {0,-1}, {0,1}, {-1,-1}, {1,-1}, {-1,1}, {1,1}};
-        int[][] I_180 = {
-                {-1,0}, {-3,0}, {1,0}, {-1,-1}, {-1,1},
-                {-3,-1}, {1,-1}, {-3,1}, {1,1}
-        };
+        int[][] I_180 = {{0,0}, {-1,0}, {1,0}, {-2,0}, {2,0}, {0,-1}, {-1,-1}, {1,-1}, {-2,-1}, {2,-1}};
+
 
 
         // Handle 180° rotation
@@ -436,7 +434,7 @@ public abstract class Mino {
 
         // ---- HORIZONTAL MOVEMENT WITH DAS/ARR ----
 
-// LEFT
+        // LEFT
         int newDirection = 0;
         if (gm.getKeyHandler().isLeftPressed()) newDirection = 1;
         if (gm.getKeyHandler().isRightPressed()) newDirection = 2;
@@ -446,7 +444,7 @@ public abstract class Mino {
             dasDirection = newDirection;
             dcdCounter = 0;
 
-            // reset ARR (important)
+            // reset ARR
             arrLeft = 0;
             arrRight = 0;
         }
@@ -484,11 +482,9 @@ public abstract class Mino {
                 }
             }
         }
-
         gm.getKeyHandler().setLeftWasPressedLastFrame(leftPressed);
 
-
-// RIGHT
+        // RIGHT
         boolean rightPressed = gm.getKeyHandler().isRightPressed();
 
         if (rightPressed) {

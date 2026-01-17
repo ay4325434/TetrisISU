@@ -1,4 +1,6 @@
 import javax.imageio.ImageIO;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.awt.*;
 import java.io.*;
 import java.util.*;
@@ -46,6 +48,7 @@ public class GameManager{
     private final ArrayList<Mino> startingMinos = new ArrayList<>();
     private final ArrayList<Mino> minos = new ArrayList<>();
 
+    // Hold flags
     private boolean hold;
     private boolean alreadyHeld = false;
     private Mino holdMino = null;
@@ -103,13 +106,14 @@ public class GameManager{
     public static final Rectangle mc8 = new Rectangle(550, 40, 500, 80);
     public static final Rectangle mc9 = new Rectangle(550, 140, 500, 80);
     public static final Rectangle mc10 = new Rectangle(550, 240, 500, 80);
+    public static final Rectangle mc11 = new Rectangle(550, 340, 500, 80);
     public static final Rectangle select = new Rectangle(80, 0, 80, 30);
     public static final Rectangle leftButton = new Rectangle(20, 220, 50, 200);
     public static final Rectangle rightButton = new Rectangle(1200, 220, 50, 200);
     public static final Rectangle placeholder = new Rectangle(80, 280, 380, 100);
     public static final Rectangle track = new Rectangle(360, 280, 100, 100);
     public static final List<Rectangle> MUSIC_COLLECTION_AREAS = Arrays.asList(
-            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10
+            mc1, mc2, mc3, mc4, mc5, mc6, mc7, mc8, mc9, mc10, mc11
     );
     public static final Rectangle dasButton = new Rectangle(327, 114, 230, 103);
     public static final Rectangle arrButton = new Rectangle(327, 254, 230, 113);
@@ -164,6 +168,7 @@ public class GameManager{
         nextX5 = rightX + 150;
         nextY5 = topY + 480;
 
+        // Associating the number of pages with each game state
         pages.put(GameState.CREDITS, 6);
         pages.put(GameState.INSTRUCTIONS, 4);
         pages.put(GameState.OTHER, 3);
@@ -179,6 +184,7 @@ public class GameManager{
         readScores();
         readSettings();
 
+        // Load the main images
         try{
             menu = ImageIO.read(new File("Images/menu.png"));
             musicSelect = ImageIO.read(new File("Images/musicselect.png"));
@@ -193,10 +199,7 @@ public class GameManager{
      */
     private Mino pickMino(){
         Mino m;
-        if(!minos.isEmpty()){
-            m = minos.removeFirst();
-        }
-        else{
+        if (minos.isEmpty()) {
             // Reestablishing the bag of 7 different pieces
             minos.add(new LPiece(this));
             minos.add(new JPiece(this));
@@ -206,8 +209,8 @@ public class GameManager{
             minos.add(new TPiece(this));
             minos.add(new OPiece(this));
             Collections.shuffle(minos);
-            m = minos.removeFirst();
         }
+        m = minos.removeFirst(); // take the first piece in the bag
         return m;
     }
 
@@ -232,13 +235,12 @@ public class GameManager{
         // Determine T-Spin / All Clear
         boolean isTSpin = checkForTSpin();   // includes mini T-Spins
         boolean isAllClear = checkForAllClear();
-        boolean countsForB2B = isTSpin || linesCleared == 4; // Quads always count
+        boolean countsForB2B = isTSpin || linesCleared == 4 || isAllClear; // All Clears, Quads and Spins count towards B2B
 
         // Surge bonus check (for breaking a B2B streak >= 4)
         if (!countsForB2B && b2b >= 4) {
             int surgeBonus = b2b * level * 10;
             score += surgeBonus;
-            // Optionally, display a message here like "SURGE BONUS!"
         }
 
         // Update B2B
@@ -297,19 +299,20 @@ public class GameManager{
     private int getBonus(int linesCleared, boolean isAllClear) {
         int b2bBonusMultiplier = 1;
         if(b2b >= 1){
-            b2bBonusMultiplier = b2b;
+            b2bBonusMultiplier = b2b; // multiply the line clear bonus by the B2B count
         }
 
         int allClearMultiplier = 1;
         if(isAllClear){
-            allClearMultiplier = 20;
+            allClearMultiplier = 20; // All Clears give 20x the line clear score
         }
 
         int bonus = 0;
-        switch (linesCleared) {
+        switch (linesCleared) { // final bonus
             case 1: bonus = 100 * level * b2bBonusMultiplier * allClearMultiplier; break;
             case 2: bonus = 200 * level * b2bBonusMultiplier * allClearMultiplier; break;
             case 3: bonus = 400 * level * b2bBonusMultiplier * allClearMultiplier; break;
+            case 4: bonus = 800 * level * b2bBonusMultiplier * allClearMultiplier; break;
         }
         if(isAllClear){
             bonus += 1000 * level * b2bBonusMultiplier;
@@ -329,7 +332,13 @@ public class GameManager{
         return placedBlocks.isEmpty(); // only works mid-game
     }
 
-    public void update() throws Exception {
+    /**
+     * Updates the game state, gameplay, and handles music transitions.
+     * @throws UnsupportedAudioFileException
+     * @throws LineUnavailableException
+     * @throws IOException
+     */
+    public void update() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         // Menu music
         if (gameState == GameState.MENU && !"menu".equals(currentSong)) {
             mm.stop();
@@ -428,17 +437,17 @@ public class GameManager{
                     currentMino.update();
                 }
             }
-            else{
+            else{ // Game is paused
                 paused = true;
                 if(k.isEscPressed()){
                     gameState = GameState.MENU;
                     k.resetEscPressed();
                     k.resetPausePressed();
-                    reset();
+                    reset(); // reset game when user goes back to menu
                 }
             }
 
-            // Message timer
+            // Message timer - reset all messages when it runs out
             if (messageTimer > 0) {
                 messageTimer--;
                 if (messageTimer == 0) {
@@ -467,7 +476,7 @@ public class GameManager{
             }
         }
 
-        // OTHER GAME STATES
+        // Other game states - stop music or play specific tracks
         else if (gameState == GameState.MUSIC_SELECT) {
             mm.stop();
             currentSong = "";
@@ -526,10 +535,10 @@ public class GameManager{
                 }
                 lines++;
                 linesCleared++; // use this to determine how many lines were cleared at once
-                if(lines % 10 == 0 && dropInterval > 1){
+                if(dropInterval > 1 && lines % 10 == 0){ // increase level every 10 lines
                     level++;
                     if(dropInterval > 9) dropInterval -= 3;
-                    else if (dropInterval > 1) dropInterval--;
+                    else dropInterval--;
                 }
                 // Drop blocks above
                 for (int i = 0; i < placedBlocks.size(); i++) {
@@ -544,10 +553,15 @@ public class GameManager{
         handleLineClear(linesCleared);
         linesCleared = 0; // Reset for next potential clear
     }
+
+    /**
+     * Draws the game elements based on the current game state.
+     * @param g2 Graphics2D object for drawing
+     */
     public void draw(Graphics2D g2) {
         Image img;
         int alpha = 150;
-        if(gameState == GameState.MENU){
+        if(gameState == GameState.MENU){ //draw menu items
             if(menu != null){
                 g2.drawImage(menu, 0, 0 , 1280, 720, null);
             }
@@ -574,11 +588,11 @@ public class GameManager{
             g2.drawRect(settingsButton.x, settingsButton.y, settingsButton.width, settingsButton.height);
         }
         if(gameState == GameState.PLAYING) {
-            g2.setColor(new Color(0, 0, 0, alpha));
+            g2.setColor(new Color(0, 0, 0, alpha)); // set background
             int index = level / 2;
             if(index >= 10) index = 9;
             String imgKey = SongConstants.IMAGE_ORDERS.get(playCollection).get(index);
-            img = im.getImage(imgKey);
+            img = im.getImage(imgKey); // image background per collection/level
             g2.drawImage(img, 0, 0, 1280, 720, null);
             g2.fillRect(0, 0, 1280, 720);
             g2.setColor(Color.WHITE);
@@ -589,12 +603,12 @@ public class GameManager{
             int y = topY;
             g2.drawRect(x, y, 200, 570);
             g2.setFont(new Font("Arial", Font.PLAIN, 30));
-            g2.drawString("NEXT", x + 20, y + 40);
+            g2.drawString("NEXT", x + 20, y + 40); // next pieces
 
             int holdX = leftX - 210;
             int holdY = topY;
             if(alreadyHeld){
-                g2.setColor(new Color(255, 0, 0, 200));
+                g2.setColor(new Color(255, 0, 0, 200)); // indicate that the user has already held
                 g2.fillRect(holdX, holdY, 200, 200);
             }
             g2.setColor(Color.WHITE);
@@ -615,7 +629,7 @@ public class GameManager{
                 g2.drawString(lineClearMessage, leftX - 200, topY + 300);
             }
 
-            if(!spinMessage.isEmpty() && spinMessageTimer > 0){
+            if(!spinMessage.isEmpty() && spinMessageTimer > 0){ // spin message
                 g2.setColor(Mino.PIECE_COLORS.get(previousMino.getType()));
                 g2.setFont(new Font("Arial", Font.BOLD, 25));
                 g2.drawString(spinMessage, leftX - 200, topY + 250);
@@ -632,6 +646,7 @@ public class GameManager{
             }
 
             if(b2b > 0){
+                // As the B2B gets higher, change color to indicate the streak
                 if(b2b < 5) {
                     g2.setColor(Color.WHITE);
                 }
@@ -661,7 +676,7 @@ public class GameManager{
                 g2.setFont(new Font("Arial", Font.BOLD, 30));
                 g2.drawString(combo + " COMBO", leftX - 200, topY + 400);
             }
-
+            // draw next pieces
             if (currentMino != null) {
                 currentMino.draw(g2);
             }
@@ -697,6 +712,7 @@ public class GameManager{
             }
         }
         if (gameState == GameState.MUSIC_SELECT) {
+            // draw music selection screen
             int x1 = 20;
             int x2 = 570;
             g2.drawImage(musicSelect, 0, 0, 1280, 720, null);
@@ -728,12 +744,14 @@ public class GameManager{
             g2.drawString("(HARDCORE TANO*C Album)", x2, 195);
             g2.drawString("Music Collection 10", x2, 270);
             g2.drawString("(D4DJ Album)", x2, 295);
+            g2.drawString("Music Collection 11", x2, 370);
+            g2.drawString("(Extra songs + PJSK backgrounds)", x2, 395);
             if(selectionActivated){
                 g2.setFont(new Font("Tahoma", Font.BOLD, 60));
                 g2.drawString("Click to select", 670, 550);
                 if(hover){
                     g2.setColor(Color.BLUE);
-                    switch (hoveredCollection){
+                    switch (hoveredCollection){ // highlight hovered collection
                         case 1:
                             g2.drawRect(mc1.x, mc1.y, mc1.width, mc1.height);
                             break;
@@ -764,6 +782,9 @@ public class GameManager{
                         case 10:
                             g2.drawRect(mc10.x, mc10.y, mc10.width, mc10.height);
                             break;
+                        case 11:
+                            g2.drawRect(mc11.x, mc11.y, mc11.width, mc11.height);
+                            break;
                     }
                 }
             }
@@ -776,7 +797,7 @@ public class GameManager{
         }
         if(gameState == GameState.SONGS){
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
-            if(collection == 1){
+            if(collection == 1){ // draw collection 1 songs (similar to all collections)
                 img = im.getImage("A" + currentBackground);
                 g2.drawImage(img, 0, 0, 1280, 720, null);
                 g2.setColor(new Color(0,0,0, alpha));
@@ -1427,6 +1448,78 @@ public class GameManager{
                     g2.drawString("by Merm4id", placeholder.x + 15, placeholder.y + 85);
                 }
             }
+            if(collection == 11){
+                img = im.getImage("K" + currentBackground);
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+                g2.setColor(new Color(0,0,0, alpha));
+                g2.fillRect(0, 0, 1280, 720);
+                g2.drawImage(img, 470, 150, 720, 405, null);
+                g2.setColor(Color.WHITE);
+                g2.drawString("Music Collection 11", 560, 30);
+                g2.setFont(new Font("Tahoma", Font.PLAIN, 25));
+                if(song == 1){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 20));
+                    g2.drawString("And Revive", placeholder.x + 15, placeholder.y + 30);
+                    g2.drawString("The Melody", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Chroma", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 2){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Arcana Eden", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 17));
+                    g2.drawString("by Team Grimoire vs Sakuzyo vs Laur", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 3){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 25));
+                    g2.drawString("BUCHiGiRE Berserker", placeholder.x + 15, placeholder.y + 35);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by REDALiCE vs MASAKI", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 4){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Chronostasis", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Kurokotei", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 5){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 35));
+                    g2.drawString("Cyberfantasia", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by tn-shi", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 6){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Highscore", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Teminite & Panda Eyes", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 7){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 30));
+                    g2.drawString("Infinity Heaven", placeholder.x + 15, placeholder.y + 45);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by HyuN", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 8){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("Mobius", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Camellia vs USAO", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 9){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 20));
+                    g2.drawString("-PRAGMATISM-", placeholder.x + 15, placeholder.y + 30);
+                    g2.drawString("-RESURRECTION-", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by Laur", placeholder.x + 15, placeholder.y + 85);
+                }
+                if(song == 10){
+                    g2.setFont(new Font("Tahoma", Font.BOLD, 40));
+                    g2.drawString("White Aura", placeholder.x + 15, placeholder.y + 50);
+                    g2.setFont(new Font("Tahoma", Font.PLAIN, 20));
+                    g2.drawString("by HyuN", placeholder.x + 15, placeholder.y + 85);
+                }
+            }
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("SansSerif", Font.PLAIN, 20));
             g2.drawRect(placeholder.x, placeholder.y, placeholder.width, placeholder.height);
@@ -1447,7 +1540,6 @@ public class GameManager{
             g2.drawRect(rightButton.x, rightButton.y, rightButton.width, rightButton.height);
             g2.setFont(new Font("Arial", Font.PLAIN, 20));
             g2.setColor(Color.WHITE);
-
         }
         if (gameState == GameState.GAME_OVER) {
             g2.setColor(Color.WHITE);
@@ -1573,15 +1665,21 @@ public class GameManager{
             g2.drawRect(sdfButton.x, sdfButton.y, sdfButton.width, sdfButton.height);
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 80));
+            // Display current settings values
             g2.drawString(String.valueOf(das), dasButton.x + 20, dasButton.y + 80);
             g2.drawString(String.valueOf(arr), arrButton.x + 20, arrButton.y + 80);
             g2.drawString(String.valueOf(dcd), dcdButton.x + 20, dcdButton.y + 80);
             g2.drawString(String.valueOf(sdf), sdfButton.x + 20, sdfButton.y + 80);
         }
     }
+
+    /**
+     * Resets the game state to start a new game.
+     */
     public void reset(){
-        placedBlocks.clear();
+        placedBlocks.clear(); // clear the board
         startingMinos.clear();
+        // reset all flags
         holdMino = null;
         hold = false;
         alreadyHeld = false;
@@ -1618,7 +1716,7 @@ public class GameManager{
 
         try{
             BufferedReader br = new BufferedReader(new FileReader("save.txt"));
-            playCollection = Integer.parseInt(br.readLine().trim());
+            playCollection = Integer.parseInt(br.readLine().trim()); // album to play
             br.close();
         } catch (NumberFormatException e){
             playCollection = 1;
@@ -1629,6 +1727,11 @@ public class GameManager{
         }
         selectedMusicCollection = MUSIC_COLLECTION_AREAS.get(playCollection - 1);
     }
+
+    /**
+     * Saves the selected music collection to a file.
+     * @param collection the selected music collection number
+     */
     public void saveSongCollection(int collection) {
         selectedMusicCollection = MUSIC_COLLECTION_AREAS.get(collection - 1);
         try {
@@ -1642,8 +1745,13 @@ public class GameManager{
         }
     }
 
+    /**
+     * Saves the player's score to the scores file.
+     * @param name the player's name
+     * @throws IOException
+     */
     public void saveScore(String name) throws IOException {
-        Player p = new Player(name, score);
+        Player p = new Player(name, score); // create a new Player object
         players.add(p);
         players.sort(new SortByScore());
         PrintWriter out = new PrintWriter(new FileWriter(FILE_PATH + "/scores.txt"));
@@ -1653,6 +1761,10 @@ public class GameManager{
         out.close();
     }
 
+    /**
+     * Saves the game settings to a file.
+     * @throws IOException
+     */
     public void saveSettings() throws IOException{
         PrintWriter out = new PrintWriter(new FileWriter("settings.txt"));
         out.println(das);
@@ -1662,6 +1774,10 @@ public class GameManager{
         out.close();
     }
 
+    /**
+     * Reads the scores from the scores file.
+     * @throws IOException
+     */
     public void readScores() throws IOException {
         try{
             Scanner sc = new Scanner(new File(FILE_PATH + "/scores.txt"));
@@ -1680,14 +1796,19 @@ public class GameManager{
         }
     }
 
+    /**
+     * Reads the game settings from a file.
+     */
     public void readSettings(){
         try{
             Scanner sc = new Scanner(new File("settings.txt"));
+            // Read each setting value from the file
             das = Integer.parseInt(sc.nextLine().trim());
             arr = Integer.parseInt(sc.nextLine().trim());
             dcd = Integer.parseInt(sc.nextLine().trim());
             sdf = Integer.parseInt(sc.nextLine().trim());
         } catch (NumberFormatException | NullPointerException | FileNotFoundException | NoSuchElementException e) {
+            // reset to default if the file is corrupted
             das = 10;
             arr = 2;
             dcd = 30;
@@ -1695,23 +1816,26 @@ public class GameManager{
         }
     }
 
+    // Pause the current song
     public int pause(){
         return mm.pause();
     }
 
+    // Resume the current song from the paused frame position
     public void resume(int framePosition){
         mm.resume(framePosition);
     }
-
+    // Reset the scores file if it is corrupted
     public void resetFile() throws IOException {
         PrintWriter out = new PrintWriter(new FileWriter(FILE_PATH + "/scores.txt"));
         out.close();
     }
 
+    // Reset the page to 1 when entering a new game state
     public void resetPage(){
         page = 1;
     }
-
+    // Select a music collection and reset song and background to 1
     public void selectCollection(int collectionId) {
         collection = collectionId;
         song = 1;
@@ -1719,6 +1843,7 @@ public class GameManager{
         gameState = GameState.SONGS;
     }
 
+    // Play the previous song
     public void previousSong(){
         song--;
         currentBackground--;
@@ -1726,12 +1851,15 @@ public class GameManager{
         if(currentBackground < 1) currentBackground = SONGS;
     }
 
+    // Play the next song
     public void nextSong(){
         song++;
         currentBackground++;
         if(song > SONGS) song = 1;
         if(currentBackground > SONGS) currentBackground = 1;
     }
+
+    // Navigate to the next page
     public void nextPage() {
         int max = pages.getOrDefault(gameState, 1);
         if (max <= 1) return;
@@ -1740,6 +1868,7 @@ public class GameManager{
         if (page > max) page = 1;
     }
 
+    // Navigate to the previous page
     public void previousPage() {
         int max = pages.getOrDefault(gameState, 1);
         if (max <= 1) return;
@@ -1748,6 +1877,7 @@ public class GameManager{
         if (page < 1) page = max;
     }
 
+    // Initialize the collection areas for mouse hover detection
     public void initCollections() {
         collectionAreas.put(mc1, 1);
         collectionAreas.put(mc2, 2);
@@ -1759,8 +1889,13 @@ public class GameManager{
         collectionAreas.put(mc8, 8);
         collectionAreas.put(mc9, 9);
         collectionAreas.put(mc10, 10);
+        collectionAreas.put(mc11, 11);
     }
 
+    /**
+     * Updates the hover state based on the provided point.
+     * @param p the point to check for hover state
+     */
     public void updateHover(Point p) {
         if (!selectionActivated) {
             hover = false;
@@ -1782,9 +1917,9 @@ public class GameManager{
     }
 
     public void updateHoverOnButtons(Point p) {
+        hover = false;
+        c = new Cursor(Cursor.DEFAULT_CURSOR);
         if(gameState == GameState.MENU){
-            hover = false;
-            c = new Cursor(Cursor.DEFAULT_CURSOR);
             for(Rectangle r: MENU_BUTTONS){
                 if(r.contains(p)){
                     hover = true;
@@ -1814,9 +1949,17 @@ public class GameManager{
                     break;
                 }
             }
+        } else if (gameState == GameState.SETTINGS) {
+            for(Rectangle r : SETTINGS_BUTTONS) {
+                if (r.contains(p)) {
+                    hover = true;
+                    c = new Cursor(Cursor.HAND_CURSOR);
+                    break;
+                }
+            }
         }
     }
-
+    // Increment the player's score
     public void increment(){
         score++;
     }

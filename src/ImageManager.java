@@ -120,6 +120,18 @@ public class ImageManager {
         paths.put("J9", "Images/Collection 10/nye.png");
         paths.put("J10", "Images/Collection 10/round and round.png");
 
+        // Collection K
+        paths.put("K1", "Images/Collection 11/pjsk1.png");
+        paths.put("K2", "Images/Collection 11/pjsk2.png");
+        paths.put("K3", "Images/Collection 11/pjsk3.png");
+        paths.put("K4", "Images/Collection 11/pjsk4.png");
+        paths.put("K5", "Images/Collection 11/pjsk5.png");
+        paths.put("K6", "Images/Collection 11/pjsk6.png");
+        paths.put("K7", "Images/Collection 11/pjsk7.png");
+        paths.put("K8", "Images/Collection 11/pjsk8.png");
+        paths.put("K9", "Images/Collection 11/pjsk9.png");
+        paths.put("K10", "Images/Collection 11/pjsk10.png");
+
         paths.put("credits1", "Images/Credits/credits1.png");
         paths.put("credits2", "Images/Credits/credits2.png");
         paths.put("credits3", "Images/Credits/credits3.png");
