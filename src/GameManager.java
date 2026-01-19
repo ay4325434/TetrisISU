@@ -170,7 +170,7 @@ public class GameManager{
         nextY5 = topY + 480;
 
         // Associating the number of pages with each game state
-        pages.put(GameState.CREDITS, 6);
+        pages.put(GameState.CREDITS, 7);
         pages.put(GameState.INSTRUCTIONS, 4);
         pages.put(GameState.OTHER, 3);
 
@@ -696,8 +696,8 @@ public class GameManager{
             if (nextMino5 != null) {
                 nextMino5.draw(g2);
             }
-            for (Block block : placedBlocks) {
-                block.draw(g2);
+            for (int i = 0; i < placedBlocks.size(); i++){
+                placedBlocks.get(i).draw(g2);
             }
             if (holdMino != null) {
                 holdMino.draw(g2);
@@ -1674,6 +1674,10 @@ public class GameManager{
                 img = im.getImage("credits5");
                 g2.drawImage(img, 0, 0, 1280, 720, null);
             }
+            if(page == 7){
+                img = im.getImage("credits6");
+                g2.drawImage(img, 0, 0, 1280, 720, null);
+            }
             g2.setColor(Color.WHITE);
             g2.setFont(new Font("Arial", Font.BOLD, 80));
             g2.drawString("<", 20, 350);
@@ -1758,6 +1762,8 @@ public class GameManager{
         lines = 0;
         score = 0;
         level = 1;
+        b2b = -1;
+        combo = -1;
         // Adding the starting bag of pieces (each piece must appear )
         startingMinos.add(new LPiece(this));
         startingMinos.add(new JPiece(this));

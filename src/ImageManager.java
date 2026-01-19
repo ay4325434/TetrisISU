@@ -149,6 +149,7 @@ public class ImageManager {
         paths.put("credits3", "Images/Credits/credits3.png");
         paths.put("credits4", "Images/Credits/credits4.png");
         paths.put("credits5", "Images/Credits/credits5.png");
+        paths.put("credits6", "Images/Credits/credits6.png");
 
         paths.put("ins1", "Images/Instructions/ins1.png");
         paths.put("ins2", "Images/Instructions/ins2.png");

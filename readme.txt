@@ -35,6 +35,10 @@ A: Rotate 180 degrees
 P: Pause
 Esc: Return to main menu if paused
 
+Note:
+Turn down your volume when playing the game. Some songs may be extremely noisy.
+They tend to appear when you reach higher levels.
+
 Tips and tricks:
 - Clean stacking: Try to make your stack flat. It opens up more potential to clear lines.
 - Spins: Rotating a piece into a stuck position results in a Spin, which provides score bonuses.

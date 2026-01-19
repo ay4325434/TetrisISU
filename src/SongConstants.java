@@ -42,9 +42,9 @@ public class SongConstants {
         SONG_ORDERS.put(10, List.of("collectionJ1", "collectionJ10", "collectionJ8", "collectionJ6", "collectionJ2",
                 "collectionJ9", "collectionJ4", "collectionJ7", "collectionJ5", "collectionJ3"));
         IMAGE_ORDERS.put(10, List.of("J1", "J10", "J8", "J6", "J2", "J9", "J4", "J7", "J5", "J3"));
-        SONG_ORDERS.put(11, List.of("collectionK7", "collectionK1", "collectionK4", "collectionK9", "collectionK6",
+        SONG_ORDERS.put(11, List.of("collectionK7", "collectionK4", "collectionK9", "collectionK1", "collectionK6",
                 "collectionK5", "collectionK10", "collectionK2", "collectionK3", "collectionK8"));
-        IMAGE_ORDERS.put(11, List.of("K7", "K1", "K4", "K9", "K6", "K5", "K10", "K2", "K3", "K8"));
+        IMAGE_ORDERS.put(11, List.of("K7", "K4", "K9", "K1", "K6", "K5", "K10", "K2", "K3", "K8"));
         SONG_ORDERS.put(12, List.of("collectionL1", "collectionL10", "collectionL6", "collectionL8", "collectionL5",
                 "collectionL4", "collectionL2", "collectionL7", "collectionL9", "collectionL3"));
         IMAGE_ORDERS.put(12, List.of("L1", "L10", "L6", "L8", "L5", "L4", "L2", "L7", "L9", "L3"));
