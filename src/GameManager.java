@@ -347,6 +347,10 @@ public class GameManager{
             currentSong = "menu";
         }
 
+        if(gameState != GameState.PLAYING){
+            k.resetAll();
+        }
+
         // Gameplay
         if (gameState == GameState.PLAYING) {
             if (!k.isPausePressed()) {

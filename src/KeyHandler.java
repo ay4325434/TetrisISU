@@ -186,4 +186,15 @@ public class KeyHandler implements KeyListener{
     public void setRightWasPressedLastFrame(boolean rightWasPressedLastFrame) {
         this.rightWasPressedLastFrame = rightWasPressedLastFrame;
     }
+    // Resets all keys.
+    public void resetAll(){
+        upPressed = false;
+        downPressed = false;
+        leftPressed = false;
+        rightPressed = false;
+        zPressed = false;
+        aPressed = false;
+        shiftPressed = false;
+        spacePressed = false;
+    }
 }
