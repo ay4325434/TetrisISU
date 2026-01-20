@@ -1,4 +1,14 @@
+/*
+Name: Andy Yang
+Teacher: Ms. Wong
+Course: ICS4U1
+Due date: Jan 21, 2026
 
+This game is a slightly modified version of Tetris, but keeps the original game
+logic. The background music has been changed to mostly rhythm game songs to help the
+player have a slight sense of rhythm while playing the game. Make sure to turn down your volume
+because some songs are loud and noisy.
+ */
 import javax.swing.*;
 import java.io.IOException;
 

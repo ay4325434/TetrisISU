@@ -28,7 +28,7 @@ public class KeyHandler implements KeyListener{
     @Override
     public void keyPressed(KeyEvent e) {
         int code = e.getKeyCode();
-        if(gm.isPlaying()) {
+        if(gm.isPlaying()) { // only keep track when user is playing
             if (code == KeyEvent.VK_UP || code == KeyEvent.VK_X) {
                 upPressed = true;
             }

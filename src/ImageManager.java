@@ -1,3 +1,6 @@
+/*
+Manages all image files and stores them in a map.
+ */
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
@@ -170,7 +173,7 @@ public class ImageManager {
      * @return The image
      */
     public Image getImage(String imageId) {
-        if(cache.size() > 10) clearCache();
+        if(cache.size() > 10) clearCache(); // Keep the image cache minimal to avoid lag and flickering
         if (!cache.containsKey(imageId)) {
             String path = paths.get(imageId);
             if (path == null) {

@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class MusicManager {
 
-    private Clip currentClip = null;
-    private final Map<String, String> songPaths = new HashMap<>();
+    private Clip currentClip = null; // Currently playing clip
+    private final Map<String, String> songPaths = new HashMap<>(); // Storing all songs
     private Thread loopThread;
-    private String currentSong = "";
+    private String currentSong = ""; // ID of the current song
     private final Map<String, int[]> snippetRanges = new HashMap<>();
     private final Map<String, Map<Integer, Snippet>> snippetMap = new HashMap<>();
 
@@ -339,9 +339,7 @@ public class MusicManager {
         currentSong = songId;
     }
 
-    // --------------------
     // Loop snippet with start/stop in seconds + gap
-    // --------------------
     public void loopSnippet(String songId, double start, double stop, int gapMs) throws LineUnavailableException, UnsupportedAudioFileException, IOException {
         if (songId.equals(currentSong)) return;
         stopLoop();
@@ -380,6 +378,11 @@ public class MusicManager {
         loopThread.start();
         currentSong = songId;
     }
+
+    /**
+     * Pauses the current clip
+     * @return the frame position of the clip
+     */
     public int pause() {
         if (currentClip != null && currentClip.isRunning()) {
             currentClip.stop();
@@ -387,13 +390,18 @@ public class MusicManager {
         }
         return -1;
     }
+
+    /**
+     * Resumes the clip from the given frame position
+     * @param framePosition The frame position to resume from
+     */
     public void resume(int framePosition) {
         if (currentClip != null) {
             currentClip.setFramePosition(framePosition);
             currentClip.start();
         }
     }
-
+    // Loads all snippets
     private void initSnippets() {
         // Collection A
         Map<Integer, Snippet> collectionA = new HashMap<>();

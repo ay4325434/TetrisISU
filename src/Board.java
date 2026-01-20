@@ -12,17 +12,21 @@ import java.awt.event.MouseMotionListener;
 import java.io.IOException;
 
 public class Board extends JPanel implements Runnable, MouseListener, MouseMotionListener {
+    // Window dimensions
     public static final int WIDTH = 1280;
     public static final int HEIGHT = 720;
+
     static final int FPS = 60;
-    private Thread gameThread;
+    private Thread gameThread; // main thread
     private GameManager gm;
     private KeyHandler k;
     public Board() throws IOException {
         k = new KeyHandler(null);
         gm = new GameManager();
+        // pass the same reference of these two classes
         k.setGameManager(gm);
         gm.setKeyHandler(k);
+
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
         this.setBackground(Color.BLACK);
         this.setLayout(null);
@@ -65,15 +69,19 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
             }
         }
     }
+    // Starts the game
     public void startGame() {
         gameThread = new Thread(this);
         gameThread.start();
     }
-    private void update() throws Exception {
+
+    // Updates the game state
+    private void update() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         setCursor(gm.getCursor());
         gm.update();
         repaint();
     }
+    // Draws the game elements onto the screen
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D) g;
@@ -88,6 +96,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     public void mouseClicked(MouseEvent e) {
         Point p = e.getPoint();
         if (gm.isInMenu()) { // outer check
+            // go to the given game state when mouse is clicked
             if (GameManager.musicSelectButton.contains(p)) {
                 gm.goToSelection();
                 return;
@@ -123,6 +132,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
             }
         }
         if(gm.isSelectingSong()) {
+            // Music selection
             if (GameManager.mc1.contains(p)) {
                 if(gm.isSelectionActivated()){
                     gm.saveSongCollection(1);
@@ -225,7 +235,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
                 gm.select();
             }
         }
-        if(gm.isInSettings()){
+        if(gm.isInSettings()){ // Change settings
             try {
                 if (GameManager.dasButton.contains(p)) {
                     int das = Integer.parseInt(JOptionPane.showInputDialog(this, "Enter new DAS (in frames):"));
@@ -280,6 +290,10 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
         }
     }
 
+    /**
+     * Saves the player's name and score.
+     * @throws IOException
+     */
     public void saveScore() throws IOException {
         try {
             String name = JOptionPane.showInputDialog(this, "Enter your name:").trim();
@@ -320,7 +334,7 @@ public class Board extends JPanel implements Runnable, MouseListener, MouseMotio
     public void mouseMoved(MouseEvent e) {
         Point p = e.getPoint();
         if(gm.isSelectionActivated()){
-            gm.updateHover(p);
+            gm.updateHover(p); // check for mouse hover
         }
         else{
             gm.updateHoverOnButtons(p);

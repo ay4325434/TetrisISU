@@ -79,9 +79,9 @@ public abstract class Mino {
     public void checkMovementCollision() { // Check for collision with the walls
         leftCollision = rightCollision = bottomCollision = false;
         for (int i = 0; i < b.length; i++) {
-            if (b[i].x <= GameManager.leftX) leftCollision = true;
-            if (b[i].x + Block.SIZE >= GameManager.rightX) rightCollision = true;
-            if (b[i].y + Block.SIZE >= GameManager.bottomY) bottomCollision = true;
+            if (b[i].x <= GameManager.leftX) leftCollision = true; // Left wall
+            if (b[i].x + Block.SIZE >= GameManager.rightX) rightCollision = true; // Right wall
+            if (b[i].y + Block.SIZE >= GameManager.bottomY) bottomCollision = true; // Floor
         }
     }
 
@@ -100,9 +100,9 @@ public abstract class Mino {
             int targetGridY = placed.y / Block.SIZE;
 
             for (int i = 0; i < 4; i++) {
-                if (pieceGridX[i] - 1 == targetGridX && pieceGridY[i] == targetGridY) leftCollision = true;
-                if (pieceGridX[i] + 1 == targetGridX && pieceGridY[i] == targetGridY) rightCollision = true;
-                if (pieceGridX[i] == targetGridX && pieceGridY[i] + 1 == targetGridY) bottomCollision = true;
+                if (pieceGridX[i] - 1 == targetGridX && pieceGridY[i] == targetGridY) leftCollision = true; // left block
+                if (pieceGridX[i] + 1 == targetGridX && pieceGridY[i] == targetGridY) rightCollision = true; // right block
+                if (pieceGridX[i] == targetGridX && pieceGridY[i] + 1 == targetGridY) bottomCollision = true; // bottom block
             }
         }
 
@@ -115,7 +115,7 @@ public abstract class Mino {
         rotationBlockCollision = false;
         for (Block placed : gm.getPlacedBlocks()) {
             for (int j = 0; j < 4; j++) {
-                if (temp[j].x == placed.x && temp[j].y == placed.y) {
+                if (temp[j].x == placed.x && temp[j].y == placed.y) { // check for rotation
                     rotationBlockCollision = true;
                     return;
                 }
@@ -301,7 +301,7 @@ public abstract class Mino {
             }
         }
 
-        // Handle 90° rotations
+        // Handle 90° rotations and check for offsets
         if (isI) {
             switch(from) {
                 case 1: {
@@ -450,7 +450,7 @@ public abstract class Mino {
         }
 
         boolean leftPressed = gm.getKeyHandler().isLeftPressed();
-
+        // DAS/ARR movement
         if (leftPressed) {
             if (!gm.getKeyHandler().isLeftWasPressedLastFrame()) {
                 // First frame of press
@@ -522,7 +522,7 @@ public abstract class Mino {
 
         // ---- SOFT DROP ----
         if (gm.getKeyHandler().isDownPressed() && !deactivating) {
-            if(gm.getSdf() == 0) hardDrop();
+            if(gm.getSdf() == 0) hardDrop(); // drop to bottom but do not lock piece
             else {
                 sdfCounter++;
                 if (sdfCounter >= gm.getSdf()) {
@@ -567,7 +567,7 @@ public abstract class Mino {
         if (deactivating) deactivate();
     }
 
-    // ---- HELPER METHODS ----
+    // move left/right
     private void moveLeft() {
         for (Block blk : b) blk.x -= Block.SIZE;
     }
@@ -614,19 +614,29 @@ public abstract class Mino {
         return true;
     }
 
-
+    /**
+     * Moves a piece down.
+     * @return true if successful, false otherwise
+     */
     private boolean movePieceDown() {
-        for (int i = 0; i < 4; i++) { temp[i].x = b[i].x; temp[i].y = b[i].y + Block.SIZE; }
+        for (int i = 0; i < 4; i++) {
+            temp[i].x = b[i].x;
+            temp[i].y = b[i].y + Block.SIZE;
+        }
         bottomCollision = leftCollision = rightCollision = false;
         checkRotationCollision();
         checkRotationBlockCollision();
         if (!bottomCollision && !rotationBlockCollision) {
-            for (int i = 0; i < 4; i++) b[i].y = temp[i].y;
+            for (int i = 0; i < 4; i++) b[i].y = temp[i].y; // move the piece down
             return true;
         }
         return false;
     }
 
+    /**
+     * Check if the piece can move down.
+     * @return whether the piece can move down
+     */
     private boolean canMoveDown() {
         for (int i = 0; i < 4; i++) {
             int newY = b[i].y + Block.SIZE;
@@ -644,7 +654,7 @@ public abstract class Mino {
         return true;
     }
 
-
+    // Update all collision flags
     private void updateCurrentCollisions() {
         leftCollision = rightCollision = bottomCollision = false;
         for (int i = 0; i < 4; i++) {
@@ -655,6 +665,9 @@ public abstract class Mino {
         checkRotationBlockCollision();
     }
 
+    /**
+     * Drops the piece to the bottom and locks if space was pressed.
+     */
     public void hardDrop() {
         boolean willCollide = false;
         int safety = 0;
@@ -693,7 +706,9 @@ public abstract class Mino {
         deactivate();
     }
 
-
+    /**
+     * Check if the piece can rotate.
+     */
     private void checkRotationCollision() {
         leftCollision = rightCollision = bottomCollision = false;
         int playfieldWidth = GameManager.rightX - GameManager.leftX;
@@ -701,7 +716,7 @@ public abstract class Mino {
         int cols = playfieldWidth / Block.SIZE;
         int rows = playfieldHeight / Block.SIZE;
 
-        for (Block block : temp) {
+        for (Block block : temp) { // check if rotation will collide with walls
             int gridX = (block.x - GameManager.leftX) / Block.SIZE;
             int gridY = (block.y - GameManager.topY) / Block.SIZE;
             if (gridX < 0) leftCollision = true;
@@ -710,6 +725,10 @@ public abstract class Mino {
         }
     }
 
+    /**
+     * Draw the piece.
+     * @param g2 Graphics
+     */
     public void draw(Graphics2D g2){
         int margin = 2;
         g2.setColor(b[0].color);
