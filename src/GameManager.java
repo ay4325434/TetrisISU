@@ -354,6 +354,14 @@ public class GameManager{
         // Gameplay
         if (gameState == GameState.PLAYING) {
             if (!k.isPausePressed()) {
+                if(k.isSPressed()) {
+                    if(dropInterval > 1){
+                        level++;
+                        if(dropInterval > 9) dropInterval -= 3;
+                        else dropInterval--;
+                    }
+                    k.resetSPressed();
+                }
                 // --- Background music per collection/level ---
                 int index = level / 2;
                 if(index > 9) index = 9;

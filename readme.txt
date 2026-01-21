@@ -47,7 +47,7 @@ Tips and tricks:
   bonus is multiplied by your current B2B chain if greater than 1. If your B2B chain is greater than
   4, breaking it allows for a surge bonus, equal to 100 * current level * B2B chain before breaking.
 - Playing quickly and efficiently: This essentially allows you to play infinitely because there is
-  a maximum gravity limit. There is no way to skip any levels.
+  a maximum gravity limit.
 
 Bugs:
 - The I-piece doesn't rely on the SRS rotation systems. Wall kicks may be bugged for those pieces.
@@ -60,6 +60,9 @@ Implemented features:
 - SRS rotation system with wall kicks
 - Music selection
 - Changing background music as player level increases
+
+Cheat: Pressing S while playing allows you to increase the level, to a maximum of 26.
+However, the pieces will drop faster as the level increases.
 
 Credits
 

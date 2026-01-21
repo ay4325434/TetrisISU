@@ -6,7 +6,7 @@ import java.awt.event.KeyListener;
 
 public class KeyHandler implements KeyListener{
     private boolean upPressed, downPressed, leftPressed, rightPressed,
-            zPressed, aPressed, shiftPressed, spacePressed, pausePressed, escPressed;
+            zPressed, aPressed, shiftPressed, spacePressed, pausePressed, escPressed, sPressed;
 
     private GameManager gm;
     private int frames;
@@ -70,6 +70,9 @@ public class KeyHandler implements KeyListener{
                     escPressed = true;
                 }
             }
+            if (code == KeyEvent.VK_S){
+                sPressed = true;
+            }
         }
     }
 
@@ -130,6 +133,9 @@ public class KeyHandler implements KeyListener{
     public boolean isRightWasPressedLastFrame() {
         return rightWasPressedLastFrame;
     }
+    public boolean isSPressed(){
+        return sPressed;
+    }
 
     public boolean isAPressed() {
         return aPressed;
@@ -166,6 +172,9 @@ public class KeyHandler implements KeyListener{
     }
     public void resetUpPressed(){
         this.upPressed = false;
+    }
+    public void resetSPressed(){
+        this.sPressed = false;
     }
     public void resetDownPressed(){
         this.downPressed = false;
