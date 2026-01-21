@@ -9,7 +9,7 @@ above will be shifted down according to the number of rows cleared. If you clear
 rows at once, you will receive a higher score. Combos (clearing lines on consecutive turns)
 will also provide a score bonus.
 
-When your pieces reach the top, the game will end of a block interferes with the next
+When your pieces reach the top, the game will end if a block interferes with the next
 piece's starting position (top middle of the board).
 
 The more lines you clear, the faster the pieces will drop!
